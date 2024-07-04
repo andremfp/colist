@@ -1,0 +1,36 @@
+from django.contrib import admin
+from django.urls import path, include
+from django.views.generic import TemplateView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns = [
+    #=== ADMIN ENDPOINTS ===#
+    # GET /admin/
+    path('admin/', admin.site.urls),
+
+    #=== API ENDPOINTS ===#
+    # * /api/<app_endpoint>
+    path('api/', include('colist_app.urls')),
+
+    #=== JWT TOKEN ENDPOINTS ===#
+    # POST /api/token/
+    # Payload:
+    # {
+    #   "username": "example_user",
+    #   "password": "example_password"
+    # }
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+
+    # POST /api/token/refresh/
+    # Payload:
+    # {
+    #   "refresh": "refresh_token_here"
+    # }
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    #=== REACT APP ENDPOINTS ===#
+    # path('', TemplateView.as_view(template_name='index.html')),
+]
