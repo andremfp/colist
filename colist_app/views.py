@@ -1,18 +1,28 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from .serializers import ListItemSerializer, UserSerializer, LoginSerializer
-from .models import ListItem
+from django.contrib.auth import login, logout
+from .serializers import ListSerializer, ListItemSerializer, UserSerializer, LoginSerializer
+from .models import List, ListItem
 
 
-#==== USER ====#
-
+###############
+#    USERS    #
+###############
 class UserCreate(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = UserSerializer
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+class UserDetail(generics.DestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
 class UserLogin(generics.GenericAPIView):
     serializer_class = LoginSerializer
@@ -35,17 +45,43 @@ class UserLogout(generics.GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-#==== ITEMS ====#
+###############
+#    LISTS    #
+###############
+class ListCreate(generics.ListCreateAPIView):
+    queryset = List.objects.all()
+    serializer_class = ListSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class ListDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = List.objects.all()
+    serializer_class = ListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+###############
+#    ITEMS    #
+###############
 class ListItemListCreate(generics.ListCreateAPIView):
     queryset = ListItem.objects.all()
     serializer_class = ListItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(added_by=self.request.user)
+
+    def get_queryset(self):
+        list_id = self.kwargs['list_id']
+        return ListItem.objects.filter(list_id=list_id)
 
 class ListItemDetail(generics.RetrieveAPIView):
     queryset = ListItem.objects.all()
     serializer_class = ListItemSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        list_id = self.kwargs['list_id']
+        return ListItem.objects.filter(list_id=list_id)

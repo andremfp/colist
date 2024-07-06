@@ -7,20 +7,36 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    #=== ADMIN ENDPOINTS ===#
+    #########################
+    #    ADMIN ENDPOINTS    #
+    #########################
+
     # GET /admin/
     path('admin/', admin.site.urls),
 
-    #=== API ENDPOINTS ===#
+    
+    #########################
+    #    API ENDPOINTS    #
+    #########################
+
     # * /api/<app_endpoint>
     path('api/', include('colist_app.urls')),
 
-    #=== JWT TOKEN ENDPOINTS ===#
+    
+    #########################
+    #     JWT ENDPOINTS     #
+    #########################
+
     # POST /api/token/
     # Payload:
     # {
     #   "username": "example_user",
     #   "password": "example_password"
+    # }
+    # Response:
+    # {
+    #   "refresh": "refresh_token_here",
+    #   "access": "access_token_here"
     # }
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 
@@ -28,6 +44,10 @@ urlpatterns = [
     # Payload:
     # {
     #   "refresh": "refresh_token_here"
+    # }
+    # Response:
+    # {
+    #   "access": "new_access_token_here"
     # }
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
