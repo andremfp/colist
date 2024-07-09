@@ -1,26 +1,26 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from django.contrib.auth import login, logout
+from django.http import Http404
 from .serializers import ListSerializer, ListItemSerializer, UserSerializer, LoginSerializer
-from .models import List, ListItem
+from .models import CustomUser, List, ListItem
 
 
 ###############
 #    USERS    #
 ###############
-class UserCreate(generics.CreateAPIView):
-    queryset = User.objects.all()
-    permission_classes = [permissions.AllowAny]
-    serializer_class = UserSerializer
-
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
+class UsersGet(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
-class UserDetail(generics.DestroyAPIView):
-    queryset = User.objects.all()
+class UserCreate(generics.CreateAPIView):
+    queryset = CustomUser.objects.all()
+    permission_classes = [permissions.AllowAny]
+    serializer_class = UserSerializer
+
+class UserGetDelete(generics.RetrieveDestroyAPIView):
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
@@ -31,13 +31,16 @@ class UserLogin(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        validated_data = serializer.validated_data
+        user = CustomUser.objects.get(username=validated_data['username'])
         login(request, user)
+
         return Response({
-            'user_id': user.id,
+            'id': user.id,
             'username': user.username,
-            'token': serializer.validated_data['token']
-        })
+            'access': validated_data['access'],
+            'refresh': validated_data['refresh']
+        }, status=status.HTTP_200_OK)
 
 class UserLogout(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
@@ -48,15 +51,20 @@ class UserLogout(generics.GenericAPIView):
 ###############
 #    LISTS    #
 ###############
-class ListCreate(generics.ListCreateAPIView):
-    queryset = List.objects.all()
+class ListsGetCreate(generics.ListCreateAPIView):
     serializer_class = ListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    queryset = List.objects.all()
+
+    def get_queryset(self):
+        # Return lists owned by the authenticated user or shared with them
+        return List.objects.filter(owner=self.request.user) | List.objects.filter(shared_with=self.request.user)
+
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-class ListDetail(generics.RetrieveUpdateDestroyAPIView):
+class ListGetUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     queryset = List.objects.all()
     serializer_class = ListSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -65,19 +73,26 @@ class ListDetail(generics.RetrieveUpdateDestroyAPIView):
 ###############
 #    ITEMS    #
 ###############
-class ListItemListCreate(generics.ListCreateAPIView):
+class ItemsGetCreate(generics.ListCreateAPIView):
     queryset = ListItem.objects.all()
     serializer_class = ListItemSerializer
     permission_classes = [permissions.IsAuthenticated]
-
+    
     def perform_create(self, serializer):
-        serializer.save(added_by=self.request.user)
+        list_id = self.kwargs['list_id']
+        list = List.objects.filter(id=list_id).first()
+        if not list:
+            raise Http404('The specified list does not exist.')
+        serializer.save(added_by=self.request.user, list=list)
 
     def get_queryset(self):
         list_id = self.kwargs['list_id']
-        return ListItem.objects.filter(list_id=list_id)
+        list = List.objects.filter(id=list_id).first()
+        if not list:
+            raise Http404('The specified list does not exist.')
+        return ListItem.objects.filter(list_id=list.id)
 
-class ListItemDetail(generics.RetrieveAPIView):
+class ItemGetUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     queryset = ListItem.objects.all()
     serializer_class = ListItemSerializer
     permission_classes = [permissions.IsAuthenticated]

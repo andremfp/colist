@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ListCreate, ListDetail, ListItemListCreate, ListItemDetail, UserCreate, UserList, UserDetail, UserLogin, UserLogout
+from .views import ListsGetCreate, ListGetUpdateDelete, ItemsGetCreate, ItemGetUpdateDelete, UserCreate, UsersGet, UserGetDelete, UserLogin, UserLogout
 
 urlpatterns = [
     #########################
@@ -22,7 +22,7 @@ urlpatterns = [
     #     "email": "user2@example.com"
     #   }
     # ]
-    path('users/', UserList.as_view(), name='user-list'),
+    path('users/', UsersGet.as_view(), name='users-get'),
 
     # GET /api/users/<int:pk>/
     # Headers:
@@ -41,7 +41,7 @@ urlpatterns = [
     # {
     #   "detail": "User deleted."
     # }
-    path('users/<int:pk>/', UserDetail.as_view(), name='user-detail'),
+    path('users/<int:pk>/', UserGetDelete.as_view(), name='user-get-delete'),
 
     # POST /api/users/register/
     # Payload:
@@ -56,7 +56,7 @@ urlpatterns = [
     #   "username": "new_user",
     #   "email": "new_user@example.com"
     # }
-    path('users/register/', UserCreate.as_view(), name='user-register'),
+    path('users/register/', UserCreate.as_view(), name='user-create'),
 
     # POST /api/users/login/
     # Payload:
@@ -66,19 +66,16 @@ urlpatterns = [
     # }
     # Response:
     # {
-    #   "user_id": 1,
+    #   "id": 1,
     #   "username": "test_user",
-    #   "token": "<token>"
+    #   "access": "<access_token>"
+    #   "refresh": "<refresh_token>"
     # }
     path('users/login/', UserLogin.as_view(), name='user-login'),
 
     # POST /api/users/logout/
     # Headers:
     #   Authorization: Bearer <access_token>
-    # Response:
-    # {
-    #   "detail": "Successfully logged out."
-    # }
     path('users/logout/', UserLogout.as_view(), name='user-logout'),
 
 
@@ -120,7 +117,7 @@ urlpatterns = [
     #   "owner": 1,
     #   "shared_with": [1, 2, 3]
     # }
-    path('lists/', ListCreate.as_view(), name='list-create'),
+    path('lists/', ListsGetCreate.as_view(), name='lists'),
 
     # GET /api/lists/<int:pk>/
     # Headers:
@@ -156,7 +153,7 @@ urlpatterns = [
     # {
     #   "detail": "List deleted."
     # }
-    path('lists/<int:pk>/', ListDetail.as_view(), name='list-detail'),
+    path('lists/<int:pk>/', ListGetUpdateDelete.as_view(), name='list-get-update-delete'),
 
 
     #########################
@@ -196,7 +193,7 @@ urlpatterns = [
     #   "list_id": 1,
     #   "added_by": 1
     # }
-    path('lists/<int:list_id>/items/', ListItemListCreate.as_view(), name='listitem-list-create'),
+    path('lists/<int:list_id>/items/', ItemsGetCreate.as_view(), name='items-get-create'),
 
     # GET /api/lists/<int:list_id>/items/<int:pk>/
     # Headers:
@@ -235,5 +232,5 @@ urlpatterns = [
     # {
     #   "detail": "Item deleted."
     # }
-    path('lists/<int:list_id>/items/<int:pk>/', ListItemDetail.as_view(), name='listitem-detail'),
+    path('lists/<int:list_id>/items/<int:pk>/', ItemGetUpdateDelete.as_view(), name='item-get-update-delete'),
 ]

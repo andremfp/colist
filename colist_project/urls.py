@@ -38,7 +38,7 @@ urlpatterns = [
     #   "refresh": "refresh_token_here",
     #   "access": "access_token_here"
     # }
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token-pair-get'),
 
     # POST /api/token/refresh/
     # Payload:
@@ -49,7 +49,7 @@ urlpatterns = [
     # {
     #   "access": "new_access_token_here"
     # }
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
 
     #=== REACT APP ENDPOINTS ===#
     # path('', TemplateView.as_view(template_name='index.html')),
