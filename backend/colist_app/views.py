@@ -2,9 +2,12 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.contrib.auth import login, logout
 from django.http import Http404
+from django.shortcuts import render
 from .serializers import ListSerializer, ListItemSerializer, UserSerializer, LoginSerializer
 from .models import CustomUser, List, ListItem
 
+def index(request):
+    return render(request, 'index.html')
 
 ###############
 #    USERS    #

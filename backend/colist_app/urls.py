@@ -1,5 +1,5 @@
-from django.urls import path
-from .views import ListsGetCreate, ListGetUpdateDelete, ItemsGetCreate, ItemGetUpdateDelete, UserCreate, UsersGet, UserGetDelete, UserLogin, UserLogout
+from django.urls import path, re_path
+from .views import index, ListsGetCreate, ListGetUpdateDelete, ItemsGetCreate, ItemGetUpdateDelete, UserCreate, UsersGet, UserGetDelete, UserLogin, UserLogout
 
 urlpatterns = [
     #########################
