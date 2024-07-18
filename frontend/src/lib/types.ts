@@ -14,7 +14,7 @@ export interface ListData {
     name: string;
     owner: number;
     shared_with: number[];
-    items: ListItemData[];
+    item_count: number;
 }
 
 export interface ListItemData {

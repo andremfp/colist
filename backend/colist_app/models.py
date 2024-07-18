@@ -11,6 +11,15 @@ class List(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     shared_with = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='shared_lists', blank=True)
 
+    @property
+    def item_count(self):
+        return self.items.count()
+    
+    @item_count.setter
+    def item_count(self, value):
+        # This setter is optional; you may not need to set item_count directly
+        pass
+
     def __str__(self):
         return self.name
 

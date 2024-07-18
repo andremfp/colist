@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from django.contrib.auth import login, logout
 from django.http import Http404
 from django.shortcuts import render
+from django.db.models import Count
 from .serializers import ListSerializer, ListItemSerializer, UserSerializer, LoginSerializer
 from .models import CustomUser, List, ListItem
 
@@ -57,7 +58,7 @@ class UserLogout(generics.GenericAPIView):
 class ListsGetCreate(generics.ListCreateAPIView):
     serializer_class = ListSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = List.objects.all()
+    queryset = List.objects.annotate(item_count=Count('items'))
 
     def get_queryset(self):
         # Return lists owned by the authenticated user or shared with them
@@ -95,6 +96,15 @@ class ItemsGetCreate(generics.ListCreateAPIView):
             raise Http404('The specified list does not exist.')
         return ListItem.objects.filter(list_id=list.id)
 
+    def finalize_response(self, request, response, *args, **kwargs):
+        # Update item_count on related list after creating/deleting item
+        list_id = self.kwargs['list_id']
+        list_obj = List.objects.filter(id=list_id).first()
+        if list_obj:
+            list_obj.item_count = list_obj.items.count()
+            list_obj.save()
+        return super().finalize_response(request, response, *args, **kwargs)
+
 class ItemGetUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     queryset = ListItem.objects.all()
     serializer_class = ListItemSerializer
@@ -102,4 +112,16 @@ class ItemGetUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         list_id = self.kwargs['list_id']
-        return ListItem.objects.filter(list_id=list_id)
+        list = List.objects.filter(id=list_id).first()
+        if not list:
+            raise Http404('The specified list does not exist.')
+        return ListItem.objects.filter(list_id=list.id)
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        # Update item_count on related list after updating/deleting item
+        list_id = self.kwargs['list_id']
+        list_obj = List.objects.filter(id=list_id).first()
+        if list_obj:
+            list_obj.item_count = list_obj.items.count()
+            list_obj.save()
+        return super().finalize_response(request, response, *args, **kwargs)

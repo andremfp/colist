@@ -51,8 +51,11 @@ class ListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = List
-        fields = ['id', 'name', 'owner', 'shared_with']
-        read_only_fields = ['owner']
+        fields = ['id', 'name', 'owner', 'shared_with', 'item_count']
+        read_only_fields = ['owner', 'item_count']
+
+    def get_item_count(self, obj):
+        return obj.item_count
 
 ###############
 #    ITEMS    #
