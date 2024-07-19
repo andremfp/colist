@@ -176,10 +176,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/object-schema/-/object-schema-2.1.4.tgz#9e69f8bb4031e11df79e03db09f9dbbae1740843"
   integrity sha512-BsWiH1yFGjXXS2yvrf5LyuoSIIbPrGUWob917o+BTKuZ7qJdxX8aJLRxs1fS9n6r7vESrq1OUqb68dANcFXuQQ==
 
-"@fontsource/fira-mono@^4.5.10":
-  version "4.5.10"
-  resolved "https://registry.yarnpkg.com/@fontsource/fira-mono/-/fira-mono-4.5.10.tgz#443be4b2b4fc6e685b88431fcfdaf8d5f5639bbf"
-  integrity sha512-bxUnRP8xptGRo8YXeY073DSpfK74XpSb0ZyRNpHV9WvLnJ7TwPOjZll8hTMin7zLC6iOp59pDZ8EQDj1gzgAQQ==
+"@fontsource/roboto-flex@^5.0.15":
+  version "5.0.15"
+  resolved "https://registry.yarnpkg.com/@fontsource/roboto-flex/-/roboto-flex-5.0.15.tgz#bc1da6b51ebc8581b4b37465e3e32acfb4b71489"
+  integrity sha512-CZFszeV3wdzASBPbzKHYrzIJT5dZvXKKjYKdcEDL3S6Cg5MYaH5L5XDT3HLXstnF9cKrKYhPwFsMQSkC3n2sVA==
 
 "@humanwhocodes/module-importer@^1.0.1":
   version "1.0.1"

@@ -3,7 +3,7 @@
     import { getLists, createList } from '../../lib/api';
     import type { ListData } from '../../lib/types';
     import { goto } from '$app/navigation';
-    import 'remixicon/fonts/remixicon.css'
+    import 'remixicon/fonts/remixicon.css';
 
     let lists: ListData[] = [];
     let newListName = '';
@@ -13,7 +13,6 @@
     onMount(async () => {
         try {
             lists = await getLists();
-            console.log(lists);
         } catch (error) {
             console.error('Failed to fetch lists:', error);
         }
@@ -40,14 +39,17 @@
         <ul class="space-y-2">
             {#each lists as list (list.id)}
                 <li class="flex justify-between items-center p-2 border border-gray-300 rounded-md">
-                    <a href={`/lists/${list.id}`} class="flex items-center space-x-4">
+                    <button 
+                        class="flex items-center space-x-4 w-full text-left"
+                        on:click={() => goto(`/lists/${list.id}`)}
+                        aria-label={`View details of ${list.name}`}
+                    >
                         <span class="ri-list-check"></span>
                         <strong>{list.name}</strong>
-                    </a>
-                    <div class="flex items-center space-x-2">
+                        <span class="flex-grow"></span>
                         <span class="text-gray-600">{list.item_count}</span>
                         <span class="ri-arrow-right-s-line"></span>
-                    </div>
+                    </button>
                 </li>
             {/each}
         </ul>
@@ -75,3 +77,10 @@
         ➕
     </button>
 </div>
+
+<style>
+    li:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+</style>
