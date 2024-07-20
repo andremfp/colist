@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  mode: 'jit',
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     extend: {
@@ -8,16 +9,25 @@ export default {
         mono: ['Roboto Flex', 'Roboto', 'Open Sans', 'Helvetica Neue', 'monospace'],
       },
       colors: {
-        'bg-0': '#F7F8F9', // Light gray background
-        'bg-1': '#FFFFFF', // White
-        'bg-2': '#F2F3F5', // Very light gray
-        'theme-1': '#007AFF', // iOS blue
-        'theme-2': '#0051A2', // Darker blue for hover
-        'text': '#1C1C1E', // Dark gray text
-        'border': '#E0E0E0', // Light gray border
+        'main-bg-light': '#F0F0F0',
+        'main-bg-dark': '#1F1F1F',
+        'text-light': '#1C1C1E',
+        'text-dark': '#E0E0E0',
+        'login-btn': '#D77D4E',
+        'login-btn-focus': '#B65A38',
+        'register-hover-light': '#4A4A4A',
+        'register-hover-dark': '#9A9A9A',
+        'border-light': '#1A1A1A',
+        'border-dark': '#666666',
+        'login-bg-light': '#FFFFFF',
+        'login-bg-dark': '#2A2A2A',
+        'lists-bg-light': '#FFFFFF',
+        'lists-bg-dark': '#2A2A2A',
+        'lists-hover-light': '#F5F5F5',
+        'lists-hover-dark': '#3A3A3A',
       },
       boxShadow: {
-        'ios': '0 2px 4px rgba(0, 0, 0, 0.1)', // Soft shadow
+        'ios': '0 2px 4px rgba(0, 0, 0, 0.1)',
       },
       spacing: {
         'column-width': '42rem',
@@ -26,4 +36,5 @@ export default {
     },
   },
   plugins: [],
+  darkMode: 'class', // Enables dark mode based on a class
 }
