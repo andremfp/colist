@@ -1,6 +1,6 @@
 <script>
 	import Header from './Header.svelte';
-	import { darkMode } from '$lib/stores/darkModeStore'; // Import the shared dark mode store
+	import { darkMode } from '$lib/stores/darkModeStore';
 	import '../app.css';
 </script>
 

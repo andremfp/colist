@@ -47,6 +47,8 @@ class UserLogin(generics.GenericAPIView):
         }, status=status.HTTP_200_OK)
 
 class UserLogout(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)

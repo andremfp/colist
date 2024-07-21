@@ -1,6 +1,7 @@
-const baseUrl = 'http://localhost:8000';
-
+import { goto } from '$app/navigation';
 import type { RegisterData, LoginData, ListData, ListItemData } from '../lib/types';
+
+const baseUrl = 'http://localhost:8000';
 
 async function request<T>(method: string, url: string, data?: object, headers: HeadersInit = {}): Promise<T> {
     const options: RequestInit = {
@@ -28,6 +29,25 @@ export function register(data: RegisterData) {
 
 export function login(data: LoginData) {
     return request<{ access: string }>('POST', '/api/users/login/', data);
+}
+
+export async function logout() {
+    const token = localStorage.getItem('access_token');
+    const headers: HeadersInit = {};
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+        await request('POST', '/api/users/logout/', undefined, headers);
+    } catch (error) {
+        console.error('Logout failed:', error);
+    } finally {
+        // Clear the access token and redirect to the login page
+        localStorage.removeItem('access_token');
+        goto('/');
+    }
 }
 
 export function getLists() {
