@@ -1,6 +1,6 @@
 const baseUrl = 'http://localhost:8000';
 
-import type { RegisterData, LoginData, ListData } from '../lib/types';
+import type { RegisterData, LoginData, ListData, ListItemData } from '../lib/types';
 
 async function request<T>(method: string, url: string, data?: object, headers: HeadersInit = {}): Promise<T> {
     const options: RequestInit = {
@@ -51,7 +51,7 @@ export function createList(data: { name: string; shared_with: number[] }) {
     return request<ListData>('POST', '/api/lists/', data, headers);
 }
 
-export function getListDetails(id: number) {
+export function getListDetail(id: number) {
     const token = localStorage.getItem('access_token');
     const headers: HeadersInit = {};
 
@@ -60,4 +60,15 @@ export function getListDetails(id: number) {
     }
 
     return request<ListData>('GET', `/api/lists/${id}/`, undefined, headers);
+}
+
+export function getListItems(id: number) {
+    const token = localStorage.getItem('access_token');
+    const headers: HeadersInit = {};
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return request<ListItemData[]>('GET', `/api/lists/${id}/items`, undefined, headers);
 }
