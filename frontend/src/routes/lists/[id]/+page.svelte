@@ -10,9 +10,6 @@
     let listDetail: ListData = { id: 0, name: '', owner: 0, shared_with: [], item_count: 0, items: [] };
     let listId: number;
 
-    // Subscribe to darkMode store
-    darkMode.subscribe(value => $darkMode = value);
-
     // Extract list ID from URL
     $: listId = parseInt($page.params.id, 10);
 

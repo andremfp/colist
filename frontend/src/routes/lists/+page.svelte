@@ -13,7 +13,6 @@
     onMount(async () => {
         try {
             lists = await getLists();
-            darkMode.subscribe(value => $darkMode = value);
         } catch (error) {
             console.error('Failed to fetch lists:', error);
         }

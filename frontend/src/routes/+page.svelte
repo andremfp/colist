@@ -16,11 +16,6 @@
         console.error('Login error:', error);
       }
     }
-  
-    onMount(() => {
-      // Initialize dark mode from localStorage
-      darkMode.subscribe(value => $darkMode = value);
-    });
   </script>
   
   <div class={$darkMode ? 'flex items-center justify-center min-h-screen bg-main-bg-dark text-text-dark p-4' : 'flex items-center justify-center min-h-screen bg-main-bg-light text-text p-4'}>
