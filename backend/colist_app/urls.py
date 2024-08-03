@@ -130,7 +130,8 @@ urlpatterns = [
     #   "id": 1,
     #   "name": "List 1",
     #   "owner": 1,
-    #   "shared_with": [2, 3]
+    #   "shared_with": [2, 3],
+    #   "item_count": 5
     # }
     #
     # PUT /api/lists/<int:pk>/
@@ -146,7 +147,8 @@ urlpatterns = [
     #   "id": 1,
     #   "name": "Updated List Name",
     #   "owner": 1,
-    #   "shared_with": [1, 2, 3]
+    #   "shared_with": [1, 2, 3],
+    #   "item_count": 5
     # }
     #
     # DELETE /api/lists/<int:pk>/

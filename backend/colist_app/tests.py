@@ -22,11 +22,12 @@ def assertUserDetail(testCase, userData, id, username, email):
     testCase.assertEqual(userData['username'], username)
     testCase.assertEqual(userData['email'], email)
 
-def assertListDetail(testCase, listData, id, name, owner, sharedWith):
+def assertListDetail(testCase, listData, id, name, owner, sharedWith, itemCount):
     testCase.assertEqual(listData['id'], id)
     testCase.assertEqual(listData['name'], name)
     testCase.assertEqual(listData['owner'], owner)
     testCase.assertEqual(listData['shared_with'], sharedWith)
+    testCase.assertEqual(listData['item_count'], itemCount)
 
 def assertListItemDetail(testCase, listItemData, id, name, listId, addedBy):
     testCase.assertEqual(listItemData['id'], id)
@@ -212,8 +213,8 @@ class ListTests(APITestCase):
         self.assertEqual(len(response.data), 2)
 
         expectedLists = [
-            (1, TEST_LIST_1_NAME, 1, [2]),
-            (2, TEST_LIST_2_NAME, 2, [1])
+            (1, TEST_LIST_1_NAME, 1, [2], 0),
+            (2, TEST_LIST_2_NAME, 2, [1], 0)
         ]
 
         for i, expectedList in enumerate(expectedLists):
@@ -229,14 +230,14 @@ class ListTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        assertListDetail(self, response.data, 3, 'Test List 3', 1, [2])
+        assertListDetail(self, response.data, 3, 'Test List 3', 1, [2], 0)
 
     def testGetListDetail(self):
         url = reverse('list-get-update-delete', args=[self.testList1.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        assertListDetail(self, response.data, 1, TEST_LIST_1_NAME, 1, [2])
+        assertListDetail(self, response.data, 1, TEST_LIST_1_NAME, 1, [2], 0)
     
     def testGetInvalidListDetail(self):
         url = reverse('list-get-update-delete', args=[999])
@@ -253,7 +254,7 @@ class ListTests(APITestCase):
         response = self.client.put(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        assertListDetail(self, response.data, 1, 'Updated Test List 1', 1, [])
+        assertListDetail(self, response.data, 1, 'Updated Test List 1', 1, [], 0)
 
     def testUpdateInvalidList(self):
         url = reverse('list-get-update-delete', args=[999])
