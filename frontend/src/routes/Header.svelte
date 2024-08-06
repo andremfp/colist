@@ -19,9 +19,16 @@
     }
 
     async function handleLogout() {
-        await logout();
-        localStorage.removeItem('access_token');
-        window.location.href = '/';  // Redirect to main page
+        try {
+            await logout();
+        } catch (error) {
+            console.error('Error during logout:', error);
+            alert('Logout failed. You have been logged out locally.');
+        } finally {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = '/';
+        }
     }
 </script>
 

@@ -1,11 +1,19 @@
+import logging
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+from rest_framework_simplejwt.tokens import TokenError, Token
 from django.contrib.auth import login, logout
 from django.http import Http404
 from django.shortcuts import render
 from django.db.models import Count
 from .serializers import ListSerializer, ListItemSerializer, UserSerializer, LoginSerializer
 from .models import CustomUser, List, ListItem
+
+logger = logging.getLogger(__name__)
 
 def index(request):
     return render(request, 'index.html')
@@ -49,10 +57,21 @@ class UserLogin(generics.GenericAPIView):
 class UserLogout(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        logout(request)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def post(self, request):
+        refresh_token = request.data.get('refresh_token')
+        if not refresh_token:
+            return Response({'error': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            token = RefreshToken(refresh_token)
+            if BlacklistedToken.objects.filter(token__jti=token['jti']).exists():
+                return Response({'error': 'Token is already blacklisted'}, status=status.HTTP_400_BAD_REQUEST)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except TokenError:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'Unexpected error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 ###############
 #    LISTS    #

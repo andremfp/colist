@@ -158,7 +158,7 @@ class UserTests(APITestCase):
         url = reverse('user-logout')
         response = self.client.post(url)
 
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
 
     def testUserGetAndRefreshToken(self):        
         url = reverse('token-refresh')
