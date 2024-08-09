@@ -164,3 +164,7 @@ export function getListDetail(id: number) {
 export function getListItems(id: number) {
     return request<ListItemData[]>('GET', `/api/lists/${id}/items/`);
 }
+
+export function createListItem(id: number, data: { name: string }) {
+    return request<ListItemData>('POST', `/api/lists/${id}/items/`, data);
+}
