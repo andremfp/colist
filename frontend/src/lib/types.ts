@@ -23,4 +23,5 @@ export interface ListItemData {
     name: string;
     list_id: number;
     added_by: number;
+    checked: boolean;
 }

@@ -27,6 +27,7 @@ class ListItem(models.Model):
     name = models.CharField(max_length=255)
     list = models.ForeignKey(List, on_delete=models.CASCADE, related_name='items')
     added_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    checked = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

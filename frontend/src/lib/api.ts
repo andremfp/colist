@@ -168,3 +168,7 @@ export function getListItems(id: number) {
 export function createListItem(id: number, data: { name: string }) {
     return request<ListItemData>('POST', `/api/lists/${id}/items/`, data);
 }
+
+export function updateListItem(listId: number, itemId: number, data: Partial<ListItemData>) {
+    return request<ListItemData>('PUT', `/api/lists/${listId}/items/${itemId}/`, data);
+}

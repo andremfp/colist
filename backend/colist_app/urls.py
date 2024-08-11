@@ -174,13 +174,15 @@ urlpatterns = [
     #     "id": 1,
     #     "name": "Milk",
     #     "list_id": 1,
-    #     "added_by": 1
+    #     "added_by": 1,
+    #     "checked": false;
     #   },
     #   {
     #     "id": 2,
     #     "name": "Eggs",
     #     "list_id": 1,
-    #     "added_by": 1
+    #     "added_by": 1,
+    #     "checked": true;
     #   }
     # ]
     #
@@ -196,7 +198,8 @@ urlpatterns = [
     #   "id": 3,
     #   "name": "New Item Name",
     #   "list_id": 1,
-    #   "added_by": 1
+    #   "added_by": 1,
+    #   "checked": false;
     # }
     path('lists/<int:list_id>/items/', ItemsGetCreate.as_view(), name='items-get-create'),
 
@@ -208,7 +211,8 @@ urlpatterns = [
     #   "id": 1,
     #   "name": "Milk",
     #   "list_id": 1,
-    #   "added_by": 1
+    #   "added_by": 1,
+    #   "checked": false;
     # }
     #
     # PUT /api/lists/<int:list_id>/items/<int:pk>/
@@ -216,23 +220,21 @@ urlpatterns = [
     #   Authorization: Bearer <access_token>
     # Payload:
     # {
-    #   "name": "Updated Item Name"
+    #   "name": "Updated Item Name",
+    #   "checked": true;
     # }
     # Response:
     # {
     #   "id": 1,
     #   "name": "Updated Item Name",
     #   "list_id": 1,
-    #   "added_by": 1
+    #   "added_by": 1,
+    #   "checked": true;
     # }
     #
     # DELETE /api/lists/<int:list_id>/items/<int:pk>/
     # Headers:
     #   Authorization: Bearer <access_token>
-    # Payload:
-    # {
-    #
-    # }
     # Response:
     # {
     #   "detail": "Item deleted."

@@ -63,5 +63,5 @@ class ListSerializer(serializers.ModelSerializer):
 class ListItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ListItem
-        fields = ['id', 'name', 'list_id', 'added_by']
+        fields = ['id', 'name', 'list_id', 'added_by', 'checked']
         read_only_fields = ['list_id', 'added_by']

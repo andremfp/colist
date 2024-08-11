@@ -52,6 +52,16 @@ export default {
         'icon-xl': '1.5rem',
         'icon-lg': '1.25rem',
       },
+      animation: {
+        blink: 'blink 1.5s step-start infinite',
+      },
+      keyframes: {
+        blink: {
+          '0%': { opacity: '1' },
+          '50%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
     },
   },
   plugins: [],
