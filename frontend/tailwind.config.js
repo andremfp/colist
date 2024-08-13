@@ -40,6 +40,9 @@ export default {
         'button-blue-hover-light': '#2563EB', 
         'button-blue-hover-dark': '#93C5FD', 
         'button-disabled': '#D1D5DB',
+        'fail-toast-bg-light': 'rgba(255, 99, 71, 0.2)',
+        'fail-toast-bg-dark': 'rgba(220, 20, 60, 0.2)',
+        'fail-toast-text': '#FF6B6B',
       },
       boxShadow: {
         'ios': '0 2px 4px rgba(0, 0, 0, 0.1)',

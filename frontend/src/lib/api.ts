@@ -82,7 +82,11 @@ async function request<T>(method: string, url: string, data?: object, headers: R
         let errorMessage = 'API request failed';
         try {
             const errorJson = JSON.parse(errorBody);
-            errorMessage = errorJson.error || errorJson.detail || errorMessage;
+            // errorMessage = Object.values(errorJson).flat().join(', ') || errorMessage;
+            errorMessage = Object.entries(errorJson).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n') || errorMessage;
+            console.log('Debug error body:', errorBody);
+            console.log('Debug error json:', errorJson);
+            console.log('Debug error message:', errorMessage);
         } catch (e) {
             console.warn('Error response was not JSON:', e);
         }

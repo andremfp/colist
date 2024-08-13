@@ -51,7 +51,7 @@
         </button>
 
         <!-- Only show logout button if not on the main page -->
-        {#if currentRoute !== '/'}
+        {#if currentRoute !== '/' && currentRoute !== '/register'}
             <button on:click={handleLogout} class="text-xl cursor-pointer">
                 <span class="ri-logout-box-r-line"></span>
             </button>
