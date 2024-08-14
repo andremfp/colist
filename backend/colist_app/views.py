@@ -34,7 +34,11 @@ class UserCreate(generics.CreateAPIView):
 class UserGetDelete(generics.RetrieveDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
 
 class UserLogin(generics.GenericAPIView):
     serializer_class = LoginSerializer

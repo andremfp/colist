@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 
 import { goto } from '$app/navigation';
-import type { RegisterData, LoginPayloadData, LoginResponseData, ListData, ListItemData, UserData } from '../lib/types';
+import type { RegisterData, LoginPayloadData, LoginResponseData, ListPayloadData, ListResponseData, ListItemData, UserData } from '../lib/types';
 
 interface JwtPayload {
     exp: number;
@@ -151,16 +151,20 @@ export function getUsers() {
     return request<UserData[]>('GET', '/api/users/');
 }
 
-export function getLists() {
-    return request<ListData[]>('GET', '/api/lists/');
+export function getUserDetail(id: number) {
+    return request<UserData>('GET', `/api/users/${id}/`);
 }
 
-export function createList(data: { name: string; shared_with: number[] }) {
-    return request<ListData>('POST', '/api/lists/', data);
+export function getLists() {
+    return request<ListResponseData[]>('GET', '/api/lists/');
+}
+
+export function createList(data: ListPayloadData) {
+    return request<ListResponseData>('POST', '/api/lists/', data);
 }
 
 export function getListDetail(id: number) {
-    return request<ListData>('GET', `/api/lists/${id}/`);
+    return request<ListResponseData>('GET', `/api/lists/${id}/`);
 }
 
 export function getListItems(id: number) {

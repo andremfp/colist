@@ -1,14 +1,14 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { getLists, createList, getUsers } from '../../lib/api';
-    import type { ListData, UserData} from '../../lib/types';
+    import type { ListResponseData, UserData} from '../../lib/types';
     import { goto } from '$app/navigation';
     import { darkMode } from '$lib/stores/darkModeStore'; // Import the shared dark mode store
 
-    let lists: ListData[] = [];
+    let lists: ListResponseData[] = [];
     let users: UserData[] = [];
     let newListName = '';
-    let selectedUser = '';
+    let selectedUser = 'None';
     let sharedWith: number[] = [];
     let showCreateForm = false;
 
@@ -33,6 +33,9 @@
     async function handleCreateList() {
         if (newListName.trim() === '') return; // Do not proceed if the name is empty
         try {
+            if (selectedUser !== 'None') {
+                sharedWith.push(parseInt(selectedUser));
+            }
             const newList = await createList({ name: newListName, shared_with: sharedWith });
             if (newList) {
                 lists = [...lists, newList];
@@ -88,14 +91,11 @@
     <h1 class="text-3xl font-bold mb-6">My Lists</h1>
 
     <div class="flex flex-col">
-        <!-- Lists Container -->
         <div class="flex-grow">
             {#if lists.length > 0}
             <ul class="space-y-2">
                 {#each lists as list (list.id)}
-                    <li class={`flex rounded-xl shadow-ios transition-colors duration-200 
-                                 ${$darkMode ? 'bg-lists-bg-dark hover:bg-lists-hover-dark' : 'bg-lists-bg-light hover:bg-lists-hover-light'}`}
-                        >
+                    <li class={`flex rounded-xl shadow-ios transition-colors duration-200 ${$darkMode ? 'bg-lists-bg-dark hover:bg-lists-hover-dark' : 'bg-lists-bg-light hover:bg-lists-hover-light'}`}>
                         <button 
                             class="w-full flex items-center justify-between p-4 text-left bg-transparent cursor-default"
                             on:click={() => goto(`/lists/${list.id}`)}
@@ -108,6 +108,9 @@
                                 </div>
                             </div>
                             <div class="flex items-center space-x-4">
+                                {#if list.shared_with.length > 0}
+                                    <small class={`text-xs ${$darkMode ? 'text-list-shared-dark' : 'text-list-shared-light'}`}>Shared</small>
+                                {/if}
                                 <span class={`text-sm ${$darkMode ? 'text-list-item-count-dark' : 'text-list-item-count-light'}`}>{list.item_count}</span>
                                 <span class="ri-arrow-right-s-line text-xl"></span>
                             </div>
@@ -176,9 +179,10 @@
                           required
                           class={`mt-2 block w-full p-3 pr-12 border rounded-md appearance-none ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'}`} 
                         >
-                          {#each users as user}
-                            <option value={user.username}>{user.username}</option>
-                          {/each}
+                            <option value="">None</option>
+                            {#each users as user}
+                            <option value={user.id}>{user.username}</option>
+                            {/each}
                         </select>
                   
                         <!-- Arrow Icon Container -->

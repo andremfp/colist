@@ -43,6 +43,8 @@ export default {
         'fail-toast-bg-light': 'rgba(255, 99, 71, 0.2)',
         'fail-toast-bg-dark': 'rgba(220, 20, 60, 0.2)',
         'fail-toast-text': '#FF6B6B',
+        'list-shared-dark': '#9CA3AF',
+        'list-shared-light': '#4B5563',  
       },
       boxShadow: {
         'ios': '0 2px 4px rgba(0, 0, 0, 0.1)',

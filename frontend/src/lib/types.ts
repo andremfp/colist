@@ -22,7 +22,12 @@ export interface UserData {
     email: number;
 }
 
-export interface ListData {
+export interface ListPayloadData {
+    name: string;
+    shared_with: number[];
+}
+
+export interface ListResponseData {
     id: number;
     name: string;
     owner: number;

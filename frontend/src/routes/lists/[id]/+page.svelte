@@ -1,17 +1,18 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { getListItems, getListDetail, createListItem, updateListItem } from '../../../lib/api';
-    import type { ListData, ListItemData } from '../../../lib/types';
+    import { getListItems, getListDetail, createListItem, updateListItem, getUserDetail } from '../../../lib/api';
+    import type { ListResponseData, ListItemData } from '../../../lib/types';
     import { page } from '$app/stores';
     import { darkMode } from '$lib/stores/darkModeStore';
     import { goto } from '$app/navigation';
     import { tick } from 'svelte';
 
     let listItems: ListItemData[] = [];
-    let listDetail: ListData = { id: 0, name: '', owner: 0, shared_with: [], item_count: 0, items: [] };
+    let listDetail: ListResponseData = { id: 0, name: '', owner: 0, shared_with: [], item_count: 0, items: [] };
     let listId: number;
     let newItemName = '';
     let isAddingItem = false;
+    let sharedWithUsernames: string[] = [];
 
     $: listId = parseInt($page.params.id, 10);
 
@@ -22,11 +23,12 @@
 
             if (fetchedListItems) {
                 listItems = fetchedListItems;
-                sortItems(); // Sort items on initial load
+                sortItems();
             }
 
             if (fetchedListDetail) {
                 listDetail = fetchedListDetail;
+                sharedWithUsernames = await getSharedWithUsers(listDetail.shared_with);
             }
 
             // Add the click listener to cancel new item on outside click
@@ -62,6 +64,44 @@
         }
         newItemName = '';
         isAddingItem = false;
+    }
+
+    async function getSharedWithUsers(sharedWith: number[]) {
+        try {
+            let shareWithUsernames: string[] = [];
+
+            for (const userId of sharedWith) {
+                const user = await getUserDetail(userId);
+
+                if (user) {
+                    shareWithUsernames.push(user.username);
+                } else {
+                    console.error('Failed to fetch user details.');
+                    break;
+                }
+            }
+
+            return shareWithUsernames;
+        } catch (error) {
+            console.error('Failed to create list item:', error);
+            console.error('Registration error:', error);
+
+            if (error instanceof Error) {
+                showToast(error.message.split('. ')[0]);
+            }
+            return [];
+        }
+    }
+
+    function showToast(message: string) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.className = `${$darkMode ? 'bg-fail-toast-bg-dark' : 'bg-fail-toast-bg-light'} text-fail-toast-text fixed top-4 left-1/2 transform -translate-x-1/2 py-2 px-6 rounded-md shadow-lg backdrop-blur-md`;
+        toast.style.whiteSpace = 'pre-line';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, 8000);
     }
 
     function addNewItemRow() {
@@ -117,8 +157,7 @@
     ) {
         cancelAddItem();
     }
-}
-
+    }
 
     function goBack() {
         goto('/lists');
@@ -134,6 +173,12 @@
         </button>
     </div>
     <h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
+    <h3 class="text-sm font-bold mb-6">
+        {'Shared with: '}
+        <span class="font-normal">
+          {(sharedWithUsernames.length > 0 ? sharedWithUsernames.join(', ') : 'No one')}
+        </span>
+      </h3>
 
     {#if listItems.length > 0}
         <div class={`rounded-xl shadow-ios p-4 ${$darkMode ? 'bg-lists-bg-dark' : 'bg-lists-bg-light'}`}>
