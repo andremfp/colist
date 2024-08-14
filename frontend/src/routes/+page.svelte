@@ -10,6 +10,7 @@
         try {
             const data = await login({ username, password });
             localStorage.setItem('access_token', data.access);
+            localStorage.setItem('user_id', String(data.id));
             goto('/lists');
         } catch (error) {
             console.error('Login error:', error);

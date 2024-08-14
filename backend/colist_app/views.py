@@ -24,7 +24,7 @@ def index(request):
 class UsersGet(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
 
 class UserCreate(generics.CreateAPIView):
     queryset = CustomUser.objects.all()

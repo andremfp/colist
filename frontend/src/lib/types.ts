@@ -4,9 +4,22 @@ export interface RegisterData {
     password: string;
 }
 
-export interface LoginData {
+export interface LoginPayloadData {
     username: string;
     password: string;
+}
+
+export interface LoginResponseData {
+    id: number;
+    username: string;
+    access: string;
+    refresh: string;
+}
+
+export interface UserData {
+    id: number;
+    username: string;
+    email: number;
 }
 
 export interface ListData {

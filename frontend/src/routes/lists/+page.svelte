@@ -1,14 +1,18 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { getLists, createList } from '../../lib/api';
-    import type { ListData } from '../../lib/types';
+    import { getLists, createList, getUsers } from '../../lib/api';
+    import type { ListData, UserData} from '../../lib/types';
     import { goto } from '$app/navigation';
     import { darkMode } from '$lib/stores/darkModeStore'; // Import the shared dark mode store
 
     let lists: ListData[] = [];
+    let users: UserData[] = [];
     let newListName = '';
+    let selectedUser = '';
     let sharedWith: number[] = [];
     let showCreateForm = false;
+
+    const userId = localStorage.getItem('user_id');
 
     // Reactive statement to determine if the "Done" button should be active
     $: isDoneActive = newListName.trim() !== '';
@@ -42,9 +46,42 @@
         }
     }
 
+    async function listUsers() {
+        try {
+            const users = await getUsers();
+            if (users) {
+                return users.filter(user => user.id !== parseInt(userId || '0'));
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+
+            if (error instanceof Error) {
+                showToast(error.message.split('. ')[0]);
+            }
+            return [];
+        }
+    }
+
+    function showToast(message: string) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.className = `${$darkMode ? 'bg-fail-toast-bg-dark' : 'bg-fail-toast-bg-light'} text-fail-toast-text fixed top-4 left-1/2 transform -translate-x-1/2 py-2 px-6 rounded-md shadow-lg backdrop-blur-md`;
+        toast.style.whiteSpace = 'pre-line';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, 8000);
+    }
+
     function toggleCreateForm() {
         showCreateForm = !showCreateForm;
     }
+
+    listUsers().then(result => {
+        users = result;
+    });
 </script>
 
 <div class={$darkMode ? 'p-4 bg-main-bg-dark text-text-dark' : 'p-4 bg-main-bg-light text-text-light'}>
@@ -120,12 +157,49 @@
                 </div>
                 <form on:submit|preventDefault={handleCreateList} class="space-y-4">
                     <label class="block">
-                        List Name:
-                        <input type="text" bind:value={newListName} required 
-                               class={`mt-2 block w-full p-3 border rounded-md 
-                                      ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'}`} />
+                      List Name:
+                      <input 
+                        type="text" 
+                        bind:value={newListName} 
+                        required 
+                        class={`mt-2 block w-full p-3 border rounded-md ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'}`} 
+                      />
                     </label>
-                </form>
+                  
+                    <label class="block">
+                      Share with:
+                      <div class="relative">
+                        <select 
+                          name="users" 
+                          id="users"
+                          bind:value={selectedUser} 
+                          required
+                          class={`mt-2 block w-full p-3 pr-12 border rounded-md appearance-none ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'}`} 
+                        >
+                          {#each users as user}
+                            <option value={user.username}>{user.username}</option>
+                          {/each}
+                        </select>
+                  
+                        <!-- Arrow Icon Container -->
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                          <svg 
+                            class="w-4 h-4 text-gray-400" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path 
+                              stroke-linecap="round" 
+                              stroke-linejoin="round" 
+                              stroke-width="2" 
+                              d="M19 9l-7 7-7-7" 
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </label>
+                </form>                                     
             </div>
         </div>
     {/if}

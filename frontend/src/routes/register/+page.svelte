@@ -36,7 +36,7 @@
         document.body.appendChild(toast);
         setTimeout(() => {
             toast.remove();
-        }, 8000); // Remove toast after 3 seconds
+        }, 8000);
     }
 
     function goBack() {

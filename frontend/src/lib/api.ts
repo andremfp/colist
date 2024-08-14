@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 
 import { goto } from '$app/navigation';
-import type { RegisterData, LoginData, ListData, ListItemData } from '../lib/types';
+import type { RegisterData, LoginPayloadData, LoginResponseData, ListData, ListItemData, UserData } from '../lib/types';
 
 interface JwtPayload {
     exp: number;
@@ -48,7 +48,6 @@ async function request<T>(method: string, url: string, data?: object, headers: R
             try {
                 const decodedToken = jwtDecode<JwtPayload>(accessToken);
                 if (decodedToken.exp < Date.now() / 1000) {
-                    console.log('DEBUG GOING TO REFRESH TOKEN');
                     accessToken = await refreshTokenRequest();
                 }
                 headers['Authorization'] = `Bearer ${accessToken}`;
@@ -82,11 +81,7 @@ async function request<T>(method: string, url: string, data?: object, headers: R
         let errorMessage = 'API request failed';
         try {
             const errorJson = JSON.parse(errorBody);
-            // errorMessage = Object.values(errorJson).flat().join(', ') || errorMessage;
             errorMessage = Object.entries(errorJson).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n') || errorMessage;
-            console.log('Debug error body:', errorBody);
-            console.log('Debug error json:', errorJson);
-            console.log('Debug error message:', errorMessage);
         } catch (e) {
             console.warn('Error response was not JSON:', e);
         }
@@ -113,8 +108,8 @@ export function register(data: RegisterData) {
     return request<RegisterData>('POST', '/api/users/register/', data, {}, true);
 }
 
-export async function login(data: LoginData) {
-    const response = await request<{ access: string, refresh: string } | null>('POST', '/api/users/login/', data, {}, true);
+export async function login(data: LoginPayloadData) {
+    const response = await request<LoginResponseData | null>('POST', '/api/users/login/', data, {}, true);
     
     if (response === null) {
         throw new Error('Login failed: No response data received');
@@ -152,6 +147,9 @@ export async function logout() {
     }
 }
 
+export function getUsers() {
+    return request<UserData[]>('GET', '/api/users/');
+}
 
 export function getLists() {
     return request<ListData[]>('GET', '/api/lists/');
