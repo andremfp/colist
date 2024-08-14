@@ -82,7 +82,7 @@
                         id="password"
                         type="password"
                         bind:value={password}
-                        class={$darkMode ? 'mb-4 w-full p-2 border rounded-md text-text-light focus:outline-none focus:ring-1' : 'mb-4 w-full p-2 border rounded-md text-text-light focus:outline-none focus:ring-1'}
+                        class={$darkMode ? 'w-full p-2 border rounded-md text-text-light focus:outline-none focus:ring-1' : 'w-full p-2 border rounded-md text-text-light focus:outline-none focus:ring-1'}
                         required
                     />
                 </div>
