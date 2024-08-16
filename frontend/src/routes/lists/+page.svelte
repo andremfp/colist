@@ -3,7 +3,7 @@
     import { getLists, createList, getUsers } from '../../lib/api';
     import type { ListResponseData, UserData} from '../../lib/types';
     import { goto } from '$app/navigation';
-    import { darkMode } from '$lib/stores/darkModeStore'; // Import the shared dark mode store
+    import { darkMode } from '$lib/stores/darkModeStore';
 
     let lists: ListResponseData[] = [];
     let users: UserData[] = [];
@@ -11,19 +11,21 @@
     let selectedUser = 'None';
     let sharedWith: number[] = [];
     let showCreateForm = false;
-
-    const userId = localStorage.getItem('user_id');
+    let userId: string;
 
     // Reactive statement to determine if the "Done" button should be active
     $: isDoneActive = newListName.trim() !== '';
 
     onMount(async () => {
+        userId = localStorage.getItem('user_id') || '';
+        users = await listUsers();
+
         try {
             const fetchedLists = await getLists();
             if (fetchedLists) {
                 lists = fetchedLists;
             } else {
-                lists = []; // Initialize with an empty array if no data
+                lists = [];
             }
         } catch (error) {
             console.error('Failed to fetch lists:', error);
@@ -82,9 +84,6 @@
         showCreateForm = !showCreateForm;
     }
 
-    listUsers().then(result => {
-        users = result;
-    });
 </script>
 
 <div class={$darkMode ? 'p-4 bg-main-bg-dark text-text-dark' : 'p-4 bg-main-bg-light text-text-light'}>
@@ -136,7 +135,7 @@
         </div>
     </div>
 
-    <!-- Create Form Modal -->
+    <!-- Create List -->
     {#if showCreateForm}
         <div class={`fixed inset-0 flex items-center justify-center z-50`}>
             <div class={`p-6 border rounded-xl ${$darkMode ? 'border-border-dark bg-main-bg-dark' : 'border-border-light bg-main-bg-light'} max-w-md w-full`}>
@@ -179,7 +178,7 @@
                           required
                           class={`mt-2 block w-full p-3 pr-12 border rounded-md appearance-none ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'}`} 
                         >
-                            <option value="">None</option>
+                            <option value="None">None</option>
                             {#each users as user}
                             <option value={user.id}>{user.username}</option>
                             {/each}
