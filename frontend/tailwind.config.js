@@ -1,5 +1,3 @@
-// tailwind.config.js
-
 /** @type {import('tailwindcss').Config} */
 export default {
   mode: 'jit',
@@ -30,45 +28,71 @@ export default {
         'add-item': '#D69E2E',
         'add-item-hover-dark': '#F6E05E',
         'add-item-hover-light': '#B7791F',
-        'list-item-count-light': '#4B5563',  
-        'list-item-count-dark': '#9CA3AF', 
-        'input-border-light': '#D1D5DB', 
-        'input-border-dark': '#4B5563', 
-        'input-bg-dark': '#374151', 
-        'input-text-dark': '#D1D5DB', 
-        'button-blue': '#3B82F6', 
-        'button-blue-hover-light': '#2563EB', 
-        'button-blue-hover-dark': '#93C5FD', 
+        'list-item-count-light': '#4B5563',
+        'list-item-count-dark': '#9CA3AF',
+        'input-border-light': '#D1D5DB',
+        'input-border-dark': '#4B5563',
+        'input-bg-dark': '#374151',
+        'input-text-dark': '#D1D5DB',
+        'button-blue': '#3B82F6',
+        'button-blue-hover-light': '#2563EB',
+        'button-blue-hover-dark': '#93C5FD',
         'button-disabled': '#D1D5DB',
         'fail-toast-bg-light': 'rgba(255, 99, 71, 0.2)',
         'fail-toast-bg-dark': 'rgba(220, 20, 60, 0.2)',
         'fail-toast-text': '#FF6B6B',
         'list-shared-dark': '#9CA3AF',
-        'list-shared-light': '#4B5563',  
+        'list-shared-light': '#4B5563',
+        'delete-btn-light': '#C53030',
+        'delete-btn-light-hover': '#E53E3E',
+        'delete-btn': '#C53030',
+        'delete-btn-hover': '#E53E3E', 
       },
       boxShadow: {
-        'ios': '0 2px 4px rgba(0, 0, 0, 0.1)',
+        ios: '0 2px 4px rgba(0, 0, 0, 0.1)',
       },
       spacing: {
         'column-width': '42rem',
         'column-margin-top': '4rem',
+        'divider': '1px', // For the divider line
       },
       fontSize: {
         'icon-xl': '1.5rem',
         'icon-lg': '1.25rem',
       },
       animation: {
-        blink: 'blink 1.5s step-start infinite',
+        swipeReveal: 'swipeReveal 0.3s ease-out forwards',
+        swipeHide: 'swipeHide 0.3s ease-out forwards',
       },
       keyframes: {
-        blink: {
-          '0%': { opacity: '1' },
-          '50%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        swipeReveal: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(100px)' }, // Adjust value as needed
         },
+        swipeHide: {
+          '0%': { transform: 'translateX(-100px)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+      },
+      transitionProperty: {
+        'transform-opacity': 'transform, opacity',
       },
     },
   },
-  plugins: [],
-  darkMode: 'class', // Enables dark mode based on a class
-}
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.translate-reveal': {
+          transform: 'translateX(-100px)',
+        },
+        '.opacity-70': {
+          opacity: '0.7',
+        },
+        '.translate-hide': {
+          transform: 'translateX(0)',
+        },
+      }, ['responsive', 'hover']);
+    },
+  ],
+  darkMode: 'class',
+};

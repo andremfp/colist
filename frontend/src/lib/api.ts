@@ -1,7 +1,16 @@
 import { jwtDecode } from "jwt-decode";
 
 import { goto } from '$app/navigation';
-import type { RegisterData, LoginPayloadData, LoginResponseData, ListPayloadData, ListResponseData, ListItemData, UserData } from '../lib/types';
+import type { 
+    RegisterData, 
+    LoginPayloadData, 
+    LoginResponseData, 
+    ListPayloadData, 
+    ListResponseData, 
+    ListItemData, 
+    UserData, 
+    DeleteResponseData 
+} from '../lib/types';
 
 interface JwtPayload {
     exp: number;
@@ -177,4 +186,8 @@ export function createListItem(id: number, data: { name: string }) {
 
 export function updateListItem(listId: number, itemId: number, data: Partial<ListItemData>) {
     return request<ListItemData>('PUT', `/api/lists/${listId}/items/${itemId}/`, data);
+}
+
+export function deleteListItem(listId: number, itemId: number) {
+    return request<DeleteResponseData>('DELETE', `/api/lists/${listId}/items/${itemId}/`);
 }

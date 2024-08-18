@@ -16,6 +16,10 @@ export interface LoginResponseData {
     refresh: string;
 }
 
+export interface DeleteResponseData {
+    detail: string;
+}
+
 export interface UserData {
     id: number;
     username: string;
