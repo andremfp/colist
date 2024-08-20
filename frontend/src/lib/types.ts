@@ -31,7 +31,7 @@ export interface ListPayloadData {
     shared_with: number[];
 }
 
-export interface ListResponseData {
+export interface ListData {
     id: number;
     name: string;
     owner: number;

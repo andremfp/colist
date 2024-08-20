@@ -6,7 +6,7 @@ import type {
     LoginPayloadData, 
     LoginResponseData, 
     ListPayloadData, 
-    ListResponseData, 
+    ListData, 
     ListItemData, 
     UserData, 
     DeleteResponseData 
@@ -165,15 +165,15 @@ export function getUserDetail(id: number) {
 }
 
 export function getLists() {
-    return request<ListResponseData[]>('GET', '/api/lists/');
+    return request<ListData[]>('GET', '/api/lists/');
 }
 
 export function createList(data: ListPayloadData) {
-    return request<ListResponseData>('POST', '/api/lists/', data);
+    return request<ListData>('POST', '/api/lists/', data);
 }
 
 export function getListDetail(id: number) {
-    return request<ListResponseData>('GET', `/api/lists/${id}/`);
+    return request<ListData>('GET', `/api/lists/${id}/`);
 }
 
 export function getListItems(id: number) {
@@ -190,4 +190,8 @@ export function updateListItem(listId: number, itemId: number, data: Partial<Lis
 
 export function deleteListItem(listId: number, itemId: number) {
     return request<DeleteResponseData>('DELETE', `/api/lists/${listId}/items/${itemId}/`);
+}
+
+export function deleteList(listId: number) {
+    return request<DeleteResponseData>('DELETE', `/api/lists/${listId}/`);
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
     import { getListItems, getListDetail, createListItem, updateListItem, getUserDetail, deleteListItem } from '../../../lib/api';
-    import type { ListResponseData, ListItemData } from '../../../lib/types';
+    import type { ListData, ListItemData } from '../../../lib/types';
     import { page } from '$app/stores';
     import { darkMode } from '$lib/stores/darkModeStore';
     import { goto } from '$app/navigation';
@@ -10,7 +10,7 @@
     import type { SwipeCustomEvent } from 'svelte-gestures';
 
     let listItems: ListItemData[] = [];
-    let listDetail: ListResponseData = { id: 0, name: '', owner: 0, shared_with: [], item_count: 0, items: [] };
+    let listDetail: ListData = { id: 0, name: '', owner: 0, shared_with: [], item_count: 0, items: [] };
     let listId: number;
     let newItemName = '';
     let isAddingItem = false;
@@ -18,7 +18,7 @@
     let activeEvent: string | null = null;
 
     const swipeDistance = 100;
-    const SWIPE_RESET_DELAY = 300;
+    const SWIPE_RESET_DELAY = 100;
 
     $: listId = parseInt($page.params.id, 10);
 
@@ -81,7 +81,7 @@
         }
     }
 
-    function handleSwipe(event: SwipeCustomEvent, item: ListItemData) {
+    function handleSwipe(event: SwipeCustomEvent) {
         activeEvent = 'swipe';
         event.preventDefault();
         event.stopPropagation();
@@ -220,7 +220,7 @@
                 <li 
                     class={`list-item relative flex items-center p-2 ${$darkMode ? 'bg-lists-bg-dark' : 'bg-lists-bg-light'} rounded-lg`}
                     use:swipe={{ timeframe: 300, minSwipeDistance: 60 }} 
-                    on:swipe={(event) => handleSwipe(event, item)}
+                    on:swipe={(event) => handleSwipe(event)}
                 >
                     <div class="list-item-content flex items-center w-full">
                         <label class="flex items-center w-full">
@@ -245,7 +245,6 @@
                         </label>
                     </div>
 
-                    <!-- The delete button that appears after swipe -->
                     <button 
                         class={`absolute top-0 bottom-0 right-0 py-1 text-white rounded-r-lg shadow-lg transition-transform-opacity duration-300 ease-in-out opacity-0 pointer-events-none flex items-center justify-center bg-delete-btn hover:bg-delete-btn-hover`}
                         style={`width: ${swipeDistance}px;`}
