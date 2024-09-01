@@ -1,20 +1,34 @@
 <script lang="ts">
-    import { login } from '../lib/api';
+    import { login } from '../lib/auth';
     import { goto } from '$app/navigation';
     import { darkMode } from '$lib/stores/darkModeStore';
     
-    let username = '';
+    let email = '';
     let password = '';
 
     async function handleLogin() {
         try {
-            const data = await login({ username, password });
+            const data = await login(email, password);
             localStorage.setItem('access_token', data.access);
             localStorage.setItem('user_id', String(data.id));
             goto('/lists');
         } catch (error) {
             console.error('Login error:', error);
+            if (error instanceof Error) {
+            showToast(error.message.split('. ')[0]);
+            }
         }
+    }
+
+    function showToast(message: string) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.className = `${$darkMode ? 'bg-fail-toast-bg-dark' : 'bg-fail-toast-bg-light'} text-fail-toast-text fixed top-4 left-1/2 transform -translate-x-1/2 py-2 px-6 rounded-md shadow-lg backdrop-blur-md`;
+        toast.style.whiteSpace = 'pre-line';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, 8000);
     }
 </script>
 
@@ -25,11 +39,11 @@
         <h1 class={$darkMode ? 'text-2xl font-bold mb-4 text-center text-text-dark' : 'text-2xl font-bold mb-4 text-center text-text-light'}>Login</h1>
         <form on:submit|preventDefault={handleLogin} class="space-y-4">
             <div>
-                <label class="block font-semibold mb-1" for="username">Username:</label>
+                <label class="block font-semibold mb-1" for="email">Email:</label>
                 <input
-                    id="username"
-                    type="text"
-                    bind:value={username}
+                    id="email"
+                    type="email"
+                    bind:value={email}
                     class={$darkMode ? 'w-full p-2 border rounded-md text-text-light focus:outline-none' : 'w-full p-2 border rounded-md text-text-light focus:outline-none focus:ring-1'}
                     required
                 />

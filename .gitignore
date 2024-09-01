@@ -12,25 +12,6 @@ venv/
 backend/venv/
 frontend/node_modules/
 
-# Backend ignores
-/backend/db.sqlite3
-/backend/.env
-/backend/*.pyc
-/backend/__pycache__/
-/backend/staticfiles/
-/backend/media/
-
-# Django specific
-*.log
-*.pot
-*.pyc
-__pycache__
-*.py[cod]
-*$py.class
-
-# Database
-*.sqlite3
-
 # Static files
 /staticfiles/
 /media/

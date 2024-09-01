@@ -1,197 +1,162 @@
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 
-import { goto } from '$app/navigation';
-import type { 
-    RegisterData, 
-    LoginPayloadData, 
-    LoginResponseData, 
-    ListPayloadData, 
-    ListData, 
-    ListItemData, 
-    UserData, 
-    DeleteResponseData 
-} from '../lib/types';
+// import { goto } from '$app/navigation';
+import type { List, ListItem, UserData } from '../lib/types';
+import { db, auth } from './firebase';
+import {
+	collection,
+	doc,
+	getDocs,
+	getDoc,
+	addDoc,
+	updateDoc,
+	deleteDoc,
+	query,
+	where
+} from 'firebase/firestore';
 
-interface JwtPayload {
-    exp: number;
-    // Add other fields from your JWT payload as needed
+// interface JwtPayload {
+//     exp: number;
+//     // Add other fields from your JWT payload as needed
+// }
+
+//------------------
+// Firebase
+
+// Fetch all items from a Firestore collection
+export async function fetchLists(): Promise<List[]> {
+	const userId = auth.currentUser?.uid;
+
+	const listsCollection = collection(db, 'lists');
+
+	// Query for lists where the user is the owner
+	const ownerQuery = query(listsCollection, where('ownerId', '==', userId));
+
+	// Query for lists where the user is in the sharedWith array
+	const sharedWithQuery = query(listsCollection, where('sharedBy', 'array-contains', userId));
+
+	// Execute both queries
+	const [ownerSnapshot, sharedWithSnapshot] = await Promise.all([
+		getDocs(ownerQuery),
+		getDocs(sharedWithQuery)
+	]);
+
+	// Combine the results and remove duplicates (if any)
+	const lists = [
+		...ownerSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as List),
+		...sharedWithSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as List)
+	];
+
+	// Optionally, you can remove duplicates based on the list id
+	const uniqueLists = Array.from(new Map(lists.map((list) => [list.id, list])).values());
+
+	return uniqueLists;
 }
 
-const baseUrl = 'http://localhost:8000';
+// Fetch a single list by ID from a Firestore collection
+export async function fetchListById(listId: string): Promise<List> {
+	const listDoc = doc(db, 'lists', listId);
+	const listSnapshot = await getDoc(listDoc);
 
-// Separate function for token refresh
-// Current token refresh settings:
-//  - 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-//  - 'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-//  - 'ROTATE_REFRESH_TOKENS': True,
-//  - 'BLACKLIST_AFTER_ROTATION': True,
-async function refreshTokenRequest(): Promise<string> {
-    const refresh = localStorage.getItem('refresh_token');
-    if (!refresh) throw new Error('No refresh token available');
-
-    const response = await fetch(`${baseUrl}/api/token/refresh/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh }),
-    });
-
-    if (!response.ok) {
-        throw new Error('Failed to refresh token');
-    }
-
-    const data = await response.json();
-    localStorage.setItem('access_token', data.access);
-    if (data.refresh) {
-        localStorage.setItem('refresh_token', data.refresh);
-    }
-
-    return data.access;
+	return listSnapshot.data() as List;
 }
 
-async function request<T>(method: string, url: string, data?: object, headers: Record<string, string> = {}, skipAuth: boolean = false): Promise<T | null> {
-    if (!skipAuth) {
-        let accessToken = localStorage.getItem('access_token');
-        if (accessToken) {
-            try {
-                const decodedToken = jwtDecode<JwtPayload>(accessToken);
-                if (decodedToken.exp < Date.now() / 1000) {
-                    accessToken = await refreshTokenRequest();
-                }
-                headers['Authorization'] = `Bearer ${accessToken}`;
-            } catch {
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                goto('/');
-                throw new Error('Session expired. Please log in again.');
-            }
-        } else {
-            goto('/');
-            throw new Error('No access token found. Please log in.');
-        }
-    }
-
-    const options: RequestInit = {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-            ...headers,
-        },
-        body: data ? JSON.stringify(data) : undefined,
-    };
-
-    const response = await fetch(`${baseUrl}${url}`, options);
-
-    if (!response.ok) {
-        const errorBody = await response.text();
-        console.error('Error response body:', errorBody);
-
-        let errorMessage = 'API request failed';
-        try {
-            const errorJson = JSON.parse(errorBody);
-            errorMessage = Object.entries(errorJson).map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`).join('\n') || errorMessage;
-        } catch (e) {
-            console.warn('Error response was not JSON:', e);
-        }
-
-        throw new Error(`${errorMessage} (Status ${response.status})`);
-    }
-
-    // Handle 205 Reset Content
-    if (response.status === 205) {
-        return null;
-    }
-
-    // For other successful responses, try to parse JSON
-    try {
-        return await response.json();
-    } catch (error) {
-        console.warn('Response is not JSON:', error);
-        return null;
-    }
+// Add a new list to a Firestore collection
+export async function addList(newList: {
+	name: string;
+	ownerId: string;
+	sharedBy: string[];
+}): Promise<List> {
+	const listsCollection = collection(db, 'lists');
+	const docRef = await addDoc(listsCollection, {
+		...newList,
+		itemCount: 0
+	});
+	const addedList: List = {
+		id: docRef.id,
+		...newList,
+		itemCount: 0
+	};
+	return addedList;
 }
 
-
-export function register(data: RegisterData) {
-    return request<RegisterData>('POST', '/api/users/register/', data, {}, true);
+// Update an existing list in a Firestore collection
+export async function updateList(listId: string, updatedList: Partial<List>) {
+	const listDoc = doc(db, 'lists', listId);
+	await updateDoc(listDoc, updatedList);
+	return { id: listId };
 }
 
-export async function login(data: LoginPayloadData) {
-    const response = await request<LoginResponseData | null>('POST', '/api/users/login/', data, {}, true);
-    
-    if (response === null) {
-        throw new Error('Login failed: No response data received');
-    }
-
-    localStorage.setItem('access_token', response.access);
-    localStorage.setItem('refresh_token', response.refresh);
-    return response;
+// Delete a list from a Firestore collection
+export async function deleteList(listId: string) {
+	const listDoc = doc(db, 'lists', listId);
+	await deleteDoc(listDoc);
+	return { id: listId };
 }
 
-export async function logout() {
-    let refreshToken = localStorage.getItem('refresh_token');
+// Fetch all items in a specific list from Firestore
+export async function fetchListItems(listId: string): Promise<ListItem[]> {
+	const listItemsCollection = collection(db, 'listItems');
 
-    // check token validity before logout request to avoid token refresh token rotation inside the request function
-    try {
-        let accessToken = localStorage.getItem('access_token');
-        if (accessToken) {
-            const decodedToken = jwtDecode<JwtPayload>(accessToken);
-            if (decodedToken.exp < Date.now() / 1000) {
-                accessToken = await refreshTokenRequest();
-                // After refreshing the access token, update the refresh token
-                refreshToken = localStorage.getItem('refresh_token');
-            }
-        } else {
-            throw new Error('No access token found. Please log in.');
-        }
+	// Query for lists where the user is the owner
+	const listItemsQuery = query(listItemsCollection, where('listId', '==', listId));
 
-        await request('POST', '/api/users/logout/', { refresh_token: refreshToken });
-    } catch (error) {
-        console.error('Logout failed:', error);
-        throw error;
-    } finally {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-    }
+	// Execute the query
+	const listItemsSnapshot = await getDocs(listItemsQuery);
+
+	return listItemsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as ListItem);
 }
 
-export function getUsers() {
-    return request<UserData[]>('GET', '/api/users/');
+// Add a new item to a list in Firestore
+export async function addListItem(newItem: Omit<ListItem, 'id'>): Promise<ListItem> {
+	const listItemsCollection = collection(db, 'listItems');
+	const docRef = await addDoc(listItemsCollection, {
+		...newItem,
+		checked: false
+	});
+	const addedListItem: ListItem = {
+		id: docRef.id,
+		...newItem,
+		checked: false
+	};
+	return addedListItem;
 }
 
-export function getUserDetail(id: number) {
-    return request<UserData>('GET', `/api/users/${id}/`);
+// Update an existing list item in Firestore
+export async function updateListItem(
+	itemId: string,
+	updatedItem: Partial<ListItem>
+): Promise<string> {
+	const itemDoc = doc(db, 'listItems', itemId);
+	await updateDoc(itemDoc, updatedItem);
+	return itemId;
 }
 
-export function getLists() {
-    return request<ListData[]>('GET', '/api/lists/');
+// Delete a list item from Firestore
+export async function deleteListItem(itemId: string) {
+	const itemDoc = doc(db, 'listItems', itemId);
+	await deleteDoc(itemDoc);
+	return { id: itemId };
 }
 
-export function createList(data: ListPayloadData) {
-    return request<ListData>('POST', '/api/lists/', data);
+export async function fetchAllUserProfilesExceptCurrent(
+	currentUserId: string
+): Promise<UserData[]> {
+	const userProfilesCollection = collection(db, 'users');
+	const userQuery = query(userProfilesCollection, where('id', '!=', currentUserId));
+	const userSnapshot = await getDocs(userQuery);
+
+	return userSnapshot.docs.map((doc) => ({
+		id: doc.data().id,
+		email: doc.data().email,
+		name: doc.data().name,
+		createdAt: doc.data().createdAt
+	}));
 }
 
-export function getListDetail(id: number) {
-    return request<ListData>('GET', `/api/lists/${id}/`);
-}
-
-export function getListItems(id: number) {
-    return request<ListItemData[]>('GET', `/api/lists/${id}/items/`);
-}
-
-export function createListItem(id: number, data: { name: string }) {
-    return request<ListItemData>('POST', `/api/lists/${id}/items/`, data);
-}
-
-export function updateListItem(listId: number, itemId: number, data: Partial<ListItemData>) {
-    return request<ListItemData>('PUT', `/api/lists/${listId}/items/${itemId}/`, data);
-}
-
-export function deleteListItem(listId: number, itemId: number) {
-    return request<DeleteResponseData>('DELETE', `/api/lists/${listId}/items/${itemId}/`);
-}
-
-export function deleteList(listId: number) {
-    return request<DeleteResponseData>('DELETE', `/api/lists/${listId}/`);
+export async function fetchUserById(userId: string): Promise<UserData> {
+	const userDoc = doc(db, 'users', userId);
+	console.log(userDoc);
+	const userSnapshot = await getDoc(userDoc);
+	return userSnapshot.data() as UserData;
 }

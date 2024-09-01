@@ -1,19 +1,21 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { getLists, createList, getUsers, deleteList } from '../../lib/api';
-    import type { ListData, UserData} from '../../lib/types';
+    import { fetchLists, addList, fetchAllUserProfilesExceptCurrent, deleteList } from '../../lib/api';
+    import type { List, UserData} from '../../lib/types';
     import { goto } from '$app/navigation';
     import { darkMode } from '$lib/stores/darkModeStore';
     import { swipe } from 'svelte-gestures';
     import type { SwipeCustomEvent } from 'svelte-gestures';
+    import { auth } from '../../lib/firebase';
 
-    let lists: ListData[] = [];
+    let lists: List[] = [];
     let users: UserData[] = [];
     let newListName = '';
     let selectedUser = 'None';
     let showCreateForm = false;
     let userId: string;
     let activeEvent: string | null = null;
+    const currentUserId = auth.currentUser?.uid;
 
     const swipeDistance = 100;
 
@@ -23,8 +25,8 @@
         userId = localStorage.getItem('user_id') || '';
         try {
             document.addEventListener('click', handleClickOutside);
-            users = await listUsers();
-            lists = await getLists() || [];
+            users = await fetchAllUserProfilesExceptCurrent(userId);
+            lists = await fetchLists() || [];
         } catch (error) {
             console.error('Failed to fetch lists or users:', error);
         }
@@ -39,8 +41,8 @@
     async function handleCreateList() {
         if (!newListName.trim()) return;
         try {
-            const newSharedWith = selectedUser !== 'None' ? [parseInt(selectedUser)] : [];
-            const newList = await createList({ name: newListName, shared_with: newSharedWith });
+            const newSharedWith = selectedUser !== 'None' ? [selectedUser, currentUserId || ''] : [];
+            const newList = await addList({ name: newListName, ownerId: userId, sharedBy: newSharedWith });
             if (newList) {
                 lists = [...lists, newList];
                 showCreateForm = false;
@@ -51,7 +53,7 @@
         }
     }
 
-    async function handleDeleteList(listId: number) {
+    async function handleDeleteList(listId: string) {
         try {
             await deleteList(listId);
             lists = lists.filter(list => list.id !== listId);
@@ -73,7 +75,7 @@
         }
     }
 
-    function handleButtonClick(event: MouseEvent, listId: number) {
+    function handleButtonClick(event: MouseEvent, listId: string) {
         if (activeEvent === 'swipe') {
             event.preventDefault();
             return;
@@ -87,20 +89,6 @@
         if (revealedItem && !revealedItem.contains(event.target as Node)) {
             revealedItem.classList.remove('revealed');
             activeEvent = null;
-        }
-    }
-
-    async function listUsers() {
-        try {
-            const users = await getUsers();
-            return users?.filter(user => user.id !== parseInt(userId)) || [];
-        } catch (error) {
-            console.error('Error fetching users:', error);
-
-            if (error instanceof Error) {
-            showToast(error.message.split('. ')[0]);
-            }
-            return [];
         }
     }
 
@@ -145,10 +133,10 @@
                                 </div>
                             </div>
                             <div class="flex items-center space-x-4">
-                                {#if list.shared_with.length > 0}
+                                {#if list.sharedBy.length > 0}
                                     <small class={$darkMode ? 'text-list-shared-dark' : 'text-list-shared-light'}>Shared</small>
                                 {/if}
-                                <span class={$darkMode ? 'text-list-item-count-dark' : 'text-list-item-count-light'}>{list.item_count}</span>
+                                <span class={$darkMode ? 'text-list-item-count-dark' : 'text-list-item-count-light'}>{list.itemCount}</span>
                                 <span class="ri-arrow-right-s-line text-xl"></span>
                             </div>
                         </button>
@@ -223,8 +211,8 @@
                           class={`mt-2 block w-full p-3 border rounded-md appearance-none ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'}`} 
                         >
                           <option value="None">None</option>
-                          {#each users as user}
-                            <option value={user.id}>{user.username}</option>
+                          {#each users as user (user.id)}
+                            <option value={user.id}>{user.name}</option>
                           {/each}
                         </select>
                   

@@ -2,7 +2,7 @@
     import { darkMode } from '$lib/stores/darkModeStore';
     import logo from '$lib/images/svelte-logo.svg';
     import github from '$lib/images/github.svg';
-    import { logout } from '$lib/api';
+    import { logout } from '$lib/auth';
     import { page } from '$app/stores';
     import 'remixicon/fonts/remixicon.css';
 

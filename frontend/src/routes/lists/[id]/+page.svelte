@@ -1,32 +1,34 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { getListItems, getListDetail, createListItem, updateListItem, getUserDetail, deleteListItem } from '../../../lib/api';
-    import type { ListData, ListItemData } from '../../../lib/types';
+    import { fetchListItems, addListItem, updateListItem, updateList, deleteListItem, fetchListById, fetchUserById } from '../../../lib/api';
+    import type { List, ListItem } from '../../../lib/types';
     import { page } from '$app/stores';
     import { darkMode } from '$lib/stores/darkModeStore';
     import { goto } from '$app/navigation';
     import { tick } from 'svelte';
     import { swipe } from 'svelte-gestures';
     import type { SwipeCustomEvent } from 'svelte-gestures';
+    import { auth } from '../../../lib/firebase';
 
-    let listItems: ListItemData[] = [];
-    let listDetail: ListData = { id: 0, name: '', owner: 0, shared_with: [], item_count: 0, items: [] };
-    let listId: number;
+    let listItems: ListItem[] = [];
+    let listDetail: List = { id: '', name: '', ownerId: '', sharedBy: [], itemCount: 0 };
+    let listId: string;
     let newItemName = '';
     let isAddingItem = false;
     let sharedWithUsernames: string[] = [];
     let activeEvent: string | null = null;
+    const currentUserId = auth.currentUser?.uid;
 
     const swipeDistance = 100;
     const SWIPE_RESET_DELAY = 100;
 
-    $: listId = parseInt($page.params.id, 10);
+    $: listId = $page.params.id;
 
     onMount(async () => {
         try {
             const [fetchedListItems, fetchedListDetail] = await Promise.all([
-                getListItems(listId),
-                getListDetail(listId)
+                fetchListItems(listId),
+                fetchListById(listId)
             ]);
 
             if (fetchedListItems) {
@@ -36,7 +38,8 @@
 
             if (fetchedListDetail) {
                 listDetail = fetchedListDetail;
-                sharedWithUsernames = await getSharedWithUsers(listDetail.shared_with);
+                sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy);
+                console.log('DEBUG: sharedWithUsernames', sharedWithUsernames);
             }
 
             document.addEventListener('click', handleClickOutside);
@@ -58,9 +61,14 @@
         }
 
         try {
-            const newListItem = await createListItem(listId, { name: newItemName });
+            const newListItem = await addListItem({
+                name: newItemName,
+                listId: listId,
+                addedBy: currentUserId || '',
+                checked: false})
             if (newListItem) {
                 listItems.pop(); // Remove the placeholder
+                await updateList(listId, { itemCount: listItems.length + 1 });
                 listItems = [...listItems, newListItem];
                 sortItems();
             }
@@ -72,9 +80,11 @@
         }
     }
 
-    async function handleDeleteItem(item: ListItemData) {
+    async function handleDeleteItem(item: ListItem) {
         try {
-            await deleteListItem(listId, item.id);
+            const listId = item.listId;
+            await deleteListItem(item.id);
+            await updateList(listId, { itemCount: listItems.length - 1 });
             listItems = listItems.filter(i => i.id !== item.id);
         } catch (error) {
             console.error('Failed to delete list item:', error);
@@ -106,7 +116,7 @@
         }
     }
 
-    async function handleCheckboxClick(event: MouseEvent, item: ListItemData) {
+    async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
         if (activeEvent === 'swipe') {
             event.preventDefault();
             event.stopPropagation();
@@ -117,13 +127,14 @@
         await toggleItemCompletion(item);
     }
 
-    async function getSharedWithUsers(sharedWith: number[]): Promise<string[]> {
+    async function getSharedWithUsers(sharedBy: string[]): Promise<string[]> {
         try {
-            const usernames = await Promise.all(sharedWith.map(async (userId) => {
-                const user = await getUserDetail(userId);
-                return user ? user.username : null;
+            const usernames = await Promise.all(sharedBy.map(async (userId) => {
+                const user = await fetchUserById(userId);
+                console.log('DEBUG: user', user);
+                return user && user.id != currentUserId ? user.name : null;
             }));
-            return usernames.filter((username): username is string => username !== null);
+            return usernames.filter((username) => username !== null);
         } catch (error) {
             console.error('Failed to fetch user details:', error);
             if (error instanceof Error) showToast(error.message.split('. ')[0]);
@@ -143,7 +154,7 @@
     function addNewItemRow() {
         if (!isAddingItem) {
             isAddingItem = true;
-            listItems = [...listItems, { id: 0, name: '', list_id: 0, added_by: 0, checked: false }];
+            listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
             tick().then(() => document.getElementById('new-item-input')?.focus());
         }
     }
@@ -159,17 +170,16 @@
         isAddingItem = false;
     }
 
-    function sortItems() {
+    function    sortItems() {
         listItems = [...listItems].sort((a, b) => Number(a.checked) - Number(b.checked));
+        console.log('Sorted Items:', listItems);
     }
 
-    async function toggleItemCompletion(item: ListItemData) {
+    async function toggleItemCompletion(item: ListItem) {
         try {
-            const updatedItem = await updateListItem(listId, item.id, { name: item.name, checked: !item.checked });
-            if (updatedItem) {
-                item.checked = updatedItem.checked;
-                sortItems();
-            }
+            const updatedItemId = await updateListItem(item.id, { checked: !item.checked });
+            listItems = listItems.map(i => i.id === updatedItemId ? { ...i, checked: !i.checked } : i);
+            sortItems();
         } catch (error) {
             console.error('Failed to update list item:', error);
         }

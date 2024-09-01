@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { register } from '../../lib/api';
+    import { register } from '../../lib/auth';
     import { goto } from '$app/navigation';
     import { darkMode } from '$lib/stores/darkModeStore';
 
-    let username = '';
     let email = '';
+    let username = '';
     let password = '';
 
     async function handleRegister() {
     try {
-        await register({ username, email, password });
+        await register( email, username,password );
         goto('/'); // Redirect to home page on successful registration
     } catch (error) {
         console.error('Registration error:', error);
