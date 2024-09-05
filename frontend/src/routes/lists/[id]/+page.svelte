@@ -17,7 +17,8 @@
     let isAddingItem = false;
     let sharedWithUsernames: string[] = [];
     let activeEvent: string | null = null;
-    const currentUserId = auth.currentUser?.uid;
+    let currentUserId = '';
+    let isLoading = true;
 
     const swipeDistance = 100;
     const SWIPE_RESET_DELAY = 100;
@@ -26,21 +27,29 @@
 
     onMount(async () => {
         try {
-            const [fetchedListItems, fetchedListDetail] = await Promise.all([
-                fetchListItems(listId),
-                fetchListById(listId)
-            ]);
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    const [fetchedListItems, fetchedListDetail] = await Promise.all([
+                        fetchListItems(listId),
+                        fetchListById(listId)
+                    ]);
 
-            if (fetchedListItems) {
-                listItems = fetchedListItems;
-                sortItems();
-            }
+                    if (fetchedListItems) {
+                        listItems = fetchedListItems;
+                        sortItems();
+                    }
 
-            if (fetchedListDetail) {
-                listDetail = fetchedListDetail;
-                sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy);
-                console.log('DEBUG: sharedWithUsernames', sharedWithUsernames);
-            }
+                    if (fetchedListDetail) {
+                        listDetail = fetchedListDetail;
+                        sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy);
+                    }
+                    isLoading = false;
+                } else {
+                    console.log("User not detected, redirecting to login");
+                    goto('/');
+                }
+            });
 
             document.addEventListener('click', handleClickOutside);
         } catch (error) {
@@ -131,7 +140,6 @@
         try {
             const usernames = await Promise.all(sharedBy.map(async (userId) => {
                 const user = await fetchUserById(userId);
-                console.log('DEBUG: user', user);
                 return user && user.id != currentUserId ? user.name : null;
             }));
             return usernames.filter((username) => username !== null);
@@ -170,9 +178,8 @@
         isAddingItem = false;
     }
 
-    function    sortItems() {
+    function sortItems() {
         listItems = [...listItems].sort((a, b) => Number(a.checked) - Number(b.checked));
-        console.log('Sorted Items:', listItems);
     }
 
     async function toggleItemCompletion(item: ListItem) {
@@ -209,78 +216,82 @@
 </script>
 
 <div class={$darkMode ? 'p-4 bg-main-bg-dark text-text-dark' : 'p-4 bg-main-bg-light text-text-light'}>
-    <div class="flex items-center mb-6">
-        <button on:click={goBack} class="flex items-center text-lg font-bold">
-            <span class="ri-arrow-left-s-line text-icon-lg mr-2"></span>
-            My Lists
-        </button>
-    </div>
-    <h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
-    <h3 class="text-sm font-bold mb-6">
-        {'Shared with: '}
-        <span class="font-normal">
-            {sharedWithUsernames.length > 0 ? sharedWithUsernames.join(', ') : 'No one'}
-        </span>
-    </h3>
+    {#if isLoading}
+        <p>Loading...</p>
+    {:else}
+        <div class="flex items-center mb-6">
+            <button on:click={goBack} class="flex items-center text-lg font-bold">
+                <span class="ri-arrow-left-s-line text-icon-lg mr-2"></span>
+                My Lists
+            </button>
+        </div>
+        <h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
+        <h3 class="text-sm font-bold mb-6">
+            {'Shared with: '}
+            <span class="font-normal">
+                {sharedWithUsernames.length > 0 ? sharedWithUsernames.join(', ') : 'No one'}
+            </span>
+        </h3>
 
-    {#if listItems.length > 0}
-        <div class={`rounded-xl shadow-ios p-4 overflow-hidden ${$darkMode ? 'bg-lists-bg-dark' : 'bg-lists-bg-light'}`}>
-            <ul class="space-y-2">
-                {#each listItems as item, index (item.id)}
-                <li 
-                    class={`list-item relative flex items-center p-2 ${$darkMode ? 'bg-lists-bg-dark' : 'bg-lists-bg-light'} rounded-lg`}
-                    use:swipe={{ timeframe: 300, minSwipeDistance: 60 }} 
-                    on:swipe={(event) => handleSwipe(event)}
-                >
-                    <div class="list-item-content flex items-center w-full">
-                        <label class="flex items-center w-full">
-                            <input 
-                                type="checkbox" 
-                                class={`flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 ${$darkMode ? 'border-add-item bg-lists-bg-dark checked:bg-add-item' : 'border-add-item bg-lists-bg-light checked:bg-add-item'} mr-4 rounded focus:ring-0`}
-                                checked={item.checked}
-                                disabled={isAddingItem && index === listItems.length - 1}
-                                on:click={(event) => handleCheckboxClick(event, item)}
-                            />
-                            {#if isAddingItem && index === listItems.length - 1}
-                            <input 
-                                id="new-item-input"
-                                type="text" 
-                                class={`flex-grow p-2 border-2 ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'} rounded-lg`}
-                                bind:value={newItemName}
-                                on:keydown={handleKeyDown}
-                            />
-                            {:else}
-                            <span class="flex-grow">{item.name}</span>
-                            {/if}
-                        </label>
-                    </div>
-
-                    <button 
-                        class={`absolute top-0 bottom-0 right-0 py-1 text-white rounded-r-lg shadow-lg transition-transform-opacity duration-300 ease-in-out opacity-0 pointer-events-none flex items-center justify-center bg-delete-btn hover:bg-delete-btn-hover`}
-                        style={`width: ${swipeDistance}px;`}
-                        aria-label="Delete item"
-                        on:click={() => handleDeleteItem(item)}
+        {#if listItems.length > 0}
+            <div class={`rounded-xl shadow-ios p-4 overflow-hidden ${$darkMode ? 'bg-lists-bg-dark' : 'bg-lists-bg-light'}`}>
+                <ul class="space-y-2">
+                    {#each listItems as item, index (item.id)}
+                    <li 
+                        class={`list-item relative flex items-center p-2 ${$darkMode ? 'bg-lists-bg-dark' : 'bg-lists-bg-light'} rounded-lg`}
+                        use:swipe={{ timeframe: 300, minSwipeDistance: 60 }} 
+                        on:swipe={(event) => handleSwipe(event)}
                     >
-                        Delete
-                    </button>
-                </li>
-                {#if listItems.length - 1 !== index}
-                    <li class={`border-t ${$darkMode ? 'border-border-dark' : 'border-border-light'} mt-2`}></li>
-                {/if}
-                {/each}
-            </ul>
+                        <div class="list-item-content flex items-center w-full">
+                            <label class="flex items-center w-full">
+                                <input 
+                                    type="checkbox" 
+                                    class={`flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 ${$darkMode ? 'border-add-item bg-lists-bg-dark checked:bg-add-item' : 'border-add-item bg-lists-bg-light checked:bg-add-item'} mr-4 rounded focus:ring-0`}
+                                    checked={item.checked}
+                                    disabled={isAddingItem && index === listItems.length - 1}
+                                    on:click={(event) => handleCheckboxClick(event, item)}
+                                />
+                                {#if isAddingItem && index === listItems.length - 1}
+                                <input 
+                                    id="new-item-input"
+                                    type="text" 
+                                    class={`flex-grow p-2 border-2 ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'} rounded-lg`}
+                                    bind:value={newItemName}
+                                    on:keydown={handleKeyDown}
+                                />
+                                {:else}
+                                <span class="flex-grow">{item.name}</span>
+                                {/if}
+                            </label>
+                        </div>
+
+                        <button 
+                            class={`absolute top-0 bottom-0 right-0 py-1 text-white rounded-r-lg shadow-lg transition-transform-opacity duration-300 ease-in-out opacity-0 pointer-events-none flex items-center justify-center bg-delete-btn hover:bg-delete-btn-hover`}
+                            style={`width: ${swipeDistance}px;`}
+                            aria-label="Delete item"
+                            on:click={() => handleDeleteItem(item)}
+                        >
+                            Delete
+                        </button>
+                    </li>
+                    {#if listItems.length - 1 !== index}
+                        <li class={`border-t ${$darkMode ? 'border-border-dark' : 'border-border-light'} mt-2`}></li>
+                    {/if}
+                    {/each}
+                </ul>
+            </div>
+        {/if}
+        <div class="mt-4">
+            <button 
+                class={`text-add-item ${$darkMode ? 'hover:text-add-item-hover-dark' : 'hover:text-add-item-hover-light'} text-base font-normal flex items-center`}
+                on:click={addNewItemRow}
+                aria-label="Add new item"
+            >
+                <span class="ri-add-line text-icon-lg"></span>
+                Add Item
+            </button>
         </div>
     {/if}
-    <div class="mt-4">
-        <button 
-            class={`text-add-item ${$darkMode ? 'hover:text-add-item-hover-dark' : 'hover:text-add-item-hover-light'} text-base font-normal flex items-center`}
-            on:click={addNewItemRow}
-            aria-label="Add new item"
-        >
-            <span class="ri-add-line text-icon-lg"></span>
-            Add Item
-        </button>
-    </div>
 </div>
 
 <style lang="postcss">

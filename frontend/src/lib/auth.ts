@@ -1,7 +1,7 @@
 import { auth, db } from './firebase';
 import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 import type { AuthError } from 'firebase/auth';
-import type { User, UserCredential } from 'firebase/auth';
+import type { UserCredential } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import type { UserData } from '../lib/types';
 
@@ -89,9 +89,4 @@ export async function register(email: string, username: string, password: string
 			throw new Error('An unknown error occurred during registration.');
 		}
 	}
-}
-
-// Check if a user is logged in
-export function onAuthStateChanged(callback: (user: User | null) => void) {
-	auth.onAuthStateChanged(callback);
 }

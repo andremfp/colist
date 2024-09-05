@@ -20,7 +20,7 @@
 
     async function handleLogout() {
         try {
-            await logout();
+            // await logout();
         } catch (error) {
             console.error('Error during logout:', error);
             alert('Logout failed. You have been logged out locally.');

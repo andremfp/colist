@@ -9,8 +9,7 @@
     async function handleLogin() {
         try {
             const data = await login(email, password);
-            localStorage.setItem('access_token', data.access);
-            localStorage.setItem('user_id', String(data.id));
+            console.log('Login successful:', data);
             goto('/lists');
         } catch (error) {
             console.error('Login error:', error);
