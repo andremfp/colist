@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { swipe } from 'svelte-gestures';
+	import type { SwipeCustomEvent } from 'svelte-gestures';
+	import { auth } from '../../lib/firebase';
 	import {
 		fetchLists,
 		addList,
@@ -7,48 +11,58 @@
 		deleteList
 	} from '../../lib/api';
 	import type { List, UserData } from '../../lib/types';
-	import { goto } from '$app/navigation';
-	import { darkMode } from '$lib/stores/darkModeStore';
-	import { swipe } from 'svelte-gestures';
-	import type { SwipeCustomEvent } from 'svelte-gestures';
-	import { auth } from '../../lib/firebase';
 
 	let lists: List[] = [];
 	let users: UserData[] = [];
-	let newListName = '';
-	let selectedUser = 'None';
-	let showCreateForm = false;
 	let currentUserId = '';
 	let isLoading = true;
+	let showCreateForm = false;
 	let swipedListId: string | null = null;
+	let newListName = '';
+	let selectedUser = 'None';
 
 	const swipeDistance = 100;
+
 	$: isDoneActive = newListName.trim() !== '';
 
-	onMount(async () => {
-		try {
-			auth.onAuthStateChanged(async (user) => {
-				if (user) {
-					currentUserId = user.uid;
-					users = await fetchAllUserProfilesExceptCurrent(currentUserId);
-					lists = (await fetchLists()) || [];
-					isLoading = false;
-				} else {
-					console.log('User not detected, redirecting to login');
-					goto('/');
-				}
-			});
-			document.addEventListener('click', handleClickOutside);
-		} catch (error) {
-			console.error('Failed to initialize authentication or fetch data:', error);
-		}
+	onMount(() => {
+		auth.onAuthStateChanged(handleAuthStateChange);
+		document.addEventListener('click', handleClickOutside);
 	});
 
 	onDestroy(() => {
 		if (typeof document !== 'undefined') {
 			document.removeEventListener('click', handleClickOutside);
+			document.removeEventListener('click', handleClickOutside);
 		}
 	});
+
+	async function handleAuthStateChange(user: any) {
+		if (user) {
+			currentUserId = user.uid;
+			await Promise.all([fetchUserData(), fetchListsData()]);
+			isLoading = false;
+		} else {
+			console.log('User not detected, redirecting to login');
+			goto('/');
+		}
+	}
+
+	async function fetchUserData() {
+		try {
+			users = await fetchAllUserProfilesExceptCurrent(currentUserId);
+		} catch (error) {
+			console.error('Failed to fetch user profiles:', error);
+		}
+	}
+
+	async function fetchListsData() {
+		try {
+			lists = (await fetchLists()) || [];
+		} catch (error) {
+			console.error('Failed to fetch lists:', error);
+		}
+	}
 
 	async function handleCreateList() {
 		if (!newListName.trim()) return;
@@ -61,12 +75,18 @@
 			});
 			if (newList) {
 				lists = [...lists, newList];
-				showCreateForm = false;
+				resetCreateForm();
 				goto(`/lists/${newList.id}`);
 			}
 		} catch (error) {
 			console.error('Failed to create list:', error);
 		}
+	}
+
+	function resetCreateForm() {
+		showCreateForm = false;
+		newListName = '';
+		selectedUser = 'None';
 	}
 
 	async function handleDeleteList(listId: string) {
@@ -88,16 +108,11 @@
 	}
 
 	function handleListItemClick(event: MouseEvent, listId: string) {
-		// Prevent navigation if any list item is swiped
 		if (swipedListId !== null) {
-			// If the clicked item is not the swiped item, just revert the swipe
-			if (swipedListId !== listId) {
-				swipedListId = null;
-			}
-			event.preventDefault(); // Prevent default click behavior
+			swipedListId = swipedListId !== listId ? null : swipedListId;
+			event.preventDefault();
 			return;
 		}
-		// Proceed to navigation if no swipe is active
 		goto(`/lists/${listId}`);
 	}
 
@@ -107,19 +122,11 @@
 			swipedListId = null;
 		}
 	}
-
-	function toggleCreateForm() {
-		showCreateForm = !showCreateForm;
-	}
 </script>
 
 <div class="p-4 bg-main-bg-light text-text-light dark:bg-main-bg-dark dark:text-text-dark">
 	{#if isLoading}
-		<p
-			class="flex justify-center text-xl text-text-light dark:bg-main-bg-dark dark:text-text-dark font-bold"
-		>
-			Loading...
-		</p>
+		<p class="flex justify-center text-xl font-bold">Loading...</p>
 	{:else}
 		<h1 class="text-3xl font-bold mb-6">My Lists</h1>
 
@@ -132,7 +139,6 @@
 							use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
 							on:swipe={(event) => handleSwipe(event, list.id)}
 						>
-							<!-- List item content -->
 							<div
 								class="flex items-center w-full transition-transform duration-300 ease-in-out"
 								style={`transform: translateX(${swipedListId === list.id ? `-${swipeDistance}px` : '0'});`}
@@ -161,7 +167,6 @@
 								</button>
 							</div>
 
-							<!-- Delete button -->
 							<button
 								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
 								style={`width: ${swipeDistance}px; transform: translateX(${swipedListId === list.id ? '0' : `${swipeDistance}px`});`}
@@ -180,7 +185,7 @@
 			<div class="mt-4 flex justify-end">
 				<button
 					class="text-button-blue text-base"
-					on:click={toggleCreateForm}
+					on:click={() => (showCreateForm = true)}
 					aria-label="Add new list"
 				>
 					Add List
@@ -195,16 +200,12 @@
 					class="relative z-10 p-6 border rounded-xl max-w-md w-full border-border-light bg-main-bg-light dark:border-border-dark dark:bg-main-bg-dark"
 				>
 					<div class="flex justify-between items-center mb-4">
-						<button
-							class="text-sm text-button-blue"
-							on:click={toggleCreateForm}
-							aria-label="Cancel"
-						>
+						<button class="text-sm text-button-blue" on:click={resetCreateForm} aria-label="Cancel">
 							Cancel
 						</button>
 						<h2 class="text-xl font-semibold">New List</h2>
 						<button
-							class={`text-sm ${isDoneActive ? `text-button-blue cursor-pointer` : 'text-button-disabled'}`}
+							class={`text-sm ${isDoneActive ? 'text-button-blue cursor-pointer' : 'text-button-disabled'}`}
 							on:click={handleCreateList}
 							aria-label="Done"
 							disabled={!isDoneActive}
