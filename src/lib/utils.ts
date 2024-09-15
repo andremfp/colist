@@ -2,16 +2,13 @@ import { fetchUserById } from './api';
 import type { ListItem } from './types';
 
 // Utility function to show toast messages
-export function showToast(message: string, duration = 5000) {
-	const toast = document.createElement('div');
-	toast.innerText = message;
-	toast.className =
-		'fixed bottom-4 left-1/2 transform -translate-x-1/2 p-4 bg-blue-500 text-white rounded-lg shadow-lg';
 
+export function showToast(message: string) {
+	const toast = document.createElement('div');
+	toast.textContent = message;
+	toast.className = `bg-fail-toast-bg-light dark:bg-fail-toast-bg-dark text-fail-toast-text fixed top-4 left-1/2 transform -translate-x-1/2 py-2 px-6 rounded-md shadow-lg backdrop-blur-md`;
 	document.body.appendChild(toast);
-	setTimeout(() => {
-		document.body.removeChild(toast);
-	}, duration);
+	setTimeout(() => toast.remove(), 5000);
 }
 
 // Utility function to sort list items by checked status and name
