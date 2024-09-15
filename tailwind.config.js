@@ -15,19 +15,13 @@ export default {
 				'text-dark': '#E0E0E0',
 				'login-btn': '#D77D4E',
 				'login-btn-focus': '#B65A38',
-				'register-hover-light': '#4A4A4A',
-				'register-hover-dark': '#9A9A9A',
 				'border-light': '#D3D3D3',
 				'border-dark': '#4D4D4D',
 				'login-bg-light': '#FFFFFF',
 				'login-bg-dark': '#2A2A2A',
 				'lists-bg-light': '#FFFFFF',
 				'lists-bg-dark': '#2A2A2A',
-				'lists-hover-light': '#F5F5F5',
-				'lists-hover-dark': '#3A3A3A',
 				'add-item': '#D69E2E',
-				'add-item-hover-dark': '#F6E05E',
-				'add-item-hover-light': '#B7791F',
 				'list-item-count-light': '#4B5563',
 				'list-item-count-dark': '#9CA3AF',
 				'input-border-light': '#D1D5DB',
@@ -35,16 +29,13 @@ export default {
 				'input-bg-dark': '#374151',
 				'input-text-dark': '#D1D5DB',
 				'button-blue': '#3B82F6',
-				'button-blue-hover-light': '#2563EB',
-				'button-blue-hover-dark': '#93C5FD',
 				'button-disabled': '#D1D5DB',
 				'fail-toast-bg-light': 'rgba(255, 99, 71, 0.2)',
 				'fail-toast-bg-dark': 'rgba(220, 20, 60, 0.2)',
 				'fail-toast-text': '#FF6B6B',
 				'list-shared-dark': '#9CA3AF',
 				'list-shared-light': '#4B5563',
-				'delete-btn': '#C53030',
-				'delete-btn-hover': '#E53E3E'
+				'delete-btn': '#C53030'
 			},
 			boxShadow: {
 				ios: '0 2px 4px rgba(0, 0, 0, 0.1)'
@@ -77,7 +68,7 @@ export default {
 						transform: 'translateX(0)'
 					}
 				},
-				['responsive', 'hover']
+				['responsive']
 			);
 		}
 	],
