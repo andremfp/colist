@@ -6,8 +6,7 @@
 		updateListItem,
 		updateList,
 		deleteListItem,
-		fetchListById,
-		fetchUserById
+		fetchListById
 	} from '$lib/api';
 	import type { List, ListItem } from '$lib/types';
 	import { page } from '$app/stores';
@@ -188,7 +187,11 @@
 
 <div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
 	{#if isLoading}
-		<p>Loading...</p>
+		<p
+			class="flex justify-center text-xl text-text-light dark:bg-main-bg-dark dark:text-text-dark font-bold"
+		>
+			Loading...
+		</p>
 	{:else}
 		<div class="flex items-center mb-6">
 			<button on:click={goBack} class="flex items-center text-lg font-bold">
