@@ -20,7 +20,7 @@
 	let showCreateForm = false;
 	let currentUserId = '';
 	let isLoading = true;
-	let activeEvent: string | null = null;
+	let swipedListId: string | null = null;
 
 	const swipeDistance = 100;
 	$: isDoneActive = newListName.trim() !== '';
@@ -73,41 +73,39 @@
 		try {
 			await deleteList(listId);
 			lists = lists.filter((list) => list.id !== listId);
+			swipedListId = null;
 		} catch (error) {
 			console.error('Failed to delete list:', error);
 		}
 	}
 
-	function handleSwipe(event: SwipeCustomEvent) {
-		const list = (event.target as HTMLElement)?.closest('li');
-		if (!list) return;
-		activeEvent = 'swipe';
-		list.classList.toggle('revealed', event.detail.direction === 'left');
+	function handleSwipe(event: SwipeCustomEvent, listId: string) {
+		if (event.detail.direction === 'left') {
+			swipedListId = listId;
+		} else if (event.detail.direction === 'right' && swipedListId === listId) {
+			swipedListId = null;
+		}
 	}
 
-	function handleButtonClick(event: MouseEvent, listId: string) {
-		if (activeEvent === 'swipe') {
-			event.preventDefault();
+	function handleListItemClick(event: MouseEvent, listId: string) {
+		// Prevent navigation if any list item is swiped
+		if (swipedListId !== null) {
+			// If the clicked item is not the swiped item, just revert the swipe
+			if (swipedListId !== listId) {
+				swipedListId = null;
+			}
+			event.preventDefault(); // Prevent default click behavior
 			return;
 		}
+		// Proceed to navigation if no swipe is active
 		goto(`/lists/${listId}`);
 	}
 
 	function handleClickOutside(event: MouseEvent) {
-		const revealedItem = document.querySelector('li.revealed');
-		if (revealedItem && !revealedItem.contains(event.target as Node)) {
-			revealedItem.classList.remove('revealed');
-			activeEvent = null;
+		const clickedElement = event.target as HTMLElement;
+		if (!clickedElement.closest('.list-item') && !clickedElement.closest('.delete-btn')) {
+			swipedListId = null;
 		}
-	}
-
-	function showToast(message: string) {
-		const toast = document.createElement('div');
-		toast.textContent = message;
-		toast.className = `${$darkMode ? 'bg-fail-toast-bg-dark' : 'bg-fail-toast-bg-light'} text-fail-toast-text fixed top-4 left-1/2 transform -translate-x-1/2 py-2 px-6 rounded-md shadow-lg backdrop-blur-md`;
-		toast.style.whiteSpace = 'pre-line';
-		document.body.appendChild(toast);
-		setTimeout(() => toast.remove(), 8000);
 	}
 
 	function toggleCreateForm() {
@@ -115,9 +113,7 @@
 	}
 </script>
 
-<div
-	class={$darkMode ? 'p-4 bg-main-bg-dark text-text-dark' : 'p-4 bg-main-bg-light text-text-light'}
->
+<div class="p-4 bg-main-bg-light text-text-light dark:bg-main-bg-dark dark:text-text-dark">
 	{#if isLoading}
 		<p>Loading...</p>
 	{:else}
@@ -128,14 +124,18 @@
 				<ul class="space-y-2 overflow-hidden">
 					{#each lists as list (list.id)}
 						<li
-							class={`relative flex rounded-xl shadow-ios transition-colors duration-200 ${$darkMode ? 'bg-lists-bg-dark hover:bg-lists-hover-dark' : 'bg-lists-bg-light hover:bg-lists-hover-light'}`}
+							class="list-item relative flex items-center rounded-xl shadow-ios overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark"
 							use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
-							on:swipe={handleSwipe}
+							on:swipe={(event) => handleSwipe(event, list.id)}
 						>
-							<div class="list-content flex items-center w-full">
+							<!-- List item content -->
+							<div
+								class="flex items-center w-full transition-transform duration-300 ease-in-out"
+								style={`transform: translateX(${swipedListId === list.id ? `-${swipeDistance}px` : '0'});`}
+							>
 								<button
 									class="w-full flex items-center justify-between p-4 text-left"
-									on:click={(event) => handleButtonClick(event, list.id)}
+									on:click={(event) => handleListItemClick(event, list.id)}
 									aria-label={`View details of ${list.name}`}
 								>
 									<div class="flex items-center space-x-4">
@@ -146,13 +146,10 @@
 									</div>
 									<div class="flex items-center space-x-4">
 										{#if list.sharedBy.length > 0}
-											<small class={$darkMode ? 'text-list-shared-dark' : 'text-list-shared-light'}
-												>Shared</small
+											<small class="text-list-shared-light dark:text-list-shared-dark">Shared</small
 											>
 										{/if}
-										<span
-											class={$darkMode ? 'text-list-item-count-dark' : 'text-list-item-count-light'}
-										>
+										<span class="text-list-item-count-light dark:text-list-item-count-dark">
 											{list.itemCount}
 										</span>
 										<span class="ri-arrow-right-s-line text-xl"></span>
@@ -160,9 +157,10 @@
 								</button>
 							</div>
 
+							<!-- Delete button -->
 							<button
-								class="absolute top-0 bottom-0 right-0 py-1 text-white rounded-r-lg shadow-lg transition-transform-opacity duration-300 ease-in-out opacity-0 pointer-events-none flex items-center justify-center bg-delete-btn hover:bg-delete-btn-hover"
-								style={`width: ${swipeDistance}px;`}
+								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
+								style={`width: ${swipeDistance}px; transform: translateX(${swipedListId === list.id ? '0' : `${swipeDistance}px`});`}
 								aria-label="Delete list"
 								on:click={() => handleDeleteList(list.id)}
 							>
@@ -177,7 +175,7 @@
 
 			<div class="mt-4 flex justify-end">
 				<button
-					class={`text-button-blue ${$darkMode ? 'hover:text-button-blue-hover-dark' : 'hover:text-button-blue-hover-light'} text-base`}
+					class="text-button-blue text-base"
 					on:click={toggleCreateForm}
 					aria-label="Add new list"
 				>
@@ -190,20 +188,20 @@
 			<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
 				<div class="bg-opacity-75 bg-black fixed inset-0 z-0"></div>
 				<div
-					class={`relative z-10 p-6 border rounded-xl ${$darkMode ? 'border-border-dark bg-main-bg-dark' : 'border-border-light bg-main-bg-light'} max-w-md w-full`}
+					class="relative z-10 p-6 border rounded-xl max-w-md w-full border-border-light bg-main-bg-light dark:border-border-dark dark:bg-main-bg-dark"
 				>
 					<div class="flex justify-between items-center mb-4">
 						<button
+							class="text-sm text-button-blue"
 							on:click={toggleCreateForm}
-							class={`text-sm text-button-blue ${$darkMode ? 'hover:text-button-blue-hover-dark' : 'hover:text-button-blue-hover-light'}`}
 							aria-label="Cancel"
 						>
 							Cancel
 						</button>
 						<h2 class="text-xl font-semibold">New List</h2>
 						<button
+							class={`text-sm ${isDoneActive ? `text-button-blue cursor-pointer` : 'text-button-disabled'}`}
 							on:click={handleCreateList}
-							class={`text-sm ${isDoneActive ? `text-button-blue cursor-pointer ${$darkMode ? 'hover:text-button-blue-hover-dark' : 'hover:text-button-blue-hover-light'}` : 'text-button-disabled'}`}
 							aria-label="Done"
 							disabled={!isDoneActive}
 						>
@@ -217,7 +215,7 @@
 								type="text"
 								bind:value={newListName}
 								required
-								class={`mt-2 block w-full p-3 border rounded-md ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'}`}
+								class="mt-2 block w-full p-3 border rounded-md border-input-border-light dark:border-input-border-dark dark:bg-input-bg-dark dark:text-input-text-dark"
 							/>
 						</label>
 
@@ -227,7 +225,7 @@
 								<select
 									name="users"
 									bind:value={selectedUser}
-									class={`mt-2 block w-full p-3 border rounded-md appearance-none ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'}`}
+									class="mt-2 block w-full p-3 border rounded-md appearance-none border-input-border-light dark:border-input-border-dark dark:bg-input-bg-dark dark:text-input-text-dark"
 								>
 									<option value="None">None</option>
 									{#each users as user (user.id)}
@@ -235,19 +233,19 @@
 									{/each}
 								</select>
 
-								<!-- Arrow Icon Container -->
 								<div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
 									<svg
 										class="w-4 h-4 text-gray-400"
+										xmlns="http://www.w3.org/2000/svg"
 										fill="none"
-										stroke="currentColor"
 										viewBox="0 0 24 24"
+										stroke="currentColor"
 									>
 										<path
 											stroke-linecap="round"
 											stroke-linejoin="round"
 											stroke-width="2"
-											d="M19 9l-7 7-7-7"
+											d="M6 9l6 6 6-6"
 										/>
 									</svg>
 								</div>
@@ -259,21 +257,3 @@
 		{/if}
 	{/if}
 </div>
-
-<style lang="postcss">
-	.revealed .list-content {
-		@apply translate-reveal opacity-70;
-	}
-
-	.revealed button {
-		@apply opacity-100 pointer-events-auto;
-	}
-
-	.unrevealed .list-content {
-		@apply translate-x-0 opacity-100;
-	}
-
-	.unrevealed button {
-		@apply opacity-0 pointer-events-none;
-	}
-</style>

@@ -74,7 +74,6 @@ declare module '$env/static/private' {
 	export const npm_execpath: string;
 	export const npm_package_devDependencies_tslib: string;
 	export const PAGER: string;
-	export const VIRTUAL_ENV: string;
 	export const npm_package_devDependencies_svelte: string;
 	export const LSCOLORS: string;
 	export const PATH: string;
@@ -92,8 +91,8 @@ declare module '$env/static/private' {
 	export const npm_package_scripts_preview: string;
 	export const P9K_SSH: string;
 	export const npm_lifecycle_event: string;
-	export const LANG: string;
 	export const P9K_TTY: string;
+	export const LANG: string;
 	export const npm_package_devDependencies__sveltejs_vite_plugin_svelte: string;
 	export const npm_package_name: string;
 	export const npm_package_scripts_test_integration: string;
@@ -144,7 +143,6 @@ declare module '$env/static/private' {
 	export const npm_config_init_version: string;
 	export const npm_config_ignore_optional: string;
 	export const SECURITYSESSIONID: string;
-	export const VIRTUAL_ENV_PROMPT: string;
 	export const npm_package_scripts_check: string;
 	export const COLORTERM: string;
 	export const npm_node_execpath: string;
@@ -231,7 +229,6 @@ declare module '$env/dynamic/private' {
 		npm_execpath: string;
 		npm_package_devDependencies_tslib: string;
 		PAGER: string;
-		VIRTUAL_ENV: string;
 		npm_package_devDependencies_svelte: string;
 		LSCOLORS: string;
 		PATH: string;
@@ -249,8 +246,8 @@ declare module '$env/dynamic/private' {
 		npm_package_scripts_preview: string;
 		P9K_SSH: string;
 		npm_lifecycle_event: string;
-		LANG: string;
 		P9K_TTY: string;
+		LANG: string;
 		npm_package_devDependencies__sveltejs_vite_plugin_svelte: string;
 		npm_package_name: string;
 		npm_package_scripts_test_integration: string;
@@ -301,7 +298,6 @@ declare module '$env/dynamic/private' {
 		npm_config_init_version: string;
 		npm_config_ignore_optional: string;
 		SECURITYSESSIONID: string;
-		VIRTUAL_ENV_PROMPT: string;
 		npm_package_scripts_check: string;
 		COLORTERM: string;
 		npm_node_execpath: string;

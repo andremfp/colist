@@ -26,7 +26,7 @@
 	let isLoading = true;
 	let isAddingItem = false;
 	let sharedWithUsernames: string[] = [];
-	let activeEvent: string | null = null;
+	let swipedListId: string | null = null;
 
 	const swipeDistance = 100;
 	const SWIPE_RESET_DELAY = 100;
@@ -115,70 +115,56 @@
 		}
 	}
 
-	function handleSwipe(event: SwipeCustomEvent) {
-		activeEvent = 'swipe';
-		event.preventDefault();
-		event.stopPropagation();
-
-		const listItem = (event.target as HTMLElement)?.closest('li');
-
-		if (listItem) {
-			const checkbox = listItem.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
-
-			if (event.detail.direction === 'left') {
-				listItem.classList.add('revealed');
-				if (checkbox) checkbox.disabled = true;
-			} else if (event.detail.direction === 'right') {
-				listItem.classList.remove('revealed');
-				if (checkbox) {
-					checkbox.disabled = false;
-					setTimeout(() => (activeEvent = null), SWIPE_RESET_DELAY);
-				}
-			}
-		} else {
-			console.error('List item not found or event.target is null');
-			showToast('List item not found or event.target is null.');
+	function handleSwipe(event: SwipeCustomEvent, listId: string) {
+		if (event.detail.direction === 'left') {
+			swipedListId = listId;
+		} else if (event.detail.direction === 'right' && swipedListId === listId) {
+			swipedListId = null;
 		}
 	}
+
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
-		if (activeEvent === 'swipe') {
+		if (isAddingItem) {
+			// Prevent any item from being checked if a new item is being added
 			event.preventDefault();
-			event.stopPropagation();
 			return;
 		}
-
-		event.stopPropagation();
+		if (swipedListId !== null) {
+			// If the clicked item is not the swiped item, just revert the swipe
+			if (swipedListId !== listId) {
+				swipedListId = null;
+			}
+			event.preventDefault(); // Prevent default click behavior
+			return;
+		}
 		await toggleItemCompletion(item);
 	}
 
 	function handleClickOutside(event: MouseEvent) {
-		const newItemInput = document.getElementById('new-item-input');
-		const addButton = document.querySelector('[aria-label="Add new item"]');
-		const revealedItem = document.querySelector('li.revealed');
-
-		if (revealedItem && !revealedItem.contains(event.target as Node)) {
-			revealedItem.classList.remove('revealed');
-			const checkbox = revealedItem.querySelector(
-				'input[type="checkbox"]'
-			) as HTMLInputElement | null;
-			if (checkbox) checkbox.disabled = false;
-			activeEvent = null;
+		const clickedElement = event.target as HTMLElement;
+		if (
+			!clickedElement.closest('.new-list-item') &&
+			!clickedElement.closest('.delete-btn') &&
+			!clickedElement.closest('.add-item')
+		) {
+			if (isAddingItem) {
+				cancelAddItem();
+				event.preventDefault();
+				swipedListId = null;
+			} else {
+				swipedListId = null;
+			}
 		}
 
-		if (
-			isAddingItem &&
-			newItemInput &&
-			!newItemInput.contains(event.target as Node) &&
-			addButton &&
-			!addButton.contains(event.target as Node)
-		) {
-			cancelAddItem();
+		if (clickedElement.closest('.new-list-item') && swipedListId !== null) {
+			swipedListId = null;
 		}
 	}
 
 	function addNewItemRow() {
 		if (!isAddingItem) {
 			isAddingItem = true;
+			swipedListId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
 			tick().then(() => document.getElementById('new-item-input')?.focus());
 		}
@@ -200,9 +186,7 @@
 	}
 </script>
 
-<div
-	class={$darkMode ? 'p-4 bg-main-bg-dark text-text-dark' : 'p-4 bg-main-bg-light text-text-light'}
->
+<div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
 	{#if isLoading}
 		<p>Loading...</p>
 	{:else}
@@ -221,20 +205,23 @@
 
 		{#if listItems.length > 0}
 			<div
-				class={`rounded-xl shadow-ios p-4 overflow-hidden ${$darkMode ? 'bg-lists-bg-dark' : 'bg-lists-bg-light'}`}
+				class="rounded-xl shadow-ios p-4 overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark"
 			>
 				<ul class="space-y-2">
 					{#each listItems as item, index (item.id)}
 						<li
-							class={`list-item relative flex items-center p-2 ${$darkMode ? 'bg-lists-bg-dark' : 'bg-lists-bg-light'} rounded-lg`}
+							class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
 							use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
-							on:swipe={(event) => handleSwipe(event)}
+							on:swipe={(event) => handleSwipe(event, item.id)}
 						>
-							<div class="list-item-content flex items-center w-full">
+							<div
+								class="list-item-content flex items-center w-full transition-transform duration-300 ease-in-out"
+								style={`transform: translateX(${swipedListId === item.id ? `-${swipeDistance}px` : '0'});`}
+							>
 								<label class="flex items-center w-full">
 									<input
 										type="checkbox"
-										class={`flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 ${$darkMode ? 'border-add-item bg-lists-bg-dark checked:bg-add-item' : 'border-add-item bg-lists-bg-light checked:bg-add-item'} mr-4 rounded focus:ring-0`}
+										class="flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item mr-4 rounded focus:ring-0"
 										checked={item.checked}
 										disabled={isAddingItem && index === listItems.length - 1}
 										on:click={(event) => handleCheckboxClick(event, item)}
@@ -243,7 +230,7 @@
 										<input
 											id="new-item-input"
 											type="text"
-											class={`flex-grow p-2 border-2 ${$darkMode ? 'border-input-border-dark bg-input-bg-dark text-input-text-dark' : 'border-input-border-light'} rounded-lg`}
+											class="new-list-item flex-grow p-2 border-2 border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark text-input-text-light dark:text-input-text-dark rounded-lg"
 											bind:value={newItemName}
 											on:keydown={handleKeyDown}
 										/>
@@ -254,8 +241,8 @@
 							</div>
 
 							<button
-								class={`absolute top-0 bottom-0 right-0 py-1 text-white rounded-r-lg shadow-lg transition-transform-opacity duration-300 ease-in-out opacity-0 pointer-events-none flex items-center justify-center bg-delete-btn hover:bg-delete-btn-hover`}
-								style={`width: ${swipeDistance}px;`}
+								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
+								style={`width: ${swipeDistance}px; transform: translateX(${swipedListId === item.id ? '0' : `${swipeDistance}px`});`}
 								aria-label="Delete item"
 								on:click={() => handleDeleteItem(item)}
 							>
@@ -263,9 +250,7 @@
 							</button>
 						</li>
 						{#if listItems.length - 1 !== index}
-							<li
-								class={`border-t ${$darkMode ? 'border-border-dark' : 'border-border-light'} mt-2`}
-							></li>
+							<li class="border-t border-border-light dark:border-border-dark mt-2"></li>
 						{/if}
 					{/each}
 				</ul>
@@ -273,7 +258,7 @@
 		{/if}
 		<div class="mt-4">
 			<button
-				class={`text-add-item ${$darkMode ? 'hover:text-add-item-hover-dark' : 'hover:text-add-item-hover-light'} text-base font-normal flex items-center`}
+				class="add-item text-add-item text-base font-normal flex items-center"
 				on:click={addNewItemRow}
 				aria-label="Add new item"
 			>
@@ -283,21 +268,3 @@
 		</div>
 	{/if}
 </div>
-
-<style lang="postcss">
-	.revealed .list-item-content {
-		@apply translate-reveal opacity-70;
-	}
-
-	.revealed button {
-		@apply opacity-100 pointer-events-auto;
-	}
-
-	.unrevealed .list-item-content {
-		@apply translate-x-0 opacity-100;
-	}
-
-	.unrevealed button {
-		@apply opacity-0 pointer-events-none;
-	}
-</style>
