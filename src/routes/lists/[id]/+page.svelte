@@ -221,7 +221,7 @@
 								<label class="flex items-center w-full">
 									<input
 										type="checkbox"
-										class="flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item mr-4 rounded focus:ring-0"
+										class="flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
 										checked={item.checked}
 										disabled={isAddingItem && index === listItems.length - 1}
 										on:click={(event) => handleCheckboxClick(event, item)}

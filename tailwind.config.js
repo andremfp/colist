@@ -22,6 +22,8 @@ export default {
 				'lists-bg-light': '#FFFFFF',
 				'lists-bg-dark': '#2A2A2A',
 				'add-item': '#D69E2E',
+				'bg-add-item': '#D69E2E',
+				'border-add-item': '#D69E2E',
 				'list-item-count-light': '#4B5563',
 				'list-item-count-dark': '#9CA3AF',
 				'input-border-light': '#D1D5DB',
