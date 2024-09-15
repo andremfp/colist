@@ -115,7 +115,11 @@
 
 <div class="p-4 bg-main-bg-light text-text-light dark:bg-main-bg-dark dark:text-text-dark">
 	{#if isLoading}
-		<p>Loading...</p>
+		<p
+			class="flex justify-center text-xl text-text-light dark:bg-main-bg-dark dark:text-text-dark font-bold"
+		>
+			Loading...
+		</p>
 	{:else}
 		<h1 class="text-3xl font-bold mb-6">My Lists</h1>
 
