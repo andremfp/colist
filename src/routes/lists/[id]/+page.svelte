@@ -10,7 +10,6 @@
 	} from '$lib/api';
 	import type { List, ListItem } from '$lib/types';
 	import { page } from '$app/stores';
-	import { darkMode } from '$lib/stores/darkModeStore';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 	import { swipe } from 'svelte-gestures';
@@ -186,88 +185,78 @@
 </script>
 
 <div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
-	{#if isLoading}
-		<p
-			class="flex justify-center text-xl text-text-light dark:bg-main-bg-dark dark:text-text-dark font-bold"
+	<div class="flex items-center mb-6">
+		<button on:click={goBack} class="flex items-center text-lg font-bold">
+			<span class="ri-arrow-left-s-line text-icon-lg mr-2"></span> My Lists
+		</button>
+	</div>
+
+	<h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
+	<h3 class="text-sm font-bold mb-6">
+		Shared with: <span class="font-normal"
+			>{sharedWithUsernames.length > 0 ? sharedWithUsernames.join(', ') : 'No one'}</span
 		>
-			Loading...
-		</p>
-	{:else}
-		<div class="flex items-center mb-6">
-			<button on:click={goBack} class="flex items-center text-lg font-bold">
-				<span class="ri-arrow-left-s-line text-icon-lg mr-2"></span> My Lists
-			</button>
-		</div>
+	</h3>
 
-		<h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
-		<h3 class="text-sm font-bold mb-6">
-			Shared with: <span class="font-normal"
-				>{sharedWithUsernames.length > 0 ? sharedWithUsernames.join(', ') : 'No one'}</span
-			>
-		</h3>
-
-		{#if listItems.length > 0}
-			<div
-				class="rounded-xl shadow-ios p-4 overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark"
-			>
-				<ul class="space-y-2">
-					{#each listItems as item, index (item.id)}
-						<li
-							class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
-							use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
-							on:swipe={(event) => handleSwipe(event, item.id)}
+	{#if listItems.length > 0}
+		<div class="rounded-xl shadow-ios p-4 overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark">
+			<ul class="space-y-2">
+				{#each listItems as item, index (item.id)}
+					<li
+						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
+						use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
+						on:swipe={(event) => handleSwipe(event, item.id)}
+					>
+						<div
+							class="list-item-content flex items-center w-full transition-transform duration-300 ease-in-out"
+							style={`transform: translateX(${swipedListId === item.id ? `-${swipeDistance}px` : '0'});`}
 						>
-							<div
-								class="list-item-content flex items-center w-full transition-transform duration-300 ease-in-out"
-								style={`transform: translateX(${swipedListId === item.id ? `-${swipeDistance}px` : '0'});`}
-							>
-								<label class="flex items-center w-full">
+							<label class="flex items-center w-full">
+								<input
+									type="checkbox"
+									class="flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
+									checked={item.checked}
+									disabled={isAddingItem && index === listItems.length - 1}
+									on:click={(event) => handleCheckboxClick(event, item)}
+								/>
+								{#if isAddingItem && index === listItems.length - 1}
 									<input
-										type="checkbox"
-										class="flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
-										checked={item.checked}
-										disabled={isAddingItem && index === listItems.length - 1}
-										on:click={(event) => handleCheckboxClick(event, item)}
+										id="new-item-input"
+										type="text"
+										class="new-list-item flex-grow p-2 border-2 border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark text-input-text-light dark:text-input-text-dark rounded-lg"
+										bind:value={newItemName}
+										on:keydown={handleKeyDown}
 									/>
-									{#if isAddingItem && index === listItems.length - 1}
-										<input
-											id="new-item-input"
-											type="text"
-											class="new-list-item flex-grow p-2 border-2 border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark text-input-text-light dark:text-input-text-dark rounded-lg"
-											bind:value={newItemName}
-											on:keydown={handleKeyDown}
-										/>
-									{:else}
-										<span class="flex-grow">{item.name}</span>
-									{/if}
-								</label>
-							</div>
+								{:else}
+									<span class="flex-grow">{item.name}</span>
+								{/if}
+							</label>
+						</div>
 
-							<button
-								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
-								style={`width: ${swipeDistance}px; transform: translateX(${swipedListId === item.id ? '0' : `${swipeDistance}px`});`}
-								aria-label="Delete item"
-								on:click={() => handleDeleteItem(item)}
-							>
-								Delete
-							</button>
-						</li>
-						{#if listItems.length - 1 !== index}
-							<li class="border-t border-border-light dark:border-border-dark mt-2"></li>
-						{/if}
-					{/each}
-				</ul>
-			</div>
-		{/if}
-		<div class="mt-4">
-			<button
-				class="add-item text-add-item text-base font-normal flex items-center"
-				on:click={addNewItemRow}
-				aria-label="Add new item"
-			>
-				<span class="ri-add-line text-icon-lg"></span>
-				Add Item
-			</button>
+						<button
+							class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
+							style={`width: ${swipeDistance}px; transform: translateX(${swipedListId === item.id ? '0' : `${swipeDistance}px`});`}
+							aria-label="Delete item"
+							on:click={() => handleDeleteItem(item)}
+						>
+							Delete
+						</button>
+					</li>
+					{#if listItems.length - 1 !== index}
+						<li class="border-t border-border-light dark:border-border-dark mt-2"></li>
+					{/if}
+				{/each}
+			</ul>
 		</div>
 	{/if}
+	<div class="mt-4">
+		<button
+			class="add-item text-add-item text-base font-normal flex items-center"
+			on:click={addNewItemRow}
+			aria-label="Add new item"
+		>
+			<span class="ri-add-line text-icon-lg"></span>
+			Add Item
+		</button>
+	</div>
 </div>

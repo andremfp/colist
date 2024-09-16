@@ -1,8 +1,16 @@
 {
 	"/": [
-		"src/routes/+page.ts"
+		"src/routes/+page.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
 	],
-	"/lists": [],
-	"/lists/[id]": [],
-	"/register": []
+	"/lists": [
+		"src/routes/+layout.ts"
+	],
+	"/lists/[id]": [
+		"src/routes/+layout.ts"
+	],
+	"/register": [
+		"src/routes/+layout.ts"
+	]
 }
