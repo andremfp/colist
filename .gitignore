@@ -3,38 +3,35 @@
 *.pot
 *.pyc
 __pycache__
-.env
 .DS_Store
 Thumbs.db
 
 # Ignore virtual environment directories
 venv/
 backend/venv/
-frontend/node_modules/
-
-# Static files
-/staticfiles/
-/media/
 
 # Local environment variables
 .env
 
-# Frontend ignores
-/frontend/node_modules/
-/frontend/build/
-/frontend/public/build/
-/frontend/.svelte-kit/
-/frontend/.vite/
+# Node.js dependencies
+node_modules/
+
+# Static files (if dynamically generated)
+static/
 
 # SvelteKit specific
-/frontend/.svelte-kit/
-/frontend/.vite/
+.svelte-kit/
+.vite/
 
 # Vite
-frontend/.svelte-kit
-frontend/.vite
-frontend/vite.lock
-frontend/vite-error.log
+vite.lock
+vite-error.log
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
 
 # Logs
 npm-debug.log*
@@ -47,3 +44,7 @@ pnpm-debug.log*
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+# Playwright (if you're generating any artifacts)
+test-results/
+playwright-report/
