@@ -16,6 +16,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-await auth.setPersistence(browserLocalPersistence);
+async function setAuthPersistence() {
+	await auth.setPersistence(browserLocalPersistence);
+}
+
+setAuthPersistence().catch((error) => {
+	console.error('Error setting auth persistence:', error);
+});
 
 export { db, auth };

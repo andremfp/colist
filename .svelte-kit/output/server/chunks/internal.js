@@ -1,4 +1,4 @@
-import { c as create_ssr_component, a as setContext, v as validate_component, m as missing_component } from "./ssr.js";
+import { c as create_ssr_component, s as setContext, v as validate_component, m as missing_component } from "./ssr.js";
 let base = "";
 let assets = base;
 const initial = { base, assets };
@@ -113,9 +113,25 @@ const options = {
   // added lazily, via `get_hooks`
   preload_strategy: "modulepreload",
   root: Root,
-  service_worker: false,
+  service_worker: true,
   templates: {
-    app: ({ head, body, assets: assets2, nonce, env }) => '<!doctype html>\n<html lang="en">\n	<head>\n		<meta charset="utf-8" />\n		<link rel="icon" href="' + assets2 + '/favicon.png" />\n		<meta name="viewport" content="width=device-width, initial-scale=1" />\n		' + head + '\n	</head>\n	<body data-sveltekit-preload-data="hover">\n		<div style="display: contents">' + body + "</div>\n	</body>\n</html>\n",
+    app: ({ head, body, assets: assets2, nonce, env }) => `<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="favicon-48x48.png" sizes="48x48" />
+		<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+		<link rel="shortcut icon" href="favicon.ico" />
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+		<meta name="apple-mobile-web-app-title" content="CoList" />
+		<link rel="manifest" href="site.webmanifest" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			if (localStorage.getItem('darkMode') === 'true') {
+				document.documentElement.classList.add('dark');
+			}
+		<\/script>
+		` + head + '\n	</head>\n	<body data-sveltekit-preload-data="hover">\n		<div style="display: contents">' + body + "</div>\n	</body>\n</html>\n",
     error: ({ status, message }) => '<!doctype html>\n<html lang="en">\n	<head>\n		<meta charset="utf-8" />\n		<title>' + message + `</title>
 
 		<style>
@@ -187,7 +203,7 @@ const options = {
 		<div class="error">
 			<span class="status">` + status + '</span>\n			<div class="message">\n				<h1>' + message + "</h1>\n			</div>\n		</div>\n	</body>\n</html>\n"
   },
-  version_hash: "k0hbcn"
+  version_hash: "1idn6in"
 };
 async function get_hooks() {
   return {};

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { darkMode } from '$lib/stores/darkModeStore';
 	import Header from './Header.svelte';
@@ -13,6 +13,19 @@
 
 	onMount(() => {
 		document.documentElement.classList.toggle('dark', $darkMode);
+
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker
+					.register('/service-worker.js')
+					.then((registration) => {
+						console.log('Service Worker registered with scope:', registration.scope);
+					})
+					.catch((error) => {
+						console.error('Service Worker registration failed:', error);
+					});
+			});
+		}
 	});
 </script>
 

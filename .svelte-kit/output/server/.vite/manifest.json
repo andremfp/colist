@@ -8,9 +8,34 @@
       "_internal.js"
     ]
   },
+  "_client.js": {
+    "file": "chunks/client.js",
+    "name": "client",
+    "imports": [
+      "_exports.js"
+    ]
+  },
+  "_darkModeStore.js": {
+    "file": "chunks/darkModeStore.js",
+    "name": "darkModeStore",
+    "imports": [
+      "_index.js"
+    ]
+  },
   "_exports.js": {
     "file": "chunks/exports.js",
     "name": "exports"
+  },
+  "_firebase.js": {
+    "file": "chunks/firebase.js",
+    "name": "firebase"
+  },
+  "_index.js": {
+    "file": "chunks/index.js",
+    "name": "index",
+    "imports": [
+      "_ssr.js"
+    ]
   },
   "_internal.js": {
     "file": "chunks/internal.js",
@@ -23,6 +48,62 @@
     "file": "chunks/ssr.js",
     "name": "ssr"
   },
+  "_stores.js": {
+    "file": "chunks/stores.js",
+    "name": "stores",
+    "imports": [
+      "_ssr.js",
+      "_client.js"
+    ]
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-cyrillic-400-normal.woff": {
+    "file": "_app/immutable/assets/roboto-flex-cyrillic-400-normal.ze0jS65n.woff",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-cyrillic-400-normal.woff"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-cyrillic-400-normal.woff2": {
+    "file": "_app/immutable/assets/roboto-flex-cyrillic-400-normal.Byl5Asvg.woff2",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-cyrillic-400-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-cyrillic-ext-400-normal.woff": {
+    "file": "_app/immutable/assets/roboto-flex-cyrillic-ext-400-normal.CYz-UdWe.woff",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-cyrillic-ext-400-normal.woff"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-cyrillic-ext-400-normal.woff2": {
+    "file": "_app/immutable/assets/roboto-flex-cyrillic-ext-400-normal.Dy_fbCN1.woff2",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-cyrillic-ext-400-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-greek-400-normal.woff": {
+    "file": "_app/immutable/assets/roboto-flex-greek-400-normal.CofrapJu.woff",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-greek-400-normal.woff"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-greek-400-normal.woff2": {
+    "file": "_app/immutable/assets/roboto-flex-greek-400-normal.DZ9SzitG.woff2",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-greek-400-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-latin-400-normal.woff": {
+    "file": "_app/immutable/assets/roboto-flex-latin-400-normal.Bwz-7M7w.woff",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-latin-400-normal.woff"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-latin-400-normal.woff2": {
+    "file": "_app/immutable/assets/roboto-flex-latin-400-normal.C-fvaPBU.woff2",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-latin-400-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-latin-ext-400-normal.woff": {
+    "file": "_app/immutable/assets/roboto-flex-latin-ext-400-normal.LdXRH_c-.woff",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-latin-ext-400-normal.woff"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-latin-ext-400-normal.woff2": {
+    "file": "_app/immutable/assets/roboto-flex-latin-ext-400-normal.CW32tKl8.woff2",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-latin-ext-400-normal.woff2"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-vietnamese-400-normal.woff": {
+    "file": "_app/immutable/assets/roboto-flex-vietnamese-400-normal.BRDdhb9g.woff",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-vietnamese-400-normal.woff"
+  },
+  "node_modules/@fontsource/roboto-flex/files/roboto-flex-vietnamese-400-normal.woff2": {
+    "file": "_app/immutable/assets/roboto-flex-vietnamese-400-normal.Dlb1GyV4.woff2",
+    "src": "node_modules/@fontsource/roboto-flex/files/roboto-flex-vietnamese-400-normal.woff2"
+  },
   "node_modules/@sveltejs/kit/src/runtime/components/error.svelte": {
     "file": "entries/fallbacks/error.svelte.js",
     "name": "entries/fallbacks/error.svelte",
@@ -30,16 +111,7 @@
     "isEntry": true,
     "imports": [
       "_ssr.js",
-      "_exports.js"
-    ]
-  },
-  "node_modules/@sveltejs/kit/src/runtime/components/layout.svelte": {
-    "file": "entries/fallbacks/layout.svelte.js",
-    "name": "entries/fallbacks/layout.svelte",
-    "src": "node_modules/@sveltejs/kit/src/runtime/components/layout.svelte",
-    "isEntry": true,
-    "imports": [
-      "_ssr.js"
+      "_stores.js"
     ]
   },
   "node_modules/@sveltejs/kit/src/runtime/server/index.js": {
@@ -50,7 +122,120 @@
     "imports": [
       "_internal.js",
       "_exports.js",
-      "_ssr.js"
+      "_index.js"
+    ]
+  },
+  "node_modules/remixicon/fonts/remixicon.eot": {
+    "file": "_app/immutable/assets/remixicon.CTLsMfss.eot",
+    "src": "node_modules/remixicon/fonts/remixicon.eot"
+  },
+  "node_modules/remixicon/fonts/remixicon.svg": {
+    "file": "_app/immutable/assets/remixicon.Dzy_cYSE.svg",
+    "src": "node_modules/remixicon/fonts/remixicon.svg"
+  },
+  "node_modules/remixicon/fonts/remixicon.ttf": {
+    "file": "_app/immutable/assets/remixicon.KtvQcpfP.ttf",
+    "src": "node_modules/remixicon/fonts/remixicon.ttf"
+  },
+  "node_modules/remixicon/fonts/remixicon.woff": {
+    "file": "_app/immutable/assets/remixicon.IHD7miHF.woff",
+    "src": "node_modules/remixicon/fonts/remixicon.woff"
+  },
+  "node_modules/remixicon/fonts/remixicon.woff2": {
+    "file": "_app/immutable/assets/remixicon.BCkO1-UF.woff2",
+    "src": "node_modules/remixicon/fonts/remixicon.woff2"
+  },
+  "src/routes/+layout.svelte": {
+    "file": "entries/pages/_layout.svelte.js",
+    "name": "entries/pages/_layout.svelte",
+    "src": "src/routes/+layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_darkModeStore.js",
+      "_firebase.js",
+      "_stores.js",
+      "_index.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_layout.B9fnxnHF.css"
+    ],
+    "assets": [
+      "_app/immutable/assets/remixicon.CTLsMfss.eot",
+      "_app/immutable/assets/remixicon.BCkO1-UF.woff2",
+      "_app/immutable/assets/remixicon.IHD7miHF.woff",
+      "_app/immutable/assets/remixicon.KtvQcpfP.ttf",
+      "_app/immutable/assets/remixicon.Dzy_cYSE.svg",
+      "_app/immutable/assets/roboto-flex-cyrillic-ext-400-normal.Dy_fbCN1.woff2",
+      "_app/immutable/assets/roboto-flex-cyrillic-ext-400-normal.CYz-UdWe.woff",
+      "_app/immutable/assets/roboto-flex-cyrillic-400-normal.Byl5Asvg.woff2",
+      "_app/immutable/assets/roboto-flex-cyrillic-400-normal.ze0jS65n.woff",
+      "_app/immutable/assets/roboto-flex-greek-400-normal.DZ9SzitG.woff2",
+      "_app/immutable/assets/roboto-flex-greek-400-normal.CofrapJu.woff",
+      "_app/immutable/assets/roboto-flex-vietnamese-400-normal.Dlb1GyV4.woff2",
+      "_app/immutable/assets/roboto-flex-vietnamese-400-normal.BRDdhb9g.woff",
+      "_app/immutable/assets/roboto-flex-latin-ext-400-normal.CW32tKl8.woff2",
+      "_app/immutable/assets/roboto-flex-latin-ext-400-normal.LdXRH_c-.woff",
+      "_app/immutable/assets/roboto-flex-latin-400-normal.C-fvaPBU.woff2",
+      "_app/immutable/assets/roboto-flex-latin-400-normal.Bwz-7M7w.woff"
+    ]
+  },
+  "src/routes/+layout.ts": {
+    "file": "entries/pages/_layout.ts.js",
+    "name": "entries/pages/_layout.ts",
+    "src": "src/routes/+layout.ts",
+    "isEntry": true
+  },
+  "src/routes/+page.svelte": {
+    "file": "entries/pages/_page.svelte.js",
+    "name": "entries/pages/_page.svelte",
+    "src": "src/routes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_firebase.js",
+      "_client.js"
+    ]
+  },
+  "src/routes/+page.ts": {
+    "file": "entries/pages/_page.ts.js",
+    "name": "entries/pages/_page.ts",
+    "src": "src/routes/+page.ts",
+    "isEntry": true
+  },
+  "src/routes/lists/+page.svelte": {
+    "file": "entries/pages/lists/_page.svelte.js",
+    "name": "entries/pages/lists/_page.svelte",
+    "src": "src/routes/lists/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_client.js",
+      "_firebase.js"
+    ]
+  },
+  "src/routes/lists/[id]/+page.svelte": {
+    "file": "entries/pages/lists/_id_/_page.svelte.js",
+    "name": "entries/pages/lists/_id_/_page.svelte",
+    "src": "src/routes/lists/[id]/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_firebase.js",
+      "_stores.js",
+      "_client.js"
+    ]
+  },
+  "src/routes/register/+page.svelte": {
+    "file": "entries/pages/register/_page.svelte.js",
+    "name": "entries/pages/register/_page.svelte",
+    "src": "src/routes/register/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_ssr.js",
+      "_firebase.js",
+      "_client.js",
+      "_darkModeStore.js"
     ]
   }
 }
