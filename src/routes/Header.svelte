@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { darkMode } from '$lib/stores/darkModeStore';
 	import logo from '$lib/images/svelte-logo.svg';
-	import github from '$lib/images/github.svg';
 	import { logout } from '$lib/auth';
 	import { page } from '$app/stores';
 	import 'remixicon/fonts/remixicon.css';
@@ -42,19 +41,7 @@
 <header
 	class="flex justify-between items-center p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
-	<div class="w-12 h-12 flex items-center justify-center">
-		<a href="https://kit.svelte.dev">
-			<img src={logo} alt="SvelteKit" class="w-8 h-8 object-contain" />
-		</a>
-	</div>
-
-	<div class="w-12 h-12 flex items-center justify-center">
-		<a href="https://github.com/sveltejs/kit">
-			<img src={github} alt="GitHub" class="w-8 h-8 object-contain" />
-		</a>
-	</div>
-
-	<div class="flex items-center space-x-4">
+	<div class="flex items-center space-x-4 ml-auto">
 		<button on:click={toggleDarkMode} class="text-xl cursor-pointer">
 			<span class={darkModeClass}></span>
 		</button>

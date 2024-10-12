@@ -19,8 +19,12 @@
 </script>
 
 <div
-	class="flex items-center justify-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
+	class="flex flex-col items-center justify-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
+	<div class="h-40 w-64 overflow-hidden mb-6">
+		<img src="src/lib/images/colist.png" class="h-auto w-full object-cover" alt="CoList Logo" />
+	</div>
+
 	<div class="w-full max-w-md bg-login-bg-light dark:bg-login-bg-dark shadow-ios rounded-lg p-6">
 		<h1 class="text-2xl font-bold mb-4 text-center">Login</h1>
 
@@ -49,7 +53,7 @@
 
 			<button
 				type="submit"
-				class="w-full py-2 bg-login-btn text-white rounded-md focus:outline-none focus:bg-login-btn-focus"
+				class="w-full py-2 bg-login-btn text-text-light rounded-md focus:outline-none focus:bg-login-btn-focus"
 			>
 				Login
 			</button>
