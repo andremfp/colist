@@ -42,6 +42,7 @@
 	"dependencies": {
 		"@firebase/firestore": "^4.7.0",
 		"@fontsource/roboto-flex": "^5.0.15",
+		"@sveltejs/adapter-node": "^5.2.6",
 		"@sveltejs/adapter-static": "^3.0.2",
 		"@types/jwt-decode": "^3.1.0",
 		"firebase": "^10.13.0",

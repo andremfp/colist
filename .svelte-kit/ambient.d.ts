@@ -80,6 +80,7 @@ declare module '$env/static/private' {
 	export const npm_config_argv: string;
 	export const LaunchInstanceID: string;
 	export const _: string;
+	export const npm_package_dependencies__sveltejs_adapter_node: string;
 	export const npm_package_devDependencies__neoconfetti_svelte: string;
 	export const npm_config_engine_strict: string;
 	export const __CFBundleIdentifier: string;
@@ -235,6 +236,7 @@ declare module '$env/dynamic/private' {
 		npm_config_argv: string;
 		LaunchInstanceID: string;
 		_: string;
+		npm_package_dependencies__sveltejs_adapter_node: string;
 		npm_package_devDependencies__neoconfetti_svelte: string;
 		npm_config_engine_strict: string;
 		__CFBundleIdentifier: string;

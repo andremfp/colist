@@ -4,12 +4,10 @@
 	import Header from './Header.svelte';
 	import '../app.css';
 	import PageTransition from '$lib/transition.svelte';
-	import github_light from '$lib/images/github_light.svg';
-	import github_dark from '$lib/images/github_dark.svg';
 
 	export let data;
 
-	$: githubIcon = $darkMode ? github_dark : github_light;
+	$: githubIcon = $darkMode ? '/images/github_dark.svg' : '/images/github_light.svg';
 
 	onMount(() => {
 		document.documentElement.classList.toggle('dark', $darkMode);

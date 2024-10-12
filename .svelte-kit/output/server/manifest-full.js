@@ -7,10 +7,10 @@ function __memo(fn) {
 return {
 	appDir: "_app",
 	appPath: "_app",
-	assets: new Set(["apple-touch-icon.png","favicon-48x48.png","favicon.ico","favicon.svg","site.webmanifest","web-app-manifest-192x192.png","web-app-manifest-512x512.png","service-worker.js"]),
+	assets: new Set(["apple-touch-icon.png","favicon-48x48.png","favicon.ico","favicon.svg","images/colist.png","images/github_dark.svg","images/github_light.svg","images/svelte-logo.svg","site.webmanifest","svelte-logo.svg","web-app-manifest-192x192.png","web-app-manifest-512x512.png","service-worker.js"]),
 	mimeTypes: {".png":"image/png",".svg":"image/svg+xml",".webmanifest":"application/manifest+json"},
 	_: {
-		client: {"start":"_app/immutable/entry/start.D0Pq9OVw.js","app":"_app/immutable/entry/app.45MmEEv0.js","imports":["_app/immutable/entry/start.D0Pq9OVw.js","_app/immutable/chunks/entry.CIqM5ITU.js","_app/immutable/chunks/scheduler.BRxxf2Ee.js","_app/immutable/entry/app.45MmEEv0.js","_app/immutable/chunks/scheduler.BRxxf2Ee.js","_app/immutable/chunks/index.CxS-fQ88.js"],"stylesheets":[],"fonts":[],"uses_env_dynamic_public":false},
+		client: {"start":"_app/immutable/entry/start.Bcty1OzB.js","app":"_app/immutable/entry/app.CkV6cbg5.js","imports":["_app/immutable/entry/start.Bcty1OzB.js","_app/immutable/chunks/entry.DQhsLhOf.js","_app/immutable/chunks/scheduler.BRxxf2Ee.js","_app/immutable/entry/app.CkV6cbg5.js","_app/immutable/chunks/scheduler.BRxxf2Ee.js","_app/immutable/chunks/index.DvX7goLC.js"],"stylesheets":[],"fonts":[],"uses_env_dynamic_public":false},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),

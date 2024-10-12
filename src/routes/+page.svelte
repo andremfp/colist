@@ -22,7 +22,7 @@
 	class="flex flex-col items-center justify-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
 	<div class="h-40 w-64 overflow-hidden mb-6">
-		<img src="src/lib/images/colist.png" class="h-auto w-full object-cover" alt="CoList Logo" />
+		<img src="/images/colist.png" class="h-auto w-full object-cover" alt="CoList Logo" />
 	</div>
 
 	<div class="w-full max-w-md bg-login-bg-light dark:bg-login-bg-dark shadow-ios rounded-lg p-6">

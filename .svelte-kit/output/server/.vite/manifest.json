@@ -197,12 +197,6 @@
       "_client.js"
     ]
   },
-  "src/routes/+page.ts": {
-    "file": "entries/pages/_page.ts.js",
-    "name": "entries/pages/_page.ts",
-    "src": "src/routes/+page.ts",
-    "isEntry": true
-  },
   "src/routes/lists/+page.svelte": {
     "file": "entries/pages/lists/_page.svelte.js",
     "name": "entries/pages/lists/_page.svelte",

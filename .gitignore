@@ -48,3 +48,6 @@ pnpm-debug.log*
 # Playwright (if you're generating any artifacts)
 test-results/
 playwright-report/
+
+# Build
+build/

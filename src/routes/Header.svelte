@@ -1,7 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
 	import { darkMode } from '$lib/stores/darkModeStore';
-	import logo from '$lib/images/svelte-logo.svg';
 	import { logout } from '$lib/auth';
 	import { page } from '$app/stores';
 	import 'remixicon/fonts/remixicon.css';
