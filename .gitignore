@@ -51,3 +51,6 @@ playwright-report/
 
 # Build
 build/
+
+# Firebase
+.firebase/
