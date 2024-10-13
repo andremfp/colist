@@ -16,9 +16,6 @@ backend/venv/
 # Node.js dependencies
 node_modules/
 
-# Static files (if dynamically generated)
-static/
-
 # SvelteKit specific
 .svelte-kit/
 .vite/
@@ -51,6 +48,3 @@ playwright-report/
 
 # Build
 build/
-
-# Firebase
-.firebase/
