@@ -48,3 +48,6 @@ playwright-report/
 
 # Build
 build/
+
+# Vercel
+.vercel
