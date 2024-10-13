@@ -50,4 +50,4 @@ playwright-report/
 build/
 
 # Vercel
-.vercel
+.vercel/
