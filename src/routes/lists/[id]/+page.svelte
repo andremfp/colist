@@ -32,7 +32,7 @@
 
 	onMount(async () => {
 		try {
-			auth.onAuthStateChanged(async (user: { uid: string }) => {
+			auth.onAuthStateChanged(async (user) => {
 				if (user) {
 					currentUserId = user.uid;
 					const [fetchedListItems, fetchedListDetail] = await Promise.all([
