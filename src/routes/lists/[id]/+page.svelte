@@ -203,7 +203,7 @@
 			<ul class="space-y-2">
 				{#each listItems as item, index (item.id)}
 					<li
-						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
+						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden touch-action-pan-y"
 						use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
 						on:swipe={(event) => handleSwipe(event, item.id)}
 					>
