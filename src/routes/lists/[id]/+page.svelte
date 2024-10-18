@@ -25,6 +25,8 @@
 	let isAddingItem = false;
 	let sharedWithUsernames: string[] = [];
 	let swipedListId: string | null = null;
+	let listItemElement: HTMLElement | null = null;
+	let hammer;
 
 	const swipeDistance = 100;
 	const SWIPE_RESET_DELAY = 100;
@@ -50,6 +52,50 @@
 						sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy, currentUserId);
 					}
 					isLoading = false;
+
+					if (listItemElement) {
+						if (typeof window !== 'undefined') {
+							const { default: Hammer } = await import('hammerjs');
+							hammer = new Hammer(listItemElement);
+							hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+							hammer.on('swipe', (event) => {
+								if (event.direction === Hammer.DIRECTION_LEFT) {
+									swipedListId = listItemElement?.id || null;
+								} else if (
+									event.direction === Hammer.DIRECTION_RIGHT &&
+									swipedListId === listItemElement?.id
+								) {
+									swipedListId = null;
+								}
+							});
+							hammer.on('pan', (event) => {
+								if (event.direction === Hammer.DIRECTION_LEFT) {
+									if (listItemElement) {
+										listItemElement.style.transform = `translateX(-${event.distance}px)`;
+									}
+								} else if (event.direction === Hammer.DIRECTION_RIGHT) {
+									if (listItemElement) {
+										listItemElement.style.transform = `translateX(${event.distance}px)`;
+									}
+								}
+							});
+							hammer.on('panend', (event) => {
+								if (event.direction === Hammer.DIRECTION_LEFT) {
+									if (listItemElement) {
+										if (event.distance > swipeDistance) {
+											listItemElement.style.transform = `translateX(-${swipeDistance}px)`;
+										} else {
+											listItemElement.style.transform = '';
+										}
+									}
+								} else if (event.direction === Hammer.DIRECTION_RIGHT) {
+									if (listItemElement) {
+										listItemElement.style.transform = '';
+									}
+								}
+							});
+						}
+					}
 				} else {
 					console.log('User not detected, redirecting to login');
 					goto('/');
@@ -65,6 +111,12 @@
 	onDestroy(() => {
 		if (typeof document !== 'undefined') {
 			document.removeEventListener('click', handleClickOutside);
+			if (hammer) {
+				hammer.off('swipe');
+				hammer.off('pan');
+				hammer.off('panend');
+				hammer.destroy();
+			}
 		}
 	});
 
@@ -203,9 +255,8 @@
 			<ul class="space-y-2">
 				{#each listItems as item, index (item.id)}
 					<li
+						bind:this={listItemElement}
 						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden touch-action-pan-y"
-						use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
-						on:swipe={(event) => handleSwipe(event, item.id)}
 					>
 						<div
 							class="list-item-content flex items-center w-full transition-transform duration-300 ease-in-out"
