@@ -128,7 +128,6 @@
 			startPosition = gestureEvent.detail.x;
 		} else {
 			isPanning = false;
-			panDistance = 0;
 		}
 	}
 
@@ -159,7 +158,7 @@
 			event.preventDefault();
 			return;
 		}
-		if (swipedItemId !== null) {
+		if (swipedItemId !== null && panDistance !== 0) {
 			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
@@ -167,6 +166,7 @@
 			event.preventDefault(); // Prevent default click behavior
 			return;
 		}
+
 		await toggleItemCompletion(item);
 	}
 
