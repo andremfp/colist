@@ -13,7 +13,6 @@
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
 	import { swipe } from 'svelte-gestures';
-	import type { SwipeCustomEvent } from 'svelte-gestures';
 	import { showToast, sortItems, getSharedWithUsers } from '$lib/utils';
 	import { auth } from '$lib/firebase';
 
@@ -24,9 +23,7 @@
 	let isLoading = true;
 	let isAddingItem = false;
 	let sharedWithUsernames: string[] = [];
-	let swipedListId: string | null = null;
-	let listItemElement: HTMLElement | null = null;
-	let hammer;
+	let swipedItemId: string | null = null;
 
 	const swipeDistance = 100;
 	const SWIPE_RESET_DELAY = 100;
@@ -52,50 +49,6 @@
 						sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy, currentUserId);
 					}
 					isLoading = false;
-
-					if (listItemElement) {
-						if (typeof window !== 'undefined') {
-							const { default: Hammer } = await import('hammerjs');
-							hammer = new Hammer(listItemElement);
-							hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
-							hammer.on('swipe', (event) => {
-								if (event.direction === Hammer.DIRECTION_LEFT) {
-									swipedListId = listItemElement?.id || null;
-								} else if (
-									event.direction === Hammer.DIRECTION_RIGHT &&
-									swipedListId === listItemElement?.id
-								) {
-									swipedListId = null;
-								}
-							});
-							hammer.on('pan', (event) => {
-								if (event.direction === Hammer.DIRECTION_LEFT) {
-									if (listItemElement) {
-										listItemElement.style.transform = `translateX(-${event.distance}px)`;
-									}
-								} else if (event.direction === Hammer.DIRECTION_RIGHT) {
-									if (listItemElement) {
-										listItemElement.style.transform = `translateX(${event.distance}px)`;
-									}
-								}
-							});
-							hammer.on('panend', (event) => {
-								if (event.direction === Hammer.DIRECTION_LEFT) {
-									if (listItemElement) {
-										if (event.distance > swipeDistance) {
-											listItemElement.style.transform = `translateX(-${swipeDistance}px)`;
-										} else {
-											listItemElement.style.transform = '';
-										}
-									}
-								} else if (event.direction === Hammer.DIRECTION_RIGHT) {
-									if (listItemElement) {
-										listItemElement.style.transform = '';
-									}
-								}
-							});
-						}
-					}
 				} else {
 					console.log('User not detected, redirecting to login');
 					goto('/');
@@ -111,12 +64,6 @@
 	onDestroy(() => {
 		if (typeof document !== 'undefined') {
 			document.removeEventListener('click', handleClickOutside);
-			if (hammer) {
-				hammer.off('swipe');
-				hammer.off('pan');
-				hammer.off('panend');
-				hammer.destroy();
-			}
 		}
 	});
 
@@ -165,11 +112,11 @@
 		}
 	}
 
-	function handleSwipe(event: SwipeCustomEvent, listId: string) {
+	function handleSwipe(event: CustomEvent, itemId: string) {
 		if (event.detail.direction === 'left') {
-			swipedListId = listId;
-		} else if (event.detail.direction === 'right' && swipedListId === listId) {
-			swipedListId = null;
+			swipedItemId = itemId;
+		} else if (event.detail.direction === 'right' && swipedItemId === itemId) {
+			swipedItemId = null;
 		}
 	}
 
@@ -179,10 +126,10 @@
 			event.preventDefault();
 			return;
 		}
-		if (swipedListId !== null) {
+		if (swipedItemId !== null) {
 			// If the clicked item is not the swiped item, just revert the swipe
-			if (swipedListId !== listId) {
-				swipedListId = null;
+			if (swipedItemId !== item.id) {
+				swipedItemId = null;
 			}
 			event.preventDefault(); // Prevent default click behavior
 			return;
@@ -200,21 +147,21 @@
 			if (isAddingItem) {
 				cancelAddItem();
 				event.preventDefault();
-				swipedListId = null;
+				swipedItemId = null;
 			} else {
-				swipedListId = null;
+				swipedItemId = null;
 			}
 		}
 
-		if (clickedElement.closest('.new-list-item') && swipedListId !== null) {
-			swipedListId = null;
+		if (clickedElement.closest('.new-list-item') && swipedItemId !== null) {
+			swipedItemId = null;
 		}
 	}
 
 	function addNewItemRow() {
 		if (!isAddingItem) {
 			isAddingItem = true;
-			swipedListId = null;
+			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
 			tick().then(() => document.getElementById('new-item-input')?.focus());
 		}
@@ -255,12 +202,13 @@
 			<ul class="space-y-2">
 				{#each listItems as item, index (item.id)}
 					<li
-						bind:this={listItemElement}
-						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden touch-action-pan-y"
+						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
+						use:swipe={{ timeframe: 300, minSwipeDistance: 60, touchAction: 'pan-y' }}
+						on:swipe={(event) => handleSwipe(event, item.id)}
 					>
 						<div
 							class="list-item-content flex items-center w-full transition-transform duration-300 ease-in-out"
-							style={`transform: translateX(${swipedListId === item.id ? `-${swipeDistance}px` : '0'});`}
+							style={`transform: translateX(${swipedItemId === item.id ? `-${swipeDistance}px` : '0'});`}
 						>
 							<label class="flex items-center w-full">
 								<input
@@ -286,7 +234,7 @@
 
 						<button
 							class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
-							style={`width: ${swipeDistance}px; transform: translateX(${swipedListId === item.id ? '0' : `${swipeDistance}px`});`}
+							style={`width: ${swipeDistance}px; transform: translateX(${swipedItemId === item.id ? '0' : `${swipeDistance}px`});`}
 							aria-label="Delete item"
 							on:click={() => handleDeleteItem(item)}
 						>
