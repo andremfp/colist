@@ -12,7 +12,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
-	import { pan, type PanCustomEvent } from 'svelte-gestures';
+	import { pan, type PanCustomEvent, type GestureCustomEvent } from 'svelte-gestures';
 	import { showToast, sortItems, getSharedWithUsers } from '$lib/utils';
 	import { auth } from '$lib/firebase';
 
@@ -25,11 +25,10 @@
 	let sharedWithUsernames: string[] = [];
 	let swipedItemId: string | null = null;
 	let panDistance = 0;
-	let lastPanDistance = 0;
+	let startPosition = 0;
 	let isPanning = false;
 
-	const swipeDistance = 100;
-	const SWIPE_RESET_DELAY = 100;
+	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
 	onMount(async () => {
@@ -115,25 +114,32 @@
 		}
 	}
 
-	function handlePan(event: PanCustomEvent, itemId: string) {
-		if (swipedItemId !== itemId) {
-			swipedItemId = itemId;
-			panDistance = 0;
-			isPanning = false;
+	function handlePanDown(gestureEvent: GestureCustomEvent, itemId: string) {
+		swipedItemId = itemId;
+		startPosition = gestureEvent.detail.x;
+		panDistance = 0;
+		isPanning = true;
+		console.log('startPosition:', startPosition);
+	}
+
+	function handlePanMove(gestureEvent: GestureCustomEvent) {
+		if (isPanning) {
+			const currentX = gestureEvent.detail.x;
+			const distance = currentX - startPosition;
+			panDistance = Math.max(panDistance + distance, swipeDistance);
+			if (panDistance > 0) {
+				panDistance = 0;
+			}
+
+			console.log('panDistance:', panDistance);
 		}
-		const distance = event.detail.x;
-		if (Math.abs(distance - lastPanDistance) > 5) {
-			panDistance = distance;
-			lastPanDistance = distance;
-		}
-		if (distance > 60 && !isPanning) {
-			isPanning = true;
-		}
-		if (Math.abs(distance) < 1 && isPanning) {
-			// panning has stopped
-			if (panDistance > 60) {
+	}
+
+	function handlePanUp(event: GestureCustomEvent) {
+		if (isPanning) {
+			if (panDistance < swipeDistance) {
 				// apply transition and reveal delete button
-				panDistance = 60;
+				panDistance = swipeDistance;
 			} else {
 				// return to normal state
 				panDistance = 0;
@@ -226,8 +232,10 @@
 				{#each listItems as item, index (item.id)}
 					<li
 						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
-						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal' }}
-						on:pan={(event) => handlePan(event, item.id)}
+						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
+						on:pandown={(event) => handlePanDown(event, item.id)}
+						on:panmove={(event) => handlePanMove(event)}
+						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
 							class="list-item-content flex items-center w-full transition-transform duration-300 ease-in-out"
@@ -255,10 +263,10 @@
 							</label>
 						</div>
 
-						{#if swipedItemId === item.id}
+						{#if swipedItemId === item.id && panDistance < 0}
 							<button
 								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
-								style={`width: ${Math.abs(panDistance)}px; transform: translateX(-${panDistance}px);`}
+								style={`width: ${Math.min(Math.abs(panDistance), Math.abs(swipeDistance))}px; transform: translateX(-${panDistance}px);`}
 								aria-label="Delete item"
 								on:click={() => handleDeleteItem(item)}
 							>
