@@ -116,11 +116,19 @@
 	}
 
 	function handlePanDown(gestureEvent: GestureCustomEvent, itemId: string) {
-		swipedItemId = itemId;
-		startPosition = gestureEvent.detail.x;
-		panDistance = 0;
-		isPanning = true;
-		console.log('startPosition:', startPosition);
+		console.log('PanDown', itemId);
+		console.log('isPanning', isPanning);
+		if (!isPanning) {
+			swipedItemId = itemId;
+			startPosition = gestureEvent.detail.x;
+			panDistance = 0;
+			isPanning = true;
+		} else if (swipedItemId === itemId) {
+			console.log('1');
+			startPosition = gestureEvent.detail.x;
+		} else {
+			isPanning = false;
+		}
 	}
 
 	function handlePanMove(gestureEvent: GestureCustomEvent) {
@@ -131,26 +139,20 @@
 			if (panDistance > 0) {
 				panDistance = 0;
 			}
-
-			console.log('panDistance:', panDistance);
 		}
 	}
 
-	// function handlePanUp(event: GestureCustomEvent) {
-	// 	if (isPanning) {
-	// 		if (panDistance < swipeDistance) {
-	// 			// apply transition and reveal delete button
-	// 			panDistance = swipeDistance;
-	// 		} else {
-	// 			// return to normal state
-	// 			panDistance = 0;
-	// 			swipedItemId = null;
-	// 			isPanning = false;
-	// 		}
-	// 	}
-	// }
+	function handlePanUp(gestureEvent: GestureCustomEvent) {
+		if (panDistance > swipeDistance) {
+			swipedItemId = null;
+			panDistance = 0;
+			isPanning = false;
+			console.log('Resetting panning state panUp');
+		}
+	}
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
+		event.stopPropagation();
 		if (isAddingItem) {
 			// Prevent any item from being checked if a new item is being added
 			event.preventDefault();
@@ -170,10 +172,10 @@
 	function handleClickOutside(event: MouseEvent) {
 		const clickedElement = event.target as HTMLElement;
 		if (
+			!clickedElement.closest('.list-item-content') &&
 			!clickedElement.closest('.new-list-item') &&
 			!clickedElement.closest('.delete-btn') &&
-			!clickedElement.closest('.add-item') &&
-			!clickedElement.closest('.list-item')
+			!clickedElement.closest('.add-item')
 		) {
 			if (isAddingItem) {
 				cancelAddItem();
@@ -183,10 +185,12 @@
 				swipedItemId = null;
 				panDistance = 0;
 				isPanning = false;
+				console.log('Resetting panning state click outside');
 			}
 		}
 
 		if (clickedElement.closest('.new-list-item') && swipedItemId !== null) {
+			console.log('4');
 			swipedItemId = null;
 		}
 	}
@@ -235,11 +239,11 @@
 			<ul class="space-y-2">
 				{#each listItems as item, index (item.id)}
 					<li
-						id="list-item"
 						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
 						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
 						on:pandown={(event) => handlePanDown(event, item.id)}
 						on:panmove={(event) => handlePanMove(event)}
+						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
 							class="list-item-content flex items-center w-full transition-transform"
