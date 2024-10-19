@@ -238,7 +238,7 @@
 						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
-							class="list-item-content flex items-center w-full transition-transform duration-300 ease-in-out"
+							class="list-item-content flex items-center w-full transition-transform"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
 							<label class="flex items-center w-full">
@@ -265,7 +265,7 @@
 
 						{#if swipedItemId === item.id && panDistance < 0}
 							<button
-								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
+								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform"
 								style={`width: ${Math.min(Math.abs(panDistance), Math.abs(swipeDistance))}px; transform: translateX(-${panDistance}px);`}
 								aria-label="Delete item"
 								on:click={() => handleDeleteItem(item)}
