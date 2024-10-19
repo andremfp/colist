@@ -43,12 +43,13 @@
 		"@sveltejs/adapter-node": "^5.2.6",
 		"@sveltejs/adapter-static": "^3.0.2",
 		"@sveltejs/adapter-vercel": "^5.4.5",
+		"@types/hammerjs": "^2.0.46",
 		"@types/jwt-decode": "^3.1.0",
 		"firebase": "^10.14.1",
 		"firebase-admin": "^12.6.0",
 		"jwt-decode": "^4.0.0",
 		"remixicon": "^4.3.0",
-		"svelte-gestures": "^5.0.4",
+		"svelte-gestures": "^5.0.6",
 		"svelte-routing": "^2.13.0"
 	}
 }
