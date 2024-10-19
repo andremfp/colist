@@ -27,6 +27,7 @@
 	let panDistance = 0;
 	let startPosition = 0;
 	let isPanning = false;
+	let isSwiped = false;
 
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
@@ -135,19 +136,19 @@
 		}
 	}
 
-	function handlePanUp(event: GestureCustomEvent) {
-		if (isPanning) {
-			if (panDistance < swipeDistance) {
-				// apply transition and reveal delete button
-				panDistance = swipeDistance;
-			} else {
-				// return to normal state
-				panDistance = 0;
-				swipedItemId = null;
-				isPanning = false;
-			}
-		}
-	}
+	// function handlePanUp(event: GestureCustomEvent) {
+	// 	if (isPanning) {
+	// 		if (panDistance < swipeDistance) {
+	// 			// apply transition and reveal delete button
+	// 			panDistance = swipeDistance;
+	// 		} else {
+	// 			// return to normal state
+	// 			panDistance = 0;
+	// 			swipedItemId = null;
+	// 			isPanning = false;
+	// 		}
+	// 	}
+	// }
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
 		if (isAddingItem) {
@@ -171,7 +172,8 @@
 		if (
 			!clickedElement.closest('.new-list-item') &&
 			!clickedElement.closest('.delete-btn') &&
-			!clickedElement.closest('.add-item')
+			!clickedElement.closest('.add-item') &&
+			!clickedElement.closest('.list-item')
 		) {
 			if (isAddingItem) {
 				cancelAddItem();
@@ -179,6 +181,8 @@
 				swipedItemId = null;
 			} else {
 				swipedItemId = null;
+				panDistance = 0;
+				isPanning = false;
 			}
 		}
 
@@ -231,11 +235,11 @@
 			<ul class="space-y-2">
 				{#each listItems as item, index (item.id)}
 					<li
+						id="list-item"
 						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
 						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
 						on:pandown={(event) => handlePanDown(event, item.id)}
 						on:panmove={(event) => handlePanMove(event)}
-						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
 							class="list-item-content flex items-center w-full transition-transform"
@@ -263,10 +267,10 @@
 							</label>
 						</div>
 
-						{#if swipedItemId === item.id && panDistance < 0}
+						{#if swipedItemId === item.id && isPanning}
 							<button
-								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform"
-								style={`width: ${Math.min(Math.abs(panDistance), Math.abs(swipeDistance))}px; transform: translateX(-${panDistance}px);`}
+								class="delete-btn absolute top-0 bottom-0 right-0 p-0 text-white shadow-lg bg-delete-btn transition-transform ease-in-out"
+								style={`width: ${Math.abs(panDistance)}px; min-width: 0px; transform: translateX(-${panDistance}px);`}
 								aria-label="Delete item"
 								on:click={() => handleDeleteItem(item)}
 							>
