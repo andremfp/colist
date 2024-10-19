@@ -15,7 +15,6 @@
 	import { pan, type PanCustomEvent } from 'svelte-gestures';
 	import { showToast, sortItems, getSharedWithUsers } from '$lib/utils';
 	import { auth } from '$lib/firebase';
-	import type { P } from 'vitest/dist/reporters-yx5ZTtEV.js';
 
 	let listItems: ListItem[] = [];
 	let listDetail: List = { id: '', name: '', ownerId: '', sharedBy: [], itemCount: 0 };
@@ -123,14 +122,14 @@
 		}
 		const distance = event.detail.x;
 		panDistance = distance;
-		if (distance < -60 && !isPanning) {
+		if (distance > 60 && !isPanning) {
 			isPanning = true;
 		}
 		if (Math.abs(distance) < 1 && isPanning) {
 			// panning has stopped
-			if (panDistance < -60) {
+			if (panDistance > 60) {
 				// apply transition and reveal delete button
-				panDistance = -60;
+				panDistance = 60;
 			} else {
 				// return to normal state
 				panDistance = 0;
