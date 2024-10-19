@@ -25,6 +25,7 @@
 	let sharedWithUsernames: string[] = [];
 	let swipedItemId: string | null = null;
 	let panDistance = 0;
+	let lastPanDistance = 0;
 	let isPanning = false;
 
 	const swipeDistance = 100;
@@ -121,7 +122,10 @@
 			isPanning = false;
 		}
 		const distance = event.detail.x;
-		panDistance = distance;
+		if (Math.abs(distance - lastPanDistance) > 5) {
+			panDistance = distance;
+			lastPanDistance = distance;
+		}
 		if (distance > 60 && !isPanning) {
 			isPanning = true;
 		}
@@ -251,14 +255,16 @@
 							</label>
 						</div>
 
-						<button
-							class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
-							style={`width: ${swipedItemId === item.id ? Math.abs(panDistance) : 0}px; transform: translateX(${swipedItemId === item.id ? panDistance : 0}px);`}
-							aria-label="Delete item"
-							on:click={() => handleDeleteItem(item)}
-						>
-							Delete
-						</button>
+						{#if swipedItemId === item.id}
+							<button
+								class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
+								style={`width: ${Math.abs(panDistance)}px; transform: translateX(-${panDistance}px);`}
+								aria-label="Delete item"
+								on:click={() => handleDeleteItem(item)}
+							>
+								Delete
+							</button>
+						{/if}
 					</li>
 					{#if listItems.length - 1 !== index}
 						<li class="border-t border-border-light dark:border-border-dark mt-2"></li>
