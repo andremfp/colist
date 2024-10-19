@@ -128,6 +128,7 @@
 			startPosition = gestureEvent.detail.x;
 		} else {
 			isPanning = false;
+			panDistance = 0;
 		}
 	}
 
@@ -143,7 +144,7 @@
 	}
 
 	function handlePanUp(gestureEvent: GestureCustomEvent) {
-		if (panDistance > swipeDistance) {
+		if (panDistance > swipeDistance && panDistance != 0) {
 			swipedItemId = null;
 			panDistance = 0;
 			isPanning = false;
