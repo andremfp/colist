@@ -56,23 +56,6 @@ export default {
 			}
 		}
 	},
-	plugins: [
-		function ({ addUtilities }) {
-			addUtilities(
-				{
-					'.translate-reveal': {
-						transform: 'translateX(-100px)'
-					},
-					'.opacity-70': {
-						opacity: '0.7'
-					},
-					'.translate-hide': {
-						transform: 'translateX(0)'
-					}
-				},
-				['responsive']
-			);
-		}
-	],
+	plugins: [function ({ addUtilities }) {}],
 	darkMode: 'class'
 };

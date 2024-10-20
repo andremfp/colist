@@ -116,15 +116,12 @@
 	}
 
 	function handlePanDown(gestureEvent: GestureCustomEvent, itemId: string) {
-		console.log('PanDown', itemId);
-		console.log('isPanning', isPanning);
 		if (!isPanning) {
 			swipedItemId = itemId;
 			startPosition = gestureEvent.detail.x;
 			panDistance = 0;
 			isPanning = true;
 		} else if (swipedItemId === itemId) {
-			console.log('1');
 			startPosition = gestureEvent.detail.x;
 		} else {
 			isPanning = false;
@@ -147,7 +144,6 @@
 			swipedItemId = null;
 			panDistance = 0;
 			isPanning = false;
-			console.log('Resetting panning state panUp');
 		}
 	}
 
@@ -186,7 +182,6 @@
 				swipedItemId = null;
 				panDistance = 0;
 				isPanning = false;
-				console.log('Resetting panning state click outside');
 			}
 		}
 
@@ -247,7 +242,7 @@
 						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
-							class="list-item-content py-2 flex items-center w-full transition-transform"
+							class="list-item-content py-2 flex items-center w-full transition-transform duration-500"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
 							<label class="flex items-center w-full">
@@ -272,16 +267,14 @@
 							</label>
 						</div>
 
-						{#if swipedItemId === item.id && isPanning}
-							<button
-								class="delete-btn absolute top-0 bottom-0 right-0 p-0 text-white shadow-lg bg-delete-btn transition-transform ease-in-out"
-								style={`width: ${Math.abs(panDistance)}px; min-width: 0px; transform: translateX(-${panDistance}px);`}
-								aria-label="Delete item"
-								on:click={() => handleDeleteItem(item)}
-							>
-								Delete
-							</button>
-						{/if}
+						<button
+							class="delete-btn absolute top-0 bottom-0 right-0 p-0 text-white shadow-lg bg-delete-btn duration-500"
+							style={`width: ${swipedItemId === item.id ? Math.abs(panDistance) : 0}px;`}
+							aria-label="Delete item"
+							on:click={() => handleDeleteItem(item)}
+						>
+							Delete
+						</button>
 					</li>
 					{#if listItems.length - 1 !== index}
 						<li class="border-t border-border-light dark:border-border-dark mt-2"></li>
