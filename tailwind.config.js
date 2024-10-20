@@ -56,6 +56,6 @@ export default {
 			}
 		}
 	},
-	plugins: [function ({ addUtilities }) {}],
+	plugins: [],
 	darkMode: 'class'
 };

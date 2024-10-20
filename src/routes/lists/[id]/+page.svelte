@@ -12,7 +12,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
-	import { pan, type PanCustomEvent, type GestureCustomEvent } from 'svelte-gestures';
+	import { pan, type GestureCustomEvent } from 'svelte-gestures';
 	import { showToast, sortItems, getSharedWithUsers } from '$lib/utils';
 	import { auth } from '$lib/firebase';
 
@@ -27,7 +27,6 @@
 	let panDistance = 0;
 	let startPosition = 0;
 	let isPanning = false;
-	let isSwiped = false;
 
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
@@ -186,7 +185,6 @@
 		}
 
 		if (clickedElement.closest('.new-list-item') && swipedItemId !== null) {
-			console.log('4');
 			swipedItemId = null;
 		}
 	}
@@ -242,7 +240,7 @@
 						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
-							class="list-item-content py-2 flex items-center w-full transition-transform duration-500"
+							class="list-item-content py-2 flex items-center w-full duration-500"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
 							<label class="flex items-center w-full">
