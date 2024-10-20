@@ -12,7 +12,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { tick } from 'svelte';
-	import { swipe } from 'svelte-gestures';
+	import { pan, type GestureCustomEvent } from 'svelte-gestures';
 	import { showToast, sortItems, getSharedWithUsers } from '$lib/utils';
 	import { auth } from '$lib/firebase';
 
@@ -24,9 +24,11 @@
 	let isAddingItem = false;
 	let sharedWithUsernames: string[] = [];
 	let swipedItemId: string | null = null;
+	let panDistance = 0;
+	let startPosition = 0;
+	let isPanning = false;
 
-	const swipeDistance = 100;
-	const SWIPE_RESET_DELAY = 100;
+	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
 	onMount(async () => {
@@ -112,21 +114,46 @@
 		}
 	}
 
-	function handleSwipe(event: CustomEvent, itemId: string) {
-		if (event.detail.direction === 'left') {
+	function handlePanDown(gestureEvent: GestureCustomEvent, itemId: string) {
+		if (!isPanning) {
 			swipedItemId = itemId;
-		} else if (event.detail.direction === 'right' && swipedItemId === itemId) {
+			startPosition = gestureEvent.detail.x;
+			panDistance = 0;
+			isPanning = true;
+		} else if (swipedItemId === itemId) {
+			startPosition = gestureEvent.detail.x;
+		} else {
+			isPanning = false;
+		}
+	}
+
+	function handlePanMove(gestureEvent: GestureCustomEvent) {
+		if (isPanning) {
+			const currentX = gestureEvent.detail.x;
+			const distance = currentX - startPosition;
+			panDistance = Math.max(panDistance + distance, swipeDistance);
+			if (panDistance > 0) {
+				panDistance = 0;
+			}
+		}
+	}
+
+	function handlePanUp(gestureEvent: GestureCustomEvent) {
+		if (panDistance > swipeDistance && panDistance != 0) {
 			swipedItemId = null;
+			panDistance = 0;
+			isPanning = false;
 		}
 	}
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
+		event.stopPropagation();
 		if (isAddingItem) {
 			// Prevent any item from being checked if a new item is being added
 			event.preventDefault();
 			return;
 		}
-		if (swipedItemId !== null) {
+		if (swipedItemId !== null && panDistance !== 0) {
 			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
@@ -134,12 +161,14 @@
 			event.preventDefault(); // Prevent default click behavior
 			return;
 		}
+
 		await toggleItemCompletion(item);
 	}
 
 	function handleClickOutside(event: MouseEvent) {
 		const clickedElement = event.target as HTMLElement;
 		if (
+			!clickedElement.closest('.list-item-content') &&
 			!clickedElement.closest('.new-list-item') &&
 			!clickedElement.closest('.delete-btn') &&
 			!clickedElement.closest('.add-item')
@@ -150,6 +179,8 @@
 				swipedItemId = null;
 			} else {
 				swipedItemId = null;
+				panDistance = 0;
+				isPanning = false;
 			}
 		}
 
@@ -198,17 +229,19 @@
 	</h3>
 
 	{#if listItems.length > 0}
-		<div class="rounded-xl shadow-ios p-4 overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark">
-			<ul class="space-y-2">
+		<div class="rounded-xl shadow-ios pl-4 overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark">
+			<ul class="space-y-0">
 				{#each listItems as item, index (item.id)}
 					<li
-						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
-						use:swipe={{ timeframe: 300, minSwipeDistance: 60, touchAction: 'pan-y' }}
-						on:swipe={(event) => handleSwipe(event, item.id)}
+						class="relative flex items-center py-2 bg-lists-bg-light dark:bg-lists-bg-dark overflow-hidden"
+						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
+						on:pandown={(event) => handlePanDown(event, item.id)}
+						on:panmove={(event) => handlePanMove(event)}
+						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
-							class="list-item-content flex items-center w-full transition-transform duration-300 ease-in-out"
-							style={`transform: translateX(${swipedItemId === item.id ? `-${swipeDistance}px` : '0'});`}
+							class="list-item-content py-2 flex items-center w-full duration-500"
+							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
 							<label class="flex items-center w-full">
 								<input
@@ -233,8 +266,8 @@
 						</div>
 
 						<button
-							class="delete-btn absolute top-0 bottom-0 right-0 py-1 px-4 text-white shadow-lg bg-delete-btn transition-transform duration-300 ease-in-out"
-							style={`width: ${swipeDistance}px; transform: translateX(${swipedItemId === item.id ? '0' : `${swipeDistance}px`});`}
+							class="delete-btn absolute top-0 bottom-0 right-0 p-0 text-white shadow-lg bg-delete-btn duration-500"
+							style={`width: ${swipedItemId === item.id ? Math.abs(panDistance) : 0}px;`}
 							aria-label="Delete item"
 							on:click={() => handleDeleteItem(item)}
 						>
