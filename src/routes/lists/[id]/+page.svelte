@@ -236,18 +236,18 @@
 	</h3>
 
 	{#if listItems.length > 0}
-		<div class="rounded-xl shadow-ios p-4 overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark">
-			<ul class="space-y-2">
+		<div class="rounded-xl shadow-ios pl-4 overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark">
+			<ul class="space-y-0">
 				{#each listItems as item, index (item.id)}
 					<li
-						class="relative flex items-center p-2 bg-lists-bg-light dark:bg-lists-bg-dark rounded-lg overflow-hidden"
+						class="relative flex items-center py-2 bg-lists-bg-light dark:bg-lists-bg-dark overflow-hidden"
 						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
 						on:pandown={(event) => handlePanDown(event, item.id)}
 						on:panmove={(event) => handlePanMove(event)}
 						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
-							class="list-item-content flex items-center w-full transition-transform"
+							class="list-item-content py-2 flex items-center w-full transition-transform"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
 							<label class="flex items-center w-full">
