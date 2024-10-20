@@ -134,8 +134,8 @@
 		}
 	}
 
-	function handleListItemClick(event: MouseEvent, listId: string) {
-		if (swipedListId !== null) {
+	function handleListClick(event: MouseEvent, listId: string) {
+		if (swipedListId !== null && panDistance !== 0) {
 			swipedListId = swipedListId !== listId ? null : swipedListId;
 			event.preventDefault();
 			return;
@@ -173,7 +173,7 @@
 						>
 							<button
 								class="w-full flex items-center justify-between p-4 text-left"
-								on:click={(event) => handleListItemClick(event, list.id)}
+								on:click={(event) => handleListClick(event, list.id)}
 								aria-label={`View details of ${list.name}`}
 							>
 								<div class="flex items-center space-x-4">
