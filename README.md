@@ -33,7 +33,8 @@ Users can register, create lists, and share them with others, enabling effective
 
 To get started with this app, follow these steps:
 
-1. **Clone the Repository**  
+1. **Clone the Repository**
+
    Clone the repository and navigate to the project directory:
 
    ```bash
@@ -42,6 +43,7 @@ To get started with this app, follow these steps:
    ```
 
 2. **Install Dependencies**
+
    Install the required dependencies using Yarn:
 
    ```bash
@@ -49,6 +51,7 @@ To get started with this app, follow these steps:
    ```
 
 3. **Set Up Firebase**
+
    Create a Firebase project in the Firebase Console.
    Set up Firestore and Authentication.
    Obtain your Firebase configuration values and add them to your .env file:
@@ -63,6 +66,7 @@ To get started with this app, follow these steps:
    ```
 
 4. **Run locally**
+
    To run the development server, use the following command:
 
    ```bash
@@ -71,7 +75,7 @@ To get started with this app, follow these steps:
 
 ## 🌍 Deployment
 
-This app is setup to be deployed on Vercel, using svelte's Vercel adapter.
+This app is setup to be deployed on Vercel, using Svelte's Vercel adapter.
 You can choose your preferred hosting platform.
 
 ## 📄 License
