@@ -12,7 +12,7 @@ Users can register, create lists, and share them with others, enabling effective
 
 - **User Authentication**: Secure registration and login using Firebase Authentication.
 - **Collaborative Lists**: Create checklists that can be shared with other users or kept private.
-- **List Management**: Add and delete lists and items within them. -- _TODO: Edit list and item names_
+- **List Management**: Add, update and delete lists and items within them. -- _TODO: Edit list's name_
 - **Swipe Actions**: Swipe left on list items to reveal a delete option.
 - **Dark Mode**: Toggle between light and dark modes. -- _TODO: Correct styles in mobile and use system settings to define dark mode_
 
