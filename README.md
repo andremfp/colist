@@ -21,7 +21,7 @@ Users can register, create lists, and share them with others, enabling effective
 - **User Registration**: New users can sign up and create an account.
 - **My Lists**: After logging in, users are presented with their lists and those shared with them.
 - **Add List**: Users can create new lists and choose to share them with specific users or keep them private.
-- **Add Items**: Users can add items to their lists.
+- **Add Items**: Users can add items to their lists. Items can be checked off when completed and edited.
 - **Delete Lists/Items**: Users can swipe on specific items or lists to delete them. If the list is shared, this action will propagate to the other users.
 
 ## 📦 Tech Stack
