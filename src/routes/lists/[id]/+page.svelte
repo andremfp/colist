@@ -96,6 +96,10 @@
 		try {
 			await deleteListItem(item.id);
 			listItems = listItems.filter((i) => i.id !== item.id);
+			tick().then(() => {
+				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				inputs[inputs.length - 1]?.focus();
+			});
 			await updateList(listId, { itemCount: listItems.length });
 		} catch (error) {
 			console.error('Error deleting item:', error);
@@ -167,13 +171,13 @@
 
 	function handleClickOutside(event: MouseEvent) {
 		const clickedElement = event.target as HTMLElement;
-		if (
-			!clickedElement.closest('.list-item-content') &&
-			!clickedElement.closest('.new-list-item') &&
-			!clickedElement.closest('.delete-btn') &&
-			!clickedElement.closest('.add-item')
-		) {
-			if (isAddingItem) {
+		// Check if clicked element is the last list item
+		const isLastListItem =
+			clickedElement.closest('.list-item') &&
+			clickedElement.closest('li') === document.querySelector('ul li:last-child');
+
+		if (!clickedElement.closest('.delete-btn') && !clickedElement.closest('.add-item')) {
+			if (isAddingItem && !isLastListItem) {
 				cancelAddItem();
 				event.preventDefault();
 				swipedItemId = null;
@@ -183,10 +187,6 @@
 				isPanning = false;
 			}
 		}
-
-		if (clickedElement.closest('.new-list-item') && swipedItemId !== null) {
-			swipedItemId = null;
-		}
 	}
 
 	function addNewItemRow() {
@@ -194,7 +194,10 @@
 			isAddingItem = true;
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
-			tick().then(() => document.getElementById('new-item-input')?.focus());
+			tick().then(() => {
+				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				inputs[inputs.length - 1]?.focus();
+			});
 		}
 	}
 
@@ -243,26 +246,28 @@
 							class="list-item-content py-2 flex items-center w-full duration-500"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
-							<label class="flex items-center w-full">
+							<label class="w-5 h-5">
 								<input
 									type="checkbox"
-									class="flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
+									class="p-2 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
 									checked={item.checked}
 									disabled={isAddingItem && index === listItems.length - 1}
 									on:click={(event) => handleCheckboxClick(event, item)}
 								/>
-								{#if isAddingItem && index === listItems.length - 1}
-									<input
-										id="new-item-input"
-										type="text"
-										class="new-list-item flex-grow p-2 border-2 border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark text-input-text-light dark:text-input-text-dark rounded-lg"
-										bind:value={newItemName}
-										on:keydown={handleKeyDown}
-									/>
-								{:else}
-									<span class="flex-grow">{item.name}</span>
-								{/if}
 							</label>
+							<input
+								type="text"
+								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
+								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
+								on:input={(e) => {
+									if (index === listItems.length - 1 && isAddingItem) {
+										newItemName = e.currentTarget.value;
+									} else {
+										item.name = e.currentTarget.value;
+									}
+								}}
+								on:keydown={handleKeyDown}
+							/>
 						</div>
 
 						<button
