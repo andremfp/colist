@@ -43,7 +43,7 @@
 
 					if (fetchedListItems) {
 						listItems = fetchedListItems;
-						sortItems(listItems);
+						listItems = sortItems(listItems);
 					}
 
 					if (fetchedListDetail) {
@@ -73,6 +73,7 @@
 		if (!newItemName.trim()) return cancelAddItem();
 
 		try {
+			swipedItemId = null;
 			const newItem = await addListItem({
 				name: newItemName,
 				listId,
@@ -82,7 +83,7 @@
 			listItems.pop(); // Remove placeholder
 			listItems = [...listItems, newItem];
 			await updateList(listId, { itemCount: listItems.length });
-			sortItems(listItems);
+			listItems = sortItems(listItems);
 		} catch (error) {
 			console.error('Error adding item:', error);
 			showToast('Failed to add item.');
@@ -111,7 +112,7 @@
 		try {
 			const updatedId = await updateListItem(item.id, { checked: !item.checked });
 			listItems = listItems.map((i) => (i.id === updatedId ? { ...i, checked: !i.checked } : i));
-			sortItems(listItems);
+			listItems = [...sortItems(listItems.slice(0, -1)), listItems[listItems.length - 1]];
 		} catch (error) {
 			console.error('Error updating item:', error);
 			showToast('Failed to update item.');
@@ -152,11 +153,6 @@
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
 		event.stopPropagation();
-		if (isAddingItem) {
-			// Prevent any item from being checked if a new item is being added
-			event.preventDefault();
-			return;
-		}
 		if (swipedItemId !== null && panDistance !== 0) {
 			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
@@ -171,20 +167,35 @@
 
 	function handleClickOutside(event: MouseEvent) {
 		const clickedElement = event.target as HTMLElement;
-		// Check if clicked element is the last list item
-		const isLastListItem =
-			clickedElement.closest('.list-item') &&
-			clickedElement.closest('li') === document.querySelector('ul li:last-child');
+		// const isLastListItem =
+		// 	clickedElement.closest('.list-item') &&
+		// 	clickedElement.closest('li') === document.querySelector('ul li:last-child');
+
+		// Get the clicked list item's ID
+		const clickedListItem = clickedElement.closest('li');
+		const clickedItemId = clickedListItem
+			? listItems[Array.from(document.querySelectorAll('li')).indexOf(clickedListItem)]?.id
+			: null;
 
 		if (!clickedElement.closest('.delete-btn') && !clickedElement.closest('.add-item')) {
-			if (isAddingItem && !isLastListItem) {
-				cancelAddItem();
+			// If there's a swiped item and clicking outside of it
+			if (swipedItemId && swipedItemId !== clickedItemId) {
+				if (isAddingItem && newItemName.trim()) {
+					handleAddItem();
+				}
+				swipedItemId = null;
+				return;
+			}
+
+			// Only cancel if no item is being swiped AND not clicking on any list item
+			if (isAddingItem && !swipedItemId && !clickedElement.closest('.list-item')) {
+				if (newItemName.trim()) {
+					handleAddItem();
+				} else {
+					console.log('cancelling');
+					cancelAddItem();
+				}
 				event.preventDefault();
-				swipedItemId = null;
-			} else {
-				swipedItemId = null;
-				panDistance = 0;
-				isPanning = false;
 			}
 		}
 	}
@@ -264,6 +275,7 @@
 										newItemName = e.currentTarget.value;
 									} else {
 										item.name = e.currentTarget.value;
+										updateListItem(item.id, { name: item.name });
 									}
 								}}
 								on:keydown={handleKeyDown}
