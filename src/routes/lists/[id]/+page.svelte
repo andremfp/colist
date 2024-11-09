@@ -121,7 +121,6 @@
 
 	function handlePanDown(gestureEvent: GestureCustomEvent, itemId: string) {
 		if (!isPanning) {
-			swipedItemId = itemId;
 			startPosition = gestureEvent.detail.x;
 			panDistance = 0;
 			isPanning = true;
@@ -132,10 +131,17 @@
 		}
 	}
 
-	function handlePanMove(gestureEvent: GestureCustomEvent) {
+	function handlePanMove(gestureEvent: GestureCustomEvent, itemId: string) {
 		if (isPanning) {
 			const currentX = gestureEvent.detail.x;
 			const distance = currentX - startPosition;
+
+			// Only set swipedItemId if there's actual movement
+			if (Math.abs(distance) > 5) {
+				// Small threshold to prevent accidental swipes
+				swipedItemId = itemId;
+			}
+
 			panDistance = Math.max(panDistance + distance, swipeDistance);
 			if (panDistance > 0) {
 				panDistance = 0;
@@ -167,9 +173,6 @@
 
 	function handleClickOutside(event: MouseEvent) {
 		const clickedElement = event.target as HTMLElement;
-		// const isLastListItem =
-		// 	clickedElement.closest('.list-item') &&
-		// 	clickedElement.closest('li') === document.querySelector('ul li:last-child');
 
 		// Get the clicked list item's ID
 		const clickedListItem = clickedElement.closest('li');
@@ -188,11 +191,10 @@
 			}
 
 			// Only cancel if no item is being swiped AND not clicking on any list item
-			if (isAddingItem && !swipedItemId && !clickedElement.closest('.list-item')) {
+			if (isAddingItem && !swipedItemId) {
 				if (newItemName.trim()) {
 					handleAddItem();
 				} else {
-					console.log('cancelling');
 					cancelAddItem();
 				}
 				event.preventDefault();
@@ -250,7 +252,7 @@
 						class="relative flex items-center py-2 bg-lists-bg-light dark:bg-lists-bg-dark overflow-hidden"
 						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
 						on:pandown={(event) => handlePanDown(event, item.id)}
-						on:panmove={(event) => handlePanMove(event)}
+						on:panmove={(event) => handlePanMove(event, item.id)}
 						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
