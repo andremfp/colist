@@ -174,6 +174,8 @@
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
 		event.stopPropagation();
+		event.preventDefault(); // Prevent default checkbox behavior
+
 		if (swipedItemId !== null && panDistance !== 0) {
 			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
@@ -183,16 +185,17 @@
 			return;
 		}
 
+		// Get reference to input before any state changes
+		const lastInput = document.querySelectorAll('.list-item')[listItems.length - 1] as HTMLElement;
+		const shouldRestoreFocus = isAddingItem;
+
 		await toggleItemCompletion(item);
 
-		// If we're adding a new item, restore focus and force keyboard
-		if (isAddingItem) {
-			await tick();
-			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-			const lastInput = inputs[inputs.length - 1];
-			lastInput?.focus();
-			// Force the keyboard to show by triggering a click
-			lastInput?.click();
+		if (shouldRestoreFocus) {
+			// Use requestAnimationFrame to ensure DOM is ready
+			requestAnimationFrame(() => {
+				lastInput?.focus();
+			});
 		}
 	}
 
