@@ -192,7 +192,7 @@
 			const lastInput = inputs[inputs.length - 1];
 			lastInput?.focus();
 			// Force the keyboard to show by triggering a click
-			// lastInput?.click();
+			lastInput?.click();
 		}
 	}
 
