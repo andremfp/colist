@@ -176,6 +176,11 @@
 		event.preventDefault();
 		event.stopPropagation();
 
+		// Find the associated text input
+		const listItem = (event.target as HTMLElement).closest('li');
+		const textInput = listItem?.querySelector('input[type="text"]') as HTMLInputElement;
+		const wasInputFocused = document.activeElement === textInput;
+
 		if (swipedItemId !== null && panDistance !== 0) {
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
@@ -184,6 +189,11 @@
 		}
 
 		await toggleItemCompletion(item);
+
+		// Restore focus if the input was focused
+		if (wasInputFocused && textInput) {
+			textInput.focus();
+		}
 	}
 
 	function handleClickOutside(event: MouseEvent) {
@@ -290,7 +300,9 @@
 								class="w-5 h-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item rounded focus:ring-0"
 								checked={item.checked}
 								disabled={isAddingItem && index === listItems.length - 1}
-								on:click|preventDefault={(event) => handleCheckboxClick(event, item)}
+								on:mousedown|preventDefault|stopPropagation
+								on:click|preventDefault|stopPropagation={(event) =>
+									handleCheckboxClick(event, item)}
 								aria-label={`Mark ${item.name} as ${item.checked ? 'incomplete' : 'complete'}`}
 							/>
 							<input
