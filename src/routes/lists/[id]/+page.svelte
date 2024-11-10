@@ -175,23 +175,28 @@
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
 		event.stopPropagation();
 		if (swipedItemId !== null && panDistance !== 0) {
-			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
 			}
-			event.preventDefault(); // Prevent default click behavior
+			event.preventDefault();
 			return;
 		}
 
 		await toggleItemCompletion(item);
 
-		// If we're adding a new item, restore focus and force keyboard
 		if (isAddingItem) {
 			await tick();
+			await new Promise((resolve) => setTimeout(resolve, 50));
+			await tick();
+
 			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
 			const lastInput = inputs[inputs.length - 1];
-			console.log(lastInput);
-			lastInput?.focus();
+			if (lastInput) {
+				lastInput.focus();
+				if ('virtualKeyboard' in navigator) {
+					(navigator as any).virtualKeyboard?.show();
+				}
+			}
 		}
 	}
 
