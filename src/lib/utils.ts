@@ -12,13 +12,14 @@ export function showToast(message: string) {
 }
 
 // Utility function to sort list items by checked status and name
-export function sortItems(items: ListItem[]) {
+export function sortItems(items: ListItem[]): ListItem[] {
 	items.sort((a, b) => {
 		if (a.checked !== b.checked) {
 			return a.checked ? 1 : -1; // Checked items go to the bottom
 		}
 		return a.name.localeCompare(b.name); // Sort alphabetically
 	});
+	return items;
 }
 
 // Utility function to get shared user names based on their IDs

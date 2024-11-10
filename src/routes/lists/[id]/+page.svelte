@@ -43,7 +43,7 @@
 
 					if (fetchedListItems) {
 						listItems = fetchedListItems;
-						sortItems(listItems);
+						listItems = sortItems(listItems);
 					}
 
 					if (fetchedListDetail) {
@@ -69,10 +69,24 @@
 		}
 	});
 
+	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
+		if (shouldFocus) {
+			node.focus();
+		}
+		return {
+			update(newShouldFocus: boolean) {
+				if (newShouldFocus) {
+					node.focus();
+				}
+			}
+		};
+	};
+
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
 
 		try {
+			swipedItemId = null;
 			const newItem = await addListItem({
 				name: newItemName,
 				listId,
@@ -82,7 +96,7 @@
 			listItems.pop(); // Remove placeholder
 			listItems = [...listItems, newItem];
 			await updateList(listId, { itemCount: listItems.length });
-			sortItems(listItems);
+			listItems = sortItems(listItems);
 		} catch (error) {
 			console.error('Error adding item:', error);
 			showToast('Failed to add item.');
@@ -96,6 +110,10 @@
 		try {
 			await deleteListItem(item.id);
 			listItems = listItems.filter((i) => i.id !== item.id);
+			tick().then(() => {
+				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				inputs[inputs.length - 1]?.focus();
+			});
 			await updateList(listId, { itemCount: listItems.length });
 		} catch (error) {
 			console.error('Error deleting item:', error);
@@ -107,7 +125,7 @@
 		try {
 			const updatedId = await updateListItem(item.id, { checked: !item.checked });
 			listItems = listItems.map((i) => (i.id === updatedId ? { ...i, checked: !i.checked } : i));
-			sortItems(listItems);
+			listItems = [...sortItems(listItems.slice(0, -1)), listItems[listItems.length - 1]];
 		} catch (error) {
 			console.error('Error updating item:', error);
 			showToast('Failed to update item.');
@@ -116,10 +134,11 @@
 
 	function handlePanDown(gestureEvent: GestureCustomEvent, itemId: string) {
 		if (!isPanning) {
-			swipedItemId = itemId;
-			startPosition = gestureEvent.detail.x;
-			panDistance = 0;
-			isPanning = true;
+			if (!isAddingItem || (isAddingItem && itemId != listItems[listItems.length - 1].id)) {
+				startPosition = gestureEvent.detail.x;
+				panDistance = 0;
+				isPanning = true;
+			}
 		} else if (swipedItemId === itemId) {
 			startPosition = gestureEvent.detail.x;
 		} else {
@@ -127,10 +146,17 @@
 		}
 	}
 
-	function handlePanMove(gestureEvent: GestureCustomEvent) {
+	function handlePanMove(gestureEvent: GestureCustomEvent, itemId: string) {
 		if (isPanning) {
 			const currentX = gestureEvent.detail.x;
 			const distance = currentX - startPosition;
+
+			// Only set swipedItemId if there's actual movement
+			if (Math.abs(distance) > 5) {
+				// Small threshold to prevent accidental swipes
+				swipedItemId = itemId;
+			}
+
 			panDistance = Math.max(panDistance + distance, swipeDistance);
 			if (panDistance > 0) {
 				panDistance = 0;
@@ -148,11 +174,6 @@
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
 		event.stopPropagation();
-		if (isAddingItem) {
-			// Prevent any item from being checked if a new item is being added
-			event.preventDefault();
-			return;
-		}
 		if (swipedItemId !== null && panDistance !== 0) {
 			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
@@ -163,29 +184,55 @@
 		}
 
 		await toggleItemCompletion(item);
+
+		// If we're adding a new item, restore focus and force keyboard
+		if (isAddingItem) {
+			await tick();
+			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+			const lastInput = inputs[inputs.length - 1];
+			console.log(lastInput);
+			lastInput?.focus();
+		}
 	}
 
 	function handleClickOutside(event: MouseEvent) {
 		const clickedElement = event.target as HTMLElement;
-		if (
-			!clickedElement.closest('.list-item-content') &&
-			!clickedElement.closest('.new-list-item') &&
-			!clickedElement.closest('.delete-btn') &&
-			!clickedElement.closest('.add-item')
-		) {
-			if (isAddingItem) {
-				cancelAddItem();
-				event.preventDefault();
-				swipedItemId = null;
-			} else {
-				swipedItemId = null;
-				panDistance = 0;
-				isPanning = false;
-			}
-		}
 
-		if (clickedElement.closest('.new-list-item') && swipedItemId !== null) {
-			swipedItemId = null;
+		// Get the clicked list item's ID and index
+		const clickedListItem = clickedElement.closest('li');
+		// Only select list items that contain list-item-content, excluding dividers
+		const listItems = Array.from(document.querySelectorAll('li:has(.list-item-content)'));
+		const clickedIndex = clickedListItem?.querySelector('.list-item-content')
+			? listItems.indexOf(clickedListItem)
+			: -1;
+		const clickedItemId = clickedListItem?.getAttribute('data-item-id') || null;
+
+		if (!clickedElement.closest('.delete-btn') && !clickedElement.closest('.add-item')) {
+			// If there's any swiped item, prevent default behavior and only handle swipe-related actions
+			if (swipedItemId !== null) {
+				event.preventDefault();
+				// If clicking outside the swiped item, clear the swipe
+				if (swipedItemId !== clickedItemId) {
+					swipedItemId = null;
+				}
+				// Always restore focus to the new item if we're adding one
+				if (isAddingItem) {
+					tick().then(() => {
+						const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+						inputs[inputs.length - 1]?.focus();
+					});
+				}
+				return;
+			}
+
+			// Only handle add/cancel if no item is being swiped and not clicking the last item
+			if (isAddingItem && clickedIndex !== listItems.length - 1) {
+				if (newItemName.trim()) {
+					handleAddItem();
+				} else {
+					cancelAddItem();
+				}
+			}
 		}
 	}
 
@@ -194,7 +241,10 @@
 			isAddingItem = true;
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
-			tick().then(() => document.getElementById('new-item-input')?.focus());
+			tick().then(() => {
+				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				inputs[inputs.length - 1]?.focus();
+			});
 		}
 	}
 
@@ -233,36 +283,43 @@
 			<ul class="space-y-0">
 				{#each listItems as item, index (item.id)}
 					<li
+						data-item-id={item.id}
 						class="relative flex items-center py-2 bg-lists-bg-light dark:bg-lists-bg-dark overflow-hidden"
 						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
 						on:pandown={(event) => handlePanDown(event, item.id)}
-						on:panmove={(event) => handlePanMove(event)}
+						on:panmove={(event) => handlePanMove(event, item.id)}
 						on:panup={(event) => handlePanUp(event)}
 					>
 						<div
 							class="list-item-content py-2 flex items-center w-full duration-500"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
-							<label class="flex items-center w-full">
+							<label class="w-5 h-5">
 								<input
 									type="checkbox"
-									class="flex-shrink-0 h-5 w-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
+									class="p-2 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
 									checked={item.checked}
 									disabled={isAddingItem && index === listItems.length - 1}
 									on:click={(event) => handleCheckboxClick(event, item)}
 								/>
-								{#if isAddingItem && index === listItems.length - 1}
-									<input
-										id="new-item-input"
-										type="text"
-										class="new-list-item flex-grow p-2 border-2 border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark text-input-text-light dark:text-input-text-dark rounded-lg"
-										bind:value={newItemName}
-										on:keydown={handleKeyDown}
-									/>
-								{:else}
-									<span class="flex-grow">{item.name}</span>
-								{/if}
 							</label>
+							<input
+								type="text"
+								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
+								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
+								readonly={swipedItemId !== null &&
+									!(isAddingItem && index === listItems.length - 1)}
+								on:input={(e) => {
+									if (index === listItems.length - 1 && isAddingItem) {
+										newItemName = e.currentTarget.value;
+									} else {
+										item.name = e.currentTarget.value;
+										updateListItem(item.id, { name: item.name });
+									}
+								}}
+								on:keydown={handleKeyDown}
+								use:autoFocus={isAddingItem && index === listItems.length - 1}
+							/>
 						</div>
 
 						<button
