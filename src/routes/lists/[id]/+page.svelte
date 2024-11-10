@@ -31,17 +31,6 @@
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
-	// Add debug logging
-	let debugLogs: string[] = [];
-
-	function log(...args: any[]) {
-		const message = args
-			.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)))
-			.join(' ');
-		debugLogs = [...debugLogs, `${new Date().toLocaleTimeString()}: ${message}`];
-		console.log(...args);
-	}
-
 	onMount(async () => {
 		try {
 			auth.onAuthStateChanged(async (user) => {
@@ -184,12 +173,10 @@
 	}
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
-		log('1. Checkbox clicked');
 		event.preventDefault();
 		event.stopPropagation();
 
 		if (swipedItemId !== null && panDistance !== 0) {
-			log('2. Swipe detected, returning');
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
 			}
@@ -197,39 +184,15 @@
 		}
 
 		const focusedElement = document.activeElement;
-		log(
-			'3. Currently focused element:',
-			focusedElement?.tagName,
-			focusedElement instanceof HTMLInputElement ? focusedElement.value : ''
-		);
-		log('4. isAddingItem:', isAddingItem);
-
 		await toggleItemCompletion(item);
 
 		if (isAddingItem) {
-			log('5. Attempting to restore focus to new item');
 			await tick();
 			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
 			const lastInput = inputs[inputs.length - 1];
-			log('6. Found last input:', lastInput?.tagName);
-
-			if (lastInput) {
-				lastInput.focus();
-				log('7. Focus attempted on last input');
-				log(
-					'8. New active element:',
-					document.activeElement?.tagName,
-					document.activeElement instanceof HTMLInputElement ? document.activeElement.value : ''
-				);
-			}
+			if (lastInput) lastInput.focus();
 		} else if (focusedElement instanceof HTMLElement) {
-			log('9. Attempting to restore focus to previous element');
 			focusedElement.focus();
-			log(
-				'10. New active element:',
-				document.activeElement?.tagName,
-				document.activeElement instanceof HTMLInputElement ? document.activeElement.value : ''
-			);
 		}
 	}
 
@@ -332,16 +295,21 @@
 							class="list-item-content py-2 flex items-center w-full duration-500"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
-							<label class="w-5 h-5">
+							<button
+								type="button"
+								class="w-5 h-5 relative"
+								aria-label={`Mark ${item.name} as ${item.checked ? 'incomplete' : 'complete'}`}
+								on:click|preventDefault={(event) => handleCheckboxClick(event, item)}
+							>
 								<input
 									type="checkbox"
-									class="p-2 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
+									class="absolute inset-0 p-2 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item rounded focus:ring-0"
 									checked={item.checked}
 									disabled={isAddingItem && index === listItems.length - 1}
 									tabindex="-1"
-									on:click={(event) => handleCheckboxClick(event, item)}
+									on:click|preventDefault
 								/>
-							</label>
+							</button>
 							<input
 								type="text"
 								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
@@ -388,20 +356,3 @@
 		</button>
 	</div>
 </div>
-
-<!-- Add the debug console at the very bottom of your template -->
-{#if debugLogs.length > 0}
-	<div
-		class="fixed bottom-0 left-0 right-0 bg-black/75 text-white p-4 max-h-48 overflow-y-auto z-50"
-	>
-		{#each debugLogs as logMessage}
-			<div class="text-xs font-mono">{logMessage}</div>
-		{/each}
-		<button
-			class="absolute top-2 right-2 text-white bg-red-500 px-2 py-1 rounded text-sm"
-			on:click={() => (debugLogs = [])}
-		>
-			Clear
-		</button>
-	</div>
-{/if}
