@@ -69,6 +69,19 @@
 		}
 	});
 
+	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
+		if (shouldFocus) {
+			node.focus();
+		}
+		return {
+			update(newShouldFocus: boolean) {
+				if (newShouldFocus) {
+					node.focus();
+				}
+			}
+		};
+	};
+
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
 
@@ -174,30 +187,40 @@
 	function handleClickOutside(event: MouseEvent) {
 		const clickedElement = event.target as HTMLElement;
 
-		// Get the clicked list item's ID
+		// Get the clicked list item's ID and index
 		const clickedListItem = clickedElement.closest('li');
-		const clickedItemId = clickedListItem
-			? listItems[Array.from(document.querySelectorAll('li')).indexOf(clickedListItem)]?.id
-			: null;
+		// Only select list items that contain list-item-content, excluding dividers
+		const listItems = Array.from(document.querySelectorAll('li:has(.list-item-content)'));
+		const clickedIndex = clickedListItem?.querySelector('.list-item-content')
+			? listItems.indexOf(clickedListItem)
+			: -1;
+		const clickedItemId = clickedListItem?.getAttribute('data-item-id') || null;
 
 		if (!clickedElement.closest('.delete-btn') && !clickedElement.closest('.add-item')) {
-			// If there's a swiped item and clicking outside of it
-			if (swipedItemId && swipedItemId !== clickedItemId) {
-				if (isAddingItem && newItemName.trim()) {
-					handleAddItem();
+			// If there's any swiped item, prevent default behavior and only handle swipe-related actions
+			if (swipedItemId !== null) {
+				event.preventDefault();
+				// If clicking outside the swiped item, clear the swipe
+				if (swipedItemId !== clickedItemId) {
+					swipedItemId = null;
 				}
-				swipedItemId = null;
+				// Restore focus to the new item if we're adding one (regardless of where we clicked)
+				if (isAddingItem) {
+					tick().then(() => {
+						const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+						inputs[inputs.length - 1]?.focus();
+					});
+				}
 				return;
 			}
 
-			// Only cancel if no item is being swiped AND not clicking on any list item
-			if (isAddingItem && !swipedItemId) {
+			// Only handle add/cancel if no item is being swiped and not clicking the last item
+			if (isAddingItem && clickedIndex !== listItems.length - 1) {
 				if (newItemName.trim()) {
 					handleAddItem();
 				} else {
 					cancelAddItem();
 				}
-				event.preventDefault();
 			}
 		}
 	}
@@ -249,6 +272,7 @@
 			<ul class="space-y-0">
 				{#each listItems as item, index (item.id)}
 					<li
+						data-item-id={item.id}
 						class="relative flex items-center py-2 bg-lists-bg-light dark:bg-lists-bg-dark overflow-hidden"
 						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
 						on:pandown={(event) => handlePanDown(event, item.id)}
@@ -272,6 +296,8 @@
 								type="text"
 								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
+								readonly={swipedItemId !== null &&
+									!(isAddingItem && index === listItems.length - 1)}
 								on:input={(e) => {
 									if (index === listItems.length - 1 && isAddingItem) {
 										newItemName = e.currentTarget.value;
@@ -281,6 +307,7 @@
 									}
 								}}
 								on:keydown={handleKeyDown}
+								use:autoFocus={isAddingItem && index === listItems.length - 1}
 							/>
 						</div>
 
