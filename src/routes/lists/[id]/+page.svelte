@@ -31,6 +31,17 @@
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
+	// Add debug logging
+	let debugLogs: string[] = [];
+
+	function log(...args: any[]) {
+		const message = args
+			.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)))
+			.join(' ');
+		debugLogs = [...debugLogs, `${new Date().toLocaleTimeString()}: ${message}`];
+		console.log(...args);
+	}
+
 	onMount(async () => {
 		try {
 			auth.onAuthStateChanged(async (user) => {
@@ -173,32 +184,52 @@
 	}
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
-		// Prevent all default behavior
+		log('1. Checkbox clicked');
 		event.preventDefault();
 		event.stopPropagation();
 
 		if (swipedItemId !== null && panDistance !== 0) {
+			log('2. Swipe detected, returning');
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
 			}
 			return;
 		}
 
-		// Store the currently focused element before toggling
 		const focusedElement = document.activeElement;
+		log(
+			'3. Currently focused element:',
+			focusedElement?.tagName,
+			focusedElement instanceof HTMLInputElement ? focusedElement.value : ''
+		);
+		log('4. isAddingItem:', isAddingItem);
 
 		await toggleItemCompletion(item);
 
-		// Restore focus to the previously focused element or the new item input
 		if (isAddingItem) {
+			log('5. Attempting to restore focus to new item');
 			await tick();
 			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
 			const lastInput = inputs[inputs.length - 1];
+			log('6. Found last input:', lastInput?.tagName);
+
 			if (lastInput) {
 				lastInput.focus();
+				log('7. Focus attempted on last input');
+				log(
+					'8. New active element:',
+					document.activeElement?.tagName,
+					document.activeElement instanceof HTMLInputElement ? document.activeElement.value : ''
+				);
 			}
 		} else if (focusedElement instanceof HTMLElement) {
+			log('9. Attempting to restore focus to previous element');
 			focusedElement.focus();
+			log(
+				'10. New active element:',
+				document.activeElement?.tagName,
+				document.activeElement instanceof HTMLInputElement ? document.activeElement.value : ''
+			);
 		}
 	}
 
@@ -357,3 +388,20 @@
 		</button>
 	</div>
 </div>
+
+<!-- Add the debug console at the very bottom of your template -->
+{#if debugLogs.length > 0}
+	<div
+		class="fixed bottom-0 left-0 right-0 bg-black/75 text-white p-4 max-h-48 overflow-y-auto z-50"
+	>
+		{#each debugLogs as logMessage}
+			<div class="text-xs font-mono">{logMessage}</div>
+		{/each}
+		<button
+			class="absolute top-2 right-2 text-white bg-red-500 px-2 py-1 rounded text-sm"
+			on:click={() => (debugLogs = [])}
+		>
+			Clear
+		</button>
+	</div>
+{/if}
