@@ -134,9 +134,11 @@
 
 	function handlePanDown(gestureEvent: GestureCustomEvent, itemId: string) {
 		if (!isPanning) {
-			startPosition = gestureEvent.detail.x;
-			panDistance = 0;
-			isPanning = true;
+			if (!isAddingItem || (isAddingItem && itemId != listItems[listItems.length - 1].id)) {
+				startPosition = gestureEvent.detail.x;
+				panDistance = 0;
+				isPanning = true;
+			}
 		} else if (swipedItemId === itemId) {
 			startPosition = gestureEvent.detail.x;
 		} else {
@@ -204,7 +206,7 @@
 				if (swipedItemId !== clickedItemId) {
 					swipedItemId = null;
 				}
-				// Restore focus to the new item if we're adding one (regardless of where we clicked)
+				// Always restore focus to the new item if we're adding one
 				if (isAddingItem) {
 					tick().then(() => {
 						const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
