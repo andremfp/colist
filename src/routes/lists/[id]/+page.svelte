@@ -173,25 +173,26 @@
 	}
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
+		event.preventDefault();
 		event.stopPropagation();
+
+		// Find the associated text input
+		const listItem = (event.target as HTMLElement).closest('li');
+		const textInput = listItem?.querySelector('input[type="text"]') as HTMLInputElement;
+		const wasInputFocused = document.activeElement === textInput;
+
 		if (swipedItemId !== null && panDistance !== 0) {
-			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
 			}
-			event.preventDefault(); // Prevent default click behavior
 			return;
 		}
 
 		await toggleItemCompletion(item);
 
-		// If we're adding a new item, restore focus and force keyboard
-		if (isAddingItem) {
-			await tick();
-			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-			const lastInput = inputs[inputs.length - 1];
-			console.log(lastInput);
-			lastInput?.focus();
+		// Restore focus if the input was focused
+		if (wasInputFocused && textInput) {
+			textInput.focus();
 		}
 	}
 
@@ -294,15 +295,16 @@
 							class="list-item-content py-2 flex items-center w-full duration-500"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
-							<label class="w-5 h-5">
-								<input
-									type="checkbox"
-									class="p-2 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
-									checked={item.checked}
-									disabled={isAddingItem && index === listItems.length - 1}
-									on:click={(event) => handleCheckboxClick(event, item)}
-								/>
-							</label>
+							<input
+								type="checkbox"
+								class="w-5 h-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item rounded focus:ring-0"
+								checked={item.checked}
+								disabled={isAddingItem && index === listItems.length - 1}
+								on:mousedown|preventDefault|stopPropagation
+								on:click|preventDefault|stopPropagation={(event) =>
+									handleCheckboxClick(event, item)}
+								aria-label={`Mark ${item.name} as ${item.checked ? 'incomplete' : 'complete'}`}
+							/>
 							<input
 								type="text"
 								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
