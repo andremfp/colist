@@ -184,6 +184,16 @@
 		}
 
 		await toggleItemCompletion(item);
+
+		// If we're adding a new item, restore focus and force keyboard
+		if (isAddingItem) {
+			await tick();
+			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+			const lastInput = inputs[inputs.length - 1];
+			lastInput?.focus();
+			// Force the keyboard to show by triggering a click
+			// lastInput?.click();
+		}
 	}
 
 	function handleClickOutside(event: MouseEvent) {
