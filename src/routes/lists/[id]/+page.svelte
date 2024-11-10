@@ -173,30 +173,32 @@
 	}
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
+		// Prevent all default behavior
+		event.preventDefault();
 		event.stopPropagation();
+
 		if (swipedItemId !== null && panDistance !== 0) {
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
 			}
-			event.preventDefault();
 			return;
 		}
 
+		// Store the currently focused element before toggling
+		const focusedElement = document.activeElement;
+
 		await toggleItemCompletion(item);
 
+		// Restore focus to the previously focused element or the new item input
 		if (isAddingItem) {
 			await tick();
-			await new Promise((resolve) => setTimeout(resolve, 50));
-			await tick();
-
 			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
 			const lastInput = inputs[inputs.length - 1];
 			if (lastInput) {
 				lastInput.focus();
-				if ('virtualKeyboard' in navigator) {
-					(navigator as any).virtualKeyboard?.show();
-				}
 			}
+		} else if (focusedElement instanceof HTMLElement) {
+			focusedElement.focus();
 		}
 	}
 
@@ -305,14 +307,12 @@
 									class="p-2 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item mr-4 rounded focus:ring-0"
 									checked={item.checked}
 									disabled={isAddingItem && index === listItems.length - 1}
+									tabindex="-1"
 									on:click={(event) => handleCheckboxClick(event, item)}
 								/>
 							</label>
 							<input
 								type="text"
-								inputmode="text"
-								enterkeyhint="done"
-								autocomplete="off"
 								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
 								readonly={swipedItemId !== null &&
