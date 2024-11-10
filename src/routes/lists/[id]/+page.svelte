@@ -174,41 +174,24 @@
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
 		event.stopPropagation();
-		event.preventDefault();
-
 		if (swipedItemId !== null && panDistance !== 0) {
+			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
 			}
+			event.preventDefault(); // Prevent default click behavior
 			return;
 		}
 
-		// Get reference to input before any state changes
-		const lastInput = document.querySelectorAll('.list-item')[listItems.length - 1] as HTMLElement;
-		const shouldRestoreFocus = isAddingItem;
-
 		await toggleItemCompletion(item);
 
-		if (shouldRestoreFocus) {
-			// Try multiple approaches with different timings
+		// If we're adding a new item, restore focus and force keyboard
+		if (isAddingItem) {
+			await tick();
+			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+			const lastInput = inputs[inputs.length - 1];
+			console.log(lastInput);
 			lastInput?.focus();
-
-			// Immediate RAF
-			requestAnimationFrame(() => {
-				lastInput?.focus();
-			});
-
-			// Delayed RAF
-			setTimeout(() => {
-				requestAnimationFrame(() => {
-					lastInput?.focus();
-				});
-			}, 100);
-
-			// Final fallback
-			setTimeout(() => {
-				lastInput?.focus();
-			}, 200);
 		}
 	}
 
