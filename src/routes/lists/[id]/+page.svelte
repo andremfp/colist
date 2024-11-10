@@ -174,14 +174,12 @@
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
 		event.stopPropagation();
-		event.preventDefault(); // Prevent default checkbox behavior
+		event.preventDefault();
 
 		if (swipedItemId !== null && panDistance !== 0) {
-			// If the clicked item is not the swiped item, just revert the swipe
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
 			}
-			event.preventDefault(); // Prevent default click behavior
 			return;
 		}
 
@@ -192,10 +190,25 @@
 		await toggleItemCompletion(item);
 
 		if (shouldRestoreFocus) {
-			// Use requestAnimationFrame to ensure DOM is ready
+			// Try multiple approaches with different timings
+			lastInput?.focus();
+
+			// Immediate RAF
 			requestAnimationFrame(() => {
 				lastInput?.focus();
 			});
+
+			// Delayed RAF
+			setTimeout(() => {
+				requestAnimationFrame(() => {
+					lastInput?.focus();
+				});
+			}, 100);
+
+			// Final fallback
+			setTimeout(() => {
+				lastInput?.focus();
+			}, 200);
 		}
 	}
 
