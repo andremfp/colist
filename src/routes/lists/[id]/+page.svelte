@@ -173,26 +173,23 @@
 	}
 
 	async function handleCheckboxClick(event: MouseEvent, item: ListItem) {
-		event.preventDefault();
-		event.stopPropagation();
-
 		if (swipedItemId !== null && panDistance !== 0) {
+			event.preventDefault();
 			if (swipedItemId !== item.id) {
 				swipedItemId = null;
 			}
 			return;
 		}
 
-		const focusedElement = document.activeElement;
+		// Store the currently focused element
+		const activeInput = document.activeElement;
+
 		await toggleItemCompletion(item);
 
-		if (isAddingItem) {
-			await tick();
-			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-			const lastInput = inputs[inputs.length - 1];
-			if (lastInput) lastInput.focus();
-		} else if (focusedElement instanceof HTMLElement) {
-			focusedElement.focus();
+		// Restore focus after the state update
+		await tick();
+		if (activeInput instanceof HTMLElement) {
+			activeInput.focus();
 		}
 	}
 
@@ -295,21 +292,14 @@
 							class="list-item-content py-2 flex items-center w-full duration-500"
 							style={`transform: translateX(${swipedItemId === item.id ? panDistance : 0}px`}
 						>
-							<button
-								type="button"
-								class="w-5 h-5 relative"
+							<input
+								type="checkbox"
+								class="w-5 h-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item rounded focus:ring-0"
+								checked={item.checked}
+								disabled={isAddingItem && index === listItems.length - 1}
+								on:click={(event) => handleCheckboxClick(event, item)}
 								aria-label={`Mark ${item.name} as ${item.checked ? 'incomplete' : 'complete'}`}
-								on:click|preventDefault={(event) => handleCheckboxClick(event, item)}
-							>
-								<input
-									type="checkbox"
-									class="absolute inset-0 p-2 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item rounded focus:ring-0"
-									checked={item.checked}
-									disabled={isAddingItem && index === listItems.length - 1}
-									tabindex="-1"
-									on:click|preventDefault
-								/>
-							</button>
+							/>
 							<input
 								type="text"
 								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
