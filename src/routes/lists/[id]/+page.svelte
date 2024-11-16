@@ -72,8 +72,8 @@
 
 		// Use a standard event listener
 		window.addEventListener('addNewItemRow', () => {
-			// Run the handler in the next tick
-			setTimeout(handleAddNewItem, 0);
+			// Run the handler in a single tick
+			handleAddNewItem();
 		});
 
 		// Set up auth state change handler immediately
@@ -110,21 +110,6 @@
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
-
-	// Watch for changes to isAddingItem
-	$: if (isAddingItem) {
-		log('4. isAddingItem changed to true');
-		tick().then(() => {
-			const lastInput = document.querySelector(
-				'li:last-child input[type="text"]'
-			) as HTMLInputElement;
-			log(`5. Found lastInput? ${!!lastInput}`);
-			if (lastInput) {
-				log('6. Attempting to focus lastInput');
-				lastInput.focus();
-			}
-		});
-	}
 
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
