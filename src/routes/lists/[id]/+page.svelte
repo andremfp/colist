@@ -109,20 +109,6 @@
 		});
 	}
 
-	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
-		if (shouldFocus) {
-			// Add a small delay to ensure the DOM is ready
-			setTimeout(() => node.focus(), 0);
-		}
-		return {
-			update(newShouldFocus: boolean) {
-				if (newShouldFocus) {
-					setTimeout(() => node.focus(), 0);
-				}
-			}
-		};
-	};
-
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
 
@@ -351,7 +337,6 @@
 									}
 								}}
 								on:keydown={handleKeyDown}
-								use:autoFocus={isAddingItem && index === listItems.length - 1}
 							/>
 						</div>
 
@@ -371,16 +356,6 @@
 			</ul>
 		</div>
 	{/if}
-	<!-- <div class="mt-4">
-		<button
-			class="add-item text-add-item text-base font-normal flex items-center"
-			on:click={addNewItemRow}
-			aria-label="Add new item"
-		>
-			<span class="ri-add-line text-icon-lg"></span>
-			Add Item
-		</button>
-	</div> -->
 </div>
 
 <pre class="hidden">
