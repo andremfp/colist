@@ -41,6 +41,14 @@
 				// Create a new array and update in two steps
 				const newListItems = [...listItems, newItem];
 				listItems = newListItems;
+
+				// Scroll to bottom after the DOM updates
+				tick().then(() => {
+					window.scrollTo({
+						top: document.documentElement.scrollHeight,
+						behavior: 'smooth'
+					});
+				});
 			}
 		};
 
@@ -113,6 +121,14 @@
 			listItems = [...listItems, newItem];
 			await updateList(listId, { itemCount: listItems.length });
 			listItems = sortItems(listItems);
+
+			// Scroll to bottom after the DOM updates
+			tick().then(() => {
+				window.scrollTo({
+					top: document.documentElement.scrollHeight,
+					behavior: 'smooth'
+				});
+			});
 		} catch (error) {
 			console.error('Error adding item:', error);
 			showToast('Failed to add item.');
