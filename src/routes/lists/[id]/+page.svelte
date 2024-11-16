@@ -50,43 +50,33 @@
 				log('1. Starting handleAddNewItem');
 				isAddingItem = true;
 				swipedItemId = null;
-				const newItem = { id: '', name: '', listId: '', addedBy: '', checked: false };
 
-				listItems = [...listItems, newItem];
+				// Add new item to list
+				listItems = [
+					...listItems,
+					{
+						id: '',
+						name: '',
+						listId: '',
+						addedBy: '',
+						checked: false
+					}
+				];
 				log('2. Added new item to listItems');
 
-				// Wait for DOM update
+				// Give DOM time to update
 				await tick();
+				await new Promise((resolve) => setTimeout(resolve, 50));
 
-				// Try multiple focus strategies
-				log('3. Attempting to focus with multiple strategies');
-
-				// Strategy 1: Direct reference
-				if (newItemInput) {
-					log('4a. Using newItemInput reference');
-					newItemInput.focus();
-				}
-
-				// Strategy 2: Query last input
-				const lastInput = document.querySelector('li:last-child input[type="text"]');
+				// Focus attempt
+				const lastInput = document.querySelector(
+					'li:last-child input[type="text"]'
+				) as HTMLInputElement;
+				log(`3. Found input: ${!!lastInput}`);
 				if (lastInput) {
-					log('4b. Using querySelector for last input');
-					(lastInput as HTMLInputElement).focus();
+					lastInput.focus();
+					log(`4. Is focused: ${document.activeElement === lastInput}`);
 				}
-
-				// Strategy 3: Wait a bit longer
-				setTimeout(() => {
-					log('4c. Delayed focus attempt');
-					const delayedInput = document.querySelector('li:last-child input[type="text"]');
-					if (delayedInput) {
-						(delayedInput as HTMLInputElement).focus();
-					}
-				}, 100);
-
-				window.scrollTo({
-					top: document.documentElement.scrollHeight,
-					behavior: 'smooth'
-				});
 			}
 		};
 
@@ -351,10 +341,10 @@
 									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 									value={newItemName}
 									bind:this={newItemInput}
-									readonly={swipedItemId !== null}
 									on:input={(e) => {
 										newItemName = e.currentTarget.value;
 									}}
+									on:focus={() => log('Input received focus event')}
 									on:keydown={handleKeyDown}
 								/>
 							{:else}
