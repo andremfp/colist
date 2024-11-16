@@ -53,29 +53,42 @@
 				const newItem = { id: '', name: '', listId: '', addedBy: '', checked: false };
 
 				listItems = [...listItems, newItem];
+				log('2. Added new item to listItems');
 
-				requestAnimationFrame(() => {
-					log('2. Attempting to focus in RAF');
-					const lastInput = document.querySelector(
-						'li:last-child input[type="text"]'
-					) as HTMLInputElement;
-					log(`3. Found lastInput? ${!!lastInput}`);
-					if (lastInput) {
-						log('4. Focusing lastInput');
-						lastInput.focus();
+				// Wait for DOM update
+				await tick();
+
+				// Try multiple focus strategies
+				log('3. Attempting to focus with multiple strategies');
+
+				// Strategy 1: Direct reference
+				if (newItemInput) {
+					log('4a. Using newItemInput reference');
+					newItemInput.focus();
+				}
+
+				// Strategy 2: Query last input
+				const lastInput = document.querySelector('li:last-child input[type="text"]');
+				if (lastInput) {
+					log('4b. Using querySelector for last input');
+					(lastInput as HTMLInputElement).focus();
+				}
+
+				// Strategy 3: Wait a bit longer
+				setTimeout(() => {
+					log('4c. Delayed focus attempt');
+					const delayedInput = document.querySelector('li:last-child input[type="text"]');
+					if (delayedInput) {
+						(delayedInput as HTMLInputElement).focus();
 					}
+				}, 100);
 
-					window.scrollTo({
-						top: document.documentElement.scrollHeight,
-						behavior: 'smooth'
-					});
+				window.scrollTo({
+					top: document.documentElement.scrollHeight,
+					behavior: 'smooth'
 				});
 			}
 		};
-
-		window.addEventListener('addNewItemRow', () => {
-			setTimeout(handleAddNewItem, 0);
-		});
 
 		// Set up auth state change handler immediately
 		auth.onAuthStateChanged(async (user) => {
@@ -103,7 +116,10 @@
 		});
 
 		// Add event listeners
-		window.addEventListener('addNewItemRow', handleAddNewItem);
+		window.addEventListener('addNewItemRow', () => {
+			// Run the handler in the next tick
+			setTimeout(handleAddNewItem, 0);
+		});
 		document.addEventListener('click', handleClickOutside);
 
 		return () => {
