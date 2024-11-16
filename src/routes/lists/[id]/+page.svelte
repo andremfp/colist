@@ -34,22 +34,32 @@
 	// Add this variable to store the input reference
 	let newItemInput: HTMLInputElement;
 
+	// Add these for debugging
+	let debugLogs: string[] = [];
+	const MAX_LOGS = 10;
+
+	function log(message: string) {
+		debugLogs = [...debugLogs, `${new Date().toISOString().slice(11, 19)} ${message}`].slice(
+			-MAX_LOGS
+		);
+	}
+
 	onMount(() => {
 		const handleAddNewItem = async () => {
 			if (!isAddingItem) {
+				log('1. Starting handleAddNewItem');
 				isAddingItem = true;
 				swipedItemId = null;
 				const newItem = { id: '', name: '', listId: '', addedBy: '', checked: false };
 
-				// Create a new array and update in two steps
 				const newListItems = [...listItems, newItem];
 				listItems = newListItems;
 
-				// Wait for DOM update
 				await tick();
 
-				// Focus the input directly using the reference
+				log(`2. newItemInput exists? ${!!newItemInput}`);
 				if (newItemInput) {
+					log('3. Attempting to focus newItemInput');
 					newItemInput.focus();
 				}
 
@@ -103,11 +113,14 @@
 
 	// Watch for changes to isAddingItem
 	$: if (isAddingItem) {
+		log('4. isAddingItem changed to true');
 		tick().then(() => {
 			const lastInput = document.querySelector(
 				'li:last-child input[type="text"]'
 			) as HTMLInputElement;
+			log(`5. Found lastInput? ${!!lastInput}`);
 			if (lastInput) {
+				log('6. Attempting to focus lastInput');
 				lastInput.focus();
 			}
 		});
@@ -379,3 +392,13 @@
 <pre class="hidden">
 	{JSON.stringify({ debugListItems: listItems.length }, null, 2)}
 </pre>
+
+{#if debugLogs.length > 0}
+	<div class="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-4 font-mono text-xs">
+		<div class="max-h-32 overflow-y-auto">
+			{#each debugLogs as log}
+				<div class="whitespace-pre-wrap">{log}</div>
+			{/each}
+		</div>
+	</div>
+{/if}
