@@ -31,6 +31,9 @@
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
+	// Add this variable to store the input reference
+	let newItemInput: HTMLInputElement;
+
 	onMount(() => {
 		const handleAddNewItem = async () => {
 			if (!isAddingItem) {
@@ -42,13 +45,12 @@
 				const newListItems = [...listItems, newItem];
 				listItems = newListItems;
 
-				// Wait for DOM update and then scroll and focus
+				// Wait for DOM update
 				await tick();
-				const lastInput = document.querySelector(
-					'li:last-child input[type="text"]'
-				) as HTMLInputElement;
-				if (lastInput) {
-					lastInput.focus();
+
+				// Focus the input directly using the reference
+				if (newItemInput) {
+					newItemInput.focus();
 				}
 
 				window.scrollTo({
@@ -288,6 +290,10 @@
 	function goBack() {
 		goto('/lists');
 	}
+
+	function isNewItem(index: number): boolean {
+		return index === listItems.length - 1 && isAddingItem;
+	}
 </script>
 
 <div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
@@ -324,22 +330,32 @@
 									handleCheckboxClick(event, item)}
 								aria-label={`Mark ${item.name} as ${item.checked ? 'incomplete' : 'complete'}`}
 							/>
-							<input
-								type="text"
-								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
-								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
-								readonly={swipedItemId !== null &&
-									!(isAddingItem && index === listItems.length - 1)}
-								on:input={(e) => {
-									if (index === listItems.length - 1 && isAddingItem) {
+							{#if isNewItem(index)}
+								<input
+									type="text"
+									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
+									value={newItemName}
+									bind:this={newItemInput}
+									readonly={swipedItemId !== null}
+									on:input={(e) => {
 										newItemName = e.currentTarget.value;
-									} else {
+									}}
+									on:keydown={handleKeyDown}
+								/>
+							{:else}
+								<input
+									type="text"
+									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
+									value={item.name}
+									readonly={swipedItemId !== null}
+									on:input={(e) => {
 										item.name = e.currentTarget.value;
 										updateListItem(item.id, { name: item.name });
-									}
-								}}
-								on:keydown={handleKeyDown}
-							/>
+										updateListItem(item.id, { name: item.name });
+									}}
+									on:keydown={handleKeyDown}
+								/>
+							{/if}
 						</div>
 
 						<button
