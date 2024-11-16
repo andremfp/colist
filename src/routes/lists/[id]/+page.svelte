@@ -52,8 +52,9 @@
 				swipedItemId = null;
 				const newItem = { id: '', name: '', listId: '', addedBy: '', checked: false };
 
-				const newListItems = [...listItems, newItem];
-				listItems = newListItems;
+				log(`1a. Current list items: ${listItems.length}`);
+				listItems = [...listItems, newItem];
+				log(`1b. Updated list items: ${listItems.length}`);
 
 				await tick();
 
@@ -70,11 +71,9 @@
 			}
 		};
 
-		// Use a standard event listener
-		window.addEventListener('addNewItemRow', () => {
-			// Run the handler in a single tick
-			handleAddNewItem();
-		});
+		// Only register the event listener once
+		window.addEventListener('addNewItemRow', handleAddNewItem);
+		document.addEventListener('click', handleClickOutside);
 
 		// Set up auth state change handler immediately
 		auth.onAuthStateChanged(async (user) => {
@@ -100,10 +99,6 @@
 				goto('/');
 			}
 		});
-
-		// Add event listeners
-		window.addEventListener('addNewItemRow', handleAddNewItem);
-		document.addEventListener('click', handleClickOutside);
 
 		return () => {
 			window.removeEventListener('addNewItemRow', handleAddNewItem);
