@@ -44,8 +44,9 @@
 
 				// Wait for DOM update and then scroll and focus
 				await tick();
-				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-				const lastInput = inputs[inputs.length - 1];
+				const lastInput = document.querySelector(
+					'li:last-child input[type="text"]'
+				) as HTMLInputElement;
 				if (lastInput) {
 					lastInput.focus();
 				}
@@ -101,8 +102,9 @@
 	// Watch for changes to isAddingItem
 	$: if (isAddingItem) {
 		tick().then(() => {
-			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-			const lastInput = inputs[inputs.length - 1];
+			const lastInput = document.querySelector(
+				'li:last-child input[type="text"]'
+			) as HTMLInputElement;
 			if (lastInput) {
 				lastInput.focus();
 			}
