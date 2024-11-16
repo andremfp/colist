@@ -374,12 +374,8 @@
 	{/if}
 </div>
 
-<pre class="hidden">
-	{JSON.stringify({ debugListItems: listItems.length }, null, 2)}
-</pre>
-
 {#if debugLogs.length > 0}
-	<div class="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-4 font-mono text-xs">
+	<div class="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-4 font-mono text-xs z-50">
 		<div class="max-h-32 overflow-y-auto">
 			{#each debugLogs as log}
 				<div class="whitespace-pre-wrap">{log}</div>
@@ -387,3 +383,7 @@
 		</div>
 	</div>
 {/if}
+
+<pre class="hidden">
+	{JSON.stringify({ debugListItems: listItems.length }, null, 2)}
+</pre>
