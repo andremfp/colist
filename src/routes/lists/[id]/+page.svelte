@@ -52,9 +52,8 @@
 				swipedItemId = null;
 				const newItem = { id: '', name: '', listId: '', addedBy: '', checked: false };
 
-				log(`1a. Current list items: ${listItems.length}`);
-				listItems = [...listItems, newItem];
-				log(`1b. Updated list items: ${listItems.length}`);
+				const newListItems = [...listItems, newItem];
+				listItems = newListItems;
 
 				await tick();
 
@@ -71,9 +70,11 @@
 			}
 		};
 
-		// Only register the event listener once
-		window.addEventListener('addNewItemRow', handleAddNewItem);
-		document.addEventListener('click', handleClickOutside);
+		// Use a standard event listener
+		window.addEventListener('addNewItemRow', () => {
+			// Run the handler in the next tick
+			setTimeout(handleAddNewItem, 0);
+		});
 
 		// Set up auth state change handler immediately
 		auth.onAuthStateChanged(async (user) => {
@@ -100,11 +101,30 @@
 			}
 		});
 
+		// Add event listeners
+		window.addEventListener('addNewItemRow', handleAddNewItem);
+		document.addEventListener('click', handleClickOutside);
+
 		return () => {
 			window.removeEventListener('addNewItemRow', handleAddNewItem);
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
+
+	// Watch for changes to isAddingItem
+	$: if (isAddingItem) {
+		log('4. isAddingItem changed to true');
+		tick().then(() => {
+			const lastInput = document.querySelector(
+				'li:last-child input[type="text"]'
+			) as HTMLInputElement;
+			log(`5. Found lastInput? ${!!lastInput}`);
+			if (lastInput) {
+				log('6. Attempting to focus lastInput');
+				lastInput.focus();
+			}
+		});
+	}
 
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
@@ -369,8 +389,12 @@
 	{/if}
 </div>
 
+<pre class="hidden">
+	{JSON.stringify({ debugListItems: listItems.length }, null, 2)}
+</pre>
+
 {#if debugLogs.length > 0}
-	<div class="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-4 font-mono text-xs z-50">
+	<div class="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-4 font-mono text-xs">
 		<div class="max-h-32 overflow-y-auto">
 			{#each debugLogs as log}
 				<div class="whitespace-pre-wrap">{log}</div>
@@ -378,7 +402,3 @@
 		</div>
 	</div>
 {/if}
-
-<pre class="hidden">
-	{JSON.stringify({ debugListItems: listItems.length }, null, 2)}
-</pre>
