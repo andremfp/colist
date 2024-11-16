@@ -42,8 +42,14 @@
 				const newListItems = [...listItems, newItem];
 				listItems = newListItems;
 
-				// Wait for DOM update and then scroll
+				// Wait for DOM update and then scroll and focus
 				await tick();
+				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				const lastInput = inputs[inputs.length - 1];
+				if (lastInput) {
+					lastInput.focus();
+				}
+
 				window.scrollTo({
 					top: document.documentElement.scrollHeight,
 					behavior: 'smooth'
@@ -91,6 +97,17 @@
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
+
+	// Watch for changes to isAddingItem
+	$: if (isAddingItem) {
+		tick().then(() => {
+			const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+			const lastInput = inputs[inputs.length - 1];
+			if (lastInput) {
+				lastInput.focus();
+			}
+		});
+	}
 
 	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
 		if (shouldFocus) {
