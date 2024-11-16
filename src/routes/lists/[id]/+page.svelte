@@ -52,27 +52,28 @@
 				swipedItemId = null;
 				const newItem = { id: '', name: '', listId: '', addedBy: '', checked: false };
 
-				const newListItems = [...listItems, newItem];
-				listItems = newListItems;
+				listItems = [...listItems, newItem];
 
-				await tick();
+				requestAnimationFrame(() => {
+					log('2. Attempting to focus in RAF');
+					const lastInput = document.querySelector(
+						'li:last-child input[type="text"]'
+					) as HTMLInputElement;
+					log(`3. Found lastInput? ${!!lastInput}`);
+					if (lastInput) {
+						log('4. Focusing lastInput');
+						lastInput.focus();
+					}
 
-				log(`2. newItemInput exists? ${!!newItemInput}`);
-				if (newItemInput) {
-					log('3. Attempting to focus newItemInput');
-					newItemInput.focus();
-				}
-
-				window.scrollTo({
-					top: document.documentElement.scrollHeight,
-					behavior: 'smooth'
+					window.scrollTo({
+						top: document.documentElement.scrollHeight,
+						behavior: 'smooth'
+					});
 				});
 			}
 		};
 
-		// Use a standard event listener
 		window.addEventListener('addNewItemRow', () => {
-			// Run the handler in the next tick
 			setTimeout(handleAddNewItem, 0);
 		});
 
@@ -110,21 +111,6 @@
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
-
-	// Watch for changes to isAddingItem
-	$: if (isAddingItem) {
-		log('4. isAddingItem changed to true');
-		tick().then(() => {
-			const lastInput = document.querySelector(
-				'li:last-child input[type="text"]'
-			) as HTMLInputElement;
-			log(`5. Found lastInput? ${!!lastInput}`);
-			if (lastInput) {
-				log('6. Attempting to focus lastInput');
-				lastInput.focus();
-			}
-		});
-	}
 
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
