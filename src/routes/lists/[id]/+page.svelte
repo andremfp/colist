@@ -31,42 +31,58 @@
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
-	onMount(async () => {
-		try {
-			auth.onAuthStateChanged(async (user) => {
-				if (user) {
-					currentUserId = user.uid;
-					const [fetchedListItems, fetchedListDetail] = await Promise.all([
-						fetchListItems(listId),
-						fetchListById(listId)
-					]);
+	onMount(() => {
+		const handleAddNewItem = () => {
+			if (!isAddingItem) {
+				isAddingItem = true;
+				swipedItemId = null;
+				const newItem = { id: '', name: '', listId: '', addedBy: '', checked: false };
 
-					if (fetchedListItems) {
-						listItems = fetchedListItems;
-						listItems = sortItems(listItems);
-					}
+				// Create a new array and update in two steps
+				const newListItems = [...listItems, newItem];
+				listItems = newListItems;
+			}
+		};
 
-					if (fetchedListDetail) {
-						listDetail = fetchedListDetail;
-						sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy, currentUserId);
-					}
-					isLoading = false;
-				} else {
-					console.log('User not detected, redirecting to login');
-					goto('/');
+		// Use a standard event listener
+		window.addEventListener('addNewItemRow', () => {
+			// Run the handler in the next tick
+			setTimeout(handleAddNewItem, 0);
+		});
+
+		// Set up auth state change handler immediately
+		auth.onAuthStateChanged(async (user) => {
+			if (user) {
+				currentUserId = user.uid;
+				const [fetchedListItems, fetchedListDetail] = await Promise.all([
+					fetchListItems(listId),
+					fetchListById(listId)
+				]);
+
+				if (fetchedListItems) {
+					listItems = fetchedListItems;
+					listItems = sortItems(listItems);
 				}
-			});
 
-			document.addEventListener('click', handleClickOutside);
-		} catch (error) {
-			console.error('Failed to fetch list details:', error);
-		}
-	});
+				if (fetchedListDetail) {
+					listDetail = fetchedListDetail;
+					sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy, currentUserId);
+				}
+				isLoading = false;
+			} else {
+				console.log('User not detected, redirecting to login');
+				goto('/');
+			}
+		});
 
-	onDestroy(() => {
-		if (typeof document !== 'undefined') {
+		// Add event listeners
+		window.addEventListener('addNewItemRow', handleAddNewItem);
+		document.addEventListener('click', handleClickOutside);
+
+		return () => {
+			window.removeEventListener('addNewItemRow', handleAddNewItem);
 			document.removeEventListener('click', handleClickOutside);
-		}
+		};
 	});
 
 	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
@@ -237,18 +253,6 @@
 		}
 	}
 
-	function addNewItemRow() {
-		if (!isAddingItem) {
-			isAddingItem = true;
-			swipedItemId = null;
-			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
-			tick().then(() => {
-				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-				inputs[inputs.length - 1]?.focus();
-			});
-		}
-	}
-
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter') handleAddItem();
 		if (event.key === 'Escape') cancelAddItem();
@@ -266,12 +270,6 @@
 </script>
 
 <div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
-	<div class="flex items-center mb-6">
-		<button on:click={goBack} class="flex items-center text-lg font-bold">
-			<span class="ri-arrow-left-s-line text-icon-lg mr-2"></span> My Lists
-		</button>
-	</div>
-
 	<h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
 	<h3 class="text-sm font-bold mb-6">
 		Shared with: <span class="font-normal"
@@ -340,7 +338,7 @@
 			</ul>
 		</div>
 	{/if}
-	<div class="mt-4">
+	<!-- <div class="mt-4">
 		<button
 			class="add-item text-add-item text-base font-normal flex items-center"
 			on:click={addNewItemRow}
@@ -349,5 +347,9 @@
 			<span class="ri-add-line text-icon-lg"></span>
 			Add Item
 		</button>
-	</div>
+	</div> -->
 </div>
+
+<pre class="hidden">
+	{JSON.stringify({ debugListItems: listItems.length }, null, 2)}
+</pre>

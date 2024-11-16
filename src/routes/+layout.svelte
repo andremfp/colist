@@ -1,13 +1,34 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { darkMode } from '$lib/stores/darkModeStore';
-	import Header from './Header.svelte';
+	import { page } from '$app/stores';
+	import Nav from './Nav.svelte';
+	import Footer from './Footer.svelte';
 	import '../app.css';
 	import PageTransition from '$lib/transition.svelte';
 
 	export let data;
 
-	$: githubIcon = $darkMode ? '/images/github_dark.svg' : '/images/github_light.svg';
+	$: isListsPage = $page.url.pathname === '/lists';
+	$: showAddButton = $page.url.pathname.startsWith('/lists');
+
+	function handleAdd() {
+		if (isListsPage) {
+			window.dispatchEvent(
+				new CustomEvent('showCreateListForm', {
+					bubbles: true,
+					composed: true
+				})
+			);
+		} else if (showAddButton) {
+			window.dispatchEvent(
+				new CustomEvent('addNewItemRow', {
+					bubbles: true,
+					composed: true
+				})
+			);
+		}
+	}
 
 	onMount(() => {
 		document.documentElement.classList.toggle('dark', $darkMode);
@@ -30,19 +51,18 @@
 <div
 	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
 >
-	<Header />
+	<Nav />
 
-	<main class="flex-1 flex flex-col p-4 w-full max-w-4xl mx-auto box-border">
+	<main
+		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border"
+	>
 		<PageTransition key={data.path} duration={200}>
 			<slot />
 		</PageTransition>
 	</main>
 
-	<footer class="flex justify-center items-center p-3 sm:p-0">
-		<div class="w-12 h-12 flex items-center justify-center">
-			<a href="https://github.com/andremfp/colist">
-				<img src={githubIcon} alt="GitHub" class="w-8 h-8 object-contain" />
-			</a>
-		</div>
-	</footer>
+	<Footer
+		addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
+		onAdd={handleAdd}
+	/>
 </div>
