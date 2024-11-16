@@ -32,7 +32,7 @@
 	$: listId = $page.params.id;
 
 	onMount(() => {
-		const handleAddNewItem = () => {
+		const handleAddNewItem = async () => {
 			if (!isAddingItem) {
 				isAddingItem = true;
 				swipedItemId = null;
@@ -42,12 +42,11 @@
 				const newListItems = [...listItems, newItem];
 				listItems = newListItems;
 
-				// Scroll to bottom after the DOM updates
-				tick().then(() => {
-					window.scrollTo({
-						top: document.documentElement.scrollHeight,
-						behavior: 'smooth'
-					});
+				// Wait for DOM update and then scroll
+				await tick();
+				window.scrollTo({
+					top: document.documentElement.scrollHeight,
+					behavior: 'smooth'
 				});
 			}
 		};
@@ -95,12 +94,13 @@
 
 	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
 		if (shouldFocus) {
-			node.focus();
+			// Add a small delay to ensure the DOM is ready
+			setTimeout(() => node.focus(), 0);
 		}
 		return {
 			update(newShouldFocus: boolean) {
 				if (newShouldFocus) {
-					node.focus();
+					setTimeout(() => node.focus(), 0);
 				}
 			}
 		};
