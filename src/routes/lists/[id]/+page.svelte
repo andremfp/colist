@@ -78,7 +78,6 @@
 
 		// Add event listeners
 		window.addEventListener('addNewItemRow', () => {
-			log('Event received: addNewItemRow');
 			setTimeout(() => {
 				handleAddNewItem();
 			}, 0);
@@ -96,10 +95,16 @@
 			isAddingItem = true;
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
-			tick().then(() => {
+			// Wait for DOM update and explicitly focus with a longer delay for mobile
+			setTimeout(() => {
 				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-				inputs[inputs.length - 1]?.focus();
-			});
+				const lastInput = inputs[inputs.length - 1];
+				if (lastInput) {
+					lastInput.focus();
+					// Force keyboard to show on mobile
+					(lastInput as HTMLInputElement).click();
+				}
+			}, 100);
 		}
 	}
 
