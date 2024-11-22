@@ -68,15 +68,37 @@
 		});
 
 		// Add event listeners
-		window.addEventListener('addNewItemRow', () => {
-			setTimeout(() => {
+		window.addEventListener('addNewItemRow', async (event) => {
+			log('Custom event received');
+
+			// First tick to ensure we're in a clean state
+			await tick();
+			log('First tick complete');
+
+			// Add the new item with setTimeout
+			setTimeout(async () => {
+				// Add the new item
 				addNewItemRow();
+				log('addNewItemRow called');
+
+				// Wait for the list update
+				await tick();
+				const lastInput = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				log(`Found ${lastInput.length} inputs`);
+
+				// Final tick for focus
+				await tick();
+				lastInput[lastInput.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+				// Simulate a user interaction
+				lastInput[lastInput.length - 1]?.click();
+				lastInput[lastInput.length - 1]?.focus({ preventScroll: false });
 			}, 50);
 		});
 		document.addEventListener('click', handleClickOutside);
 
 		return () => {
-			window.removeEventListener('addNewItemRow', addNewItemRow);
+			window.removeEventListener('addNewItemRow', () => {});
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
@@ -95,13 +117,6 @@
 				// Simulate a user interaction
 				lastInput[lastInput.length - 1]?.click();
 				lastInput[lastInput.length - 1]?.focus({ preventScroll: false });
-
-				// If that doesn't work, try touching the element (for mobile)
-				const touchEvent = new TouchEvent('touchend', {
-					bubbles: true,
-					cancelable: true
-				});
-				lastInput[lastInput.length - 1]?.dispatchEvent(touchEvent);
 			});
 		}
 	}
