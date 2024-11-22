@@ -91,8 +91,14 @@
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
 			tick().then(() => {
 				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-				log(inputs[inputs.length - 1].innerHTML);
+				log(`Found ${inputs.length} inputs`);
+				log(`Last input HTML: ${inputs[inputs.length - 1]?.innerHTML || 'not found'}`);
+				log(`Last input is focused: ${document.activeElement === inputs[inputs.length - 1]}`);
 				inputs[inputs.length - 1]?.focus();
+				// Log after focus attempt
+				log(
+					`Last input is focused (after focus): ${document.activeElement === inputs[inputs.length - 1]}`
+				);
 			});
 		}
 	}
