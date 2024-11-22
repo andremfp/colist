@@ -64,37 +64,47 @@
 				];
 				log('2. Added new item to listItems');
 
-				// Wait for DOM update and a bit more time for mobile browsers
+				// Initial delay for DOM update
 				await tick();
-				await new Promise((resolve) => setTimeout(resolve, 100));
+				await new Promise((resolve) => setTimeout(resolve, 200));
 
-				// Try multiple focus strategies
 				const lastInput = document.querySelector(
 					'li:last-child input[type="text"]'
 				) as HTMLInputElement;
 				log(`3. Found input: ${!!lastInput}`);
 
 				if (lastInput) {
-					// Force scroll to make the element visible first
+					// Force scroll first
 					lastInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-					// Try multiple focus attempts with delays
-					const focusAttempts = async () => {
-						for (let i = 0; i < 3; i++) {
+					// More aggressive focus strategy
+					const focusInput = async () => {
+						// First attempt
+						lastInput.focus();
+						lastInput.click();
+
+						// Second attempt after a delay
+						setTimeout(() => {
+							// Programmatically trigger a touch event
+							const touchEvent = new TouchEvent('touchstart', {
+								bubbles: true,
+								cancelable: true,
+								view: window
+							});
+							lastInput.dispatchEvent(touchEvent);
+
 							lastInput.focus();
-							// On mobile, this can help trigger the keyboard
 							lastInput.click();
 
-							if (document.activeElement === lastInput) {
-								log('4. Focus successful');
-								break;
-							}
+							// Third attempt with direct attribute manipulation
+							lastInput.setAttribute('readonly', 'false');
+							lastInput.removeAttribute('readonly');
 
-							await new Promise((resolve) => setTimeout(resolve, 50));
-						}
+							log('4. Focus attempts completed');
+						}, 300);
 					};
 
-					focusAttempts();
+					focusInput();
 				}
 			}
 		};
@@ -360,6 +370,7 @@
 									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 									value={newItemName}
 									bind:this={newItemInput}
+									inputmode="text"
 									on:input={(e) => {
 										newItemName = e.currentTarget.value;
 									}}
