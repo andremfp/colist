@@ -90,9 +90,11 @@
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
 			tick().then(() => {
-				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				const inputs = document.querySelectorAll(
+					'input[type="text"].list-item'
+				) as NodeListOf<HTMLInputElement>;
 				log(`Found ${inputs.length} inputs`);
-				log(`Last input HTML: ${inputs[inputs.length - 1]?.innerHTML || 'not found'}`);
+				log(`Last input HTML: ${inputs[inputs.length - 1]?.outerHTML || 'not found'}`);
 				log(`Last input is focused: ${document.activeElement === inputs[inputs.length - 1]}`);
 				inputs[inputs.length - 1]?.focus();
 				// Log after focus attempt
