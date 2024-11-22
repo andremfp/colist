@@ -47,7 +47,7 @@
 	onMount(() => {
 		const handleAddNewItem = async () => {
 			if (!isAddingItem) {
-				log('1. Starting handleAddNewItem');
+				log('ADD-1: Starting handleAddNewItem');
 				isAddingItem = true;
 				swipedItemId = null;
 
@@ -62,23 +62,10 @@
 						checked: false
 					}
 				];
-				log('2. Added new item to listItems');
+				log('ADD-2: Added new item to listItems');
 
-				// Initial delay for DOM update
+				// Wait for DOM update
 				await tick();
-				await new Promise((resolve) => setTimeout(resolve, 200));
-
-				const lastInput = document.querySelector(
-					'li:last-child input[type="text"]'
-				) as HTMLInputElement;
-				log(`3. Found input: ${!!lastInput}`);
-
-				if (lastInput) {
-					// Force scroll first
-					lastInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-					lastInput.focus();
-				}
 			}
 		};
 
@@ -121,12 +108,16 @@
 	});
 
 	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
+		log('FOCUS-1: autoFocus directive called');
 		if (shouldFocus) {
+			log('FOCUS-2: attempting to focus');
 			node.focus();
 		}
 		return {
 			update(newShouldFocus: boolean) {
+				log('FOCUS-3: autoFocus update called');
 				if (newShouldFocus) {
+					log('FOCUS-4: attempting to focus on update');
 					node.focus();
 				}
 			}
@@ -355,8 +346,11 @@
 									type="text"
 									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 									bind:value={newItemName}
+									autocomplete="off"
+									inputmode="text"
+									enterkeyhint="done"
+									use:autoFocus={true}
 									on:keydown={handleKeyDown}
-									use:autoFocus={isAddingItem && index === listItems.length - 1}
 								/>
 							{:else}
 								<input
