@@ -45,13 +45,11 @@
 	}
 
 	onMount(() => {
-		const handleAddNewItem = async () => {
+		const handleAddNewItem = () => {
 			if (!isAddingItem) {
 				log('ADD-1: Starting handleAddNewItem');
 				isAddingItem = true;
 				swipedItemId = null;
-
-				// Add new item to list
 				listItems = [
 					...listItems,
 					{
@@ -64,20 +62,12 @@
 				];
 				log('ADD-2: Added new item to listItems');
 
-				// Wait for DOM update and try focus
-				await tick();
-				log('ADD-3: First tick completed');
-
-				// Give the browser a moment to handle any click events
-				await new Promise((resolve) => setTimeout(resolve, 50));
-				log('ADD-4: After small delay');
-
-				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-				const lastInput = inputs[inputs.length - 1];
-				if (lastInput) {
-					lastInput.focus();
-					log('ADD-5: Focus attempted on input');
-				}
+				tick().then(() => {
+					log('ADD-3: Tick completed');
+					const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+					inputs[inputs.length - 1]?.focus();
+					log('ADD-4: Focus attempted');
+				});
 			}
 		};
 
@@ -108,8 +98,10 @@
 
 		// Add event listeners
 		window.addEventListener('addNewItemRow', () => {
-			// Remove the setTimeout and call directly
-			handleAddNewItem();
+			log('Event received: addNewItemRow');
+			setTimeout(() => {
+				handleAddNewItem();
+			}, 0);
 		});
 		document.addEventListener('click', handleClickOutside);
 
