@@ -12,8 +12,6 @@
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
 
-	let addNewItemFunction: (() => void) | null = null;
-
 	function handleAdd() {
 		if (isListsPage) {
 			window.dispatchEvent(
@@ -22,9 +20,13 @@
 					composed: true
 				})
 			);
-		} else if (showAddButton && addNewItemFunction) {
-			console.log('Calling addNewItemFunction from layout');
-			addNewItemFunction();
+		} else if (showAddButton) {
+			window.dispatchEvent(
+				new CustomEvent('addNewItemRow', {
+					bubbles: true,
+					composed: true
+				})
+			);
 		}
 	}
 
@@ -55,7 +57,7 @@
 		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border"
 	>
 		<PageTransition key={data.path} duration={200}>
-			<slot {addNewItemFunction} />
+			<slot />
 		</PageTransition>
 	</main>
 

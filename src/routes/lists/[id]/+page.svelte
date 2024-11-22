@@ -31,8 +31,6 @@
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
-	export let addNewItemFunction: (() => void) | null;
-
 	// Add this variable to store the input reference
 	let newItemInput: HTMLInputElement;
 
@@ -47,11 +45,11 @@
 	}
 
 	onMount(() => {
-		console.log('Setting addNewItemFunction');
-		addNewItemFunction = addNewItemRow;
-
-		// Verify it's set correctly
-		console.log('addNewItemFunction is set:', addNewItemFunction !== null);
+		const handleAddNewItem = () => {
+			if (!isAddingItem) {
+				addNewItemRow();
+			}
+		};
 
 		// Set up auth state change handler immediately
 		auth.onAuthStateChanged(async (user) => {
@@ -78,9 +76,17 @@
 			}
 		});
 
+		// Add event listeners
+		window.addEventListener('addNewItemRow', () => {
+			log('Event received: addNewItemRow');
+			setTimeout(() => {
+				handleAddNewItem();
+			}, 0);
+		});
 		document.addEventListener('click', handleClickOutside);
 
 		return () => {
+			window.removeEventListener('addNewItemRow', handleAddNewItem);
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
