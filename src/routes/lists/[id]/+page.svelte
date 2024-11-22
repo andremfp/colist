@@ -64,12 +64,20 @@
 				];
 				log('ADD-2: Added new item to listItems');
 
-				// Use the same focus approach as addNewItemRow
-				tick().then(() => {
-					const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-					inputs[inputs.length - 1]?.focus();
-					log('ADD-3: Attempted to focus last input');
-				});
+				// Wait for DOM update and try focus
+				await tick();
+				log('ADD-3: First tick completed');
+
+				// Give the browser a moment to handle any click events
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				log('ADD-4: After small delay');
+
+				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				const lastInput = inputs[inputs.length - 1];
+				if (lastInput) {
+					lastInput.focus();
+					log('ADD-5: Focus attempted on input');
+				}
 			}
 		};
 
@@ -100,8 +108,8 @@
 
 		// Add event listeners
 		window.addEventListener('addNewItemRow', () => {
-			// Run the handler in the next tick
-			setTimeout(handleAddNewItem, 0);
+			// Remove the setTimeout and call directly
+			handleAddNewItem();
 		});
 		document.addEventListener('click', handleClickOutside);
 
