@@ -93,14 +93,22 @@
 				const inputs = document.querySelectorAll(
 					'input[type="text"].list-item'
 				) as NodeListOf<HTMLInputElement>;
+				const lastInput = inputs[inputs.length - 1];
+
 				log(`Found ${inputs.length} inputs`);
-				log(`Last input HTML: ${inputs[inputs.length - 1]?.outerHTML || 'not found'}`);
-				log(`Last input is focused: ${document.activeElement === inputs[inputs.length - 1]}`);
-				inputs[inputs.length - 1]?.focus();
+				log(`Last input HTML: ${lastInput?.outerHTML || 'not found'}`);
+				log(`Is last input disabled? ${lastInput?.disabled}`);
+				log(`Is last input readonly? ${lastInput?.readOnly}`);
+				log(`Last input is focused: ${document.activeElement === lastInput}`);
+
+				// Try both focus methods
+				lastInput?.focus();
+				lastInput?.focus({ preventScroll: false });
+
 				// Log after focus attempt
-				log(
-					`Last input is focused (after focus): ${document.activeElement === inputs[inputs.length - 1]}`
-				);
+				log(`Last input is focused (after focus): ${document.activeElement === lastInput}`);
+				log(`Active element tag: ${(document.activeElement as HTMLElement)?.tagName}`);
+				log(`Active element class: ${(document.activeElement as HTMLElement)?.className}`);
 			});
 		}
 	}
