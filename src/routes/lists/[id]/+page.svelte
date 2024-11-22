@@ -31,9 +31,6 @@
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
-	// Add this variable to store the input reference
-	let newItemInput: HTMLInputElement;
-
 	// Add these for debugging
 	let debugLogs: string[] = [];
 	const MAX_LOGS = 10;
@@ -90,19 +87,21 @@
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
 			tick().then(() => {
-				const inputs = document.querySelectorAll(
-					'input[type="text"].list-item'
-				) as NodeListOf<HTMLInputElement>;
-				const lastInput = inputs[inputs.length - 1];
+				const lastInput = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
 
 				// Try to scroll into view first
-				lastInput?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+				lastInput[lastInput.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-				// Focus after a small delay to ensure scroll is complete
-				setTimeout(() => {
-					lastInput?.focus({ preventScroll: false });
-					log(`Last input is focused (after timeout): ${document.activeElement === lastInput}`);
-				}, 100);
+				// Simulate a user interaction
+				lastInput[lastInput.length - 1]?.click();
+				lastInput[lastInput.length - 1]?.focus({ preventScroll: false });
+
+				// If that doesn't work, try touching the element (for mobile)
+				const touchEvent = new TouchEvent('touchend', {
+					bubbles: true,
+					cancelable: true
+				});
+				lastInput[lastInput.length - 1]?.dispatchEvent(touchEvent);
 			});
 		}
 	}
