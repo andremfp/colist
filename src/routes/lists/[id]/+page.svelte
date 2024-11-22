@@ -95,20 +95,14 @@
 				) as NodeListOf<HTMLInputElement>;
 				const lastInput = inputs[inputs.length - 1];
 
-				log(`Found ${inputs.length} inputs`);
-				log(`Last input HTML: ${lastInput?.outerHTML || 'not found'}`);
-				log(`Is last input disabled? ${lastInput?.disabled}`);
-				log(`Is last input readonly? ${lastInput?.readOnly}`);
-				log(`Last input is focused: ${document.activeElement === lastInput}`);
+				// Try to scroll into view first
+				lastInput?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-				// Try both focus methods
-				lastInput?.focus();
-				lastInput?.focus({ preventScroll: false });
-
-				// Log after focus attempt
-				log(`Last input is focused (after focus): ${document.activeElement === lastInput}`);
-				log(`Active element tag: ${(document.activeElement as HTMLElement)?.tagName}`);
-				log(`Active element class: ${(document.activeElement as HTMLElement)?.className}`);
+				// Focus after a small delay to ensure scroll is complete
+				setTimeout(() => {
+					lastInput?.focus({ preventScroll: false });
+					log(`Last input is focused (after timeout): ${document.activeElement === lastInput}`);
+				}, 100);
 			});
 		}
 	}
@@ -324,7 +318,7 @@
 							/>
 							<input
 								type="text"
-								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
+								class="list-item flex-grow pl-4 p-2 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 bg-transparent"
 								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
 								readonly={swipedItemId !== null &&
 									!(isAddingItem && index === listItems.length - 1)}
