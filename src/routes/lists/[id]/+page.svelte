@@ -111,13 +111,28 @@
 		log('FOCUS-1: autoFocus directive called');
 		if (shouldFocus) {
 			log('FOCUS-2: attempting to focus');
+
+			// Immediate focus attempt
 			node.focus();
 
-			// Also try after a small delay
-			setTimeout(() => {
-				log('FOCUS-2.1: attempting delayed focus');
+			// Force the virtual keyboard by simulating a touch/click
+			const showKeyboard = () => {
+				log('FOCUS-2.1: simulating touch/click');
+				node.click();
 				node.focus();
-			}, 100);
+
+				// Some mobile browsers need an input event
+				const event = new InputEvent('input', {
+					bubbles: true,
+					cancelable: true
+				});
+				node.dispatchEvent(event);
+			};
+
+			// Try multiple times with increasing delays
+			setTimeout(showKeyboard, 100);
+			setTimeout(showKeyboard, 300);
+			setTimeout(showKeyboard, 500);
 		}
 	};
 
@@ -348,6 +363,8 @@
 									enterkeyhint="done"
 									use:autoFocus={true}
 									on:keydown={handleKeyDown}
+									style="opacity: 1; -webkit-user-select: text"
+									readonly={false}
 								/>
 							{:else}
 								<input
