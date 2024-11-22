@@ -64,10 +64,11 @@
 				];
 				log('ADD-2: Added new item to listItems');
 
-				// Wait for DOM update
+				// Use the same focus approach as addNewItemRow
 				tick().then(() => {
 					const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
 					inputs[inputs.length - 1]?.focus();
+					log('ADD-3: Attempted to focus last input');
 				});
 			}
 		};
@@ -109,20 +110,6 @@
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
-
-	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
-		log('FOCUS-1: autoFocus directive called');
-		if (shouldFocus) {
-			log('FOCUS-2: attempting to focus');
-			node.focus();
-
-			// Also try after a small delay
-			setTimeout(() => {
-				log('FOCUS-2.1: attempting delayed focus');
-				node.focus();
-			}, 100);
-		}
-	};
 
 	function addNewItemRow() {
 		if (!isAddingItem) {
