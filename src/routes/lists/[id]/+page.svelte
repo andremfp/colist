@@ -74,7 +74,7 @@
 		window.addEventListener('addNewItemRow', () => {
 			setTimeout(() => {
 				addNewItemRow();
-			}, 50);
+			}, 200);
 		});
 		document.addEventListener('click', handleClickOutside);
 
@@ -90,7 +90,9 @@
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
 			tick().then(() => {
-				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				const inputs = document.querySelectorAll(
+					'input.list-item[type="text"]'
+				) as NodeListOf<HTMLInputElement>;
 				inputs[inputs.length - 1]?.focus();
 			});
 		}
@@ -133,7 +135,9 @@
 			await deleteListItem(item.id);
 			listItems = listItems.filter((i) => i.id !== item.id);
 			tick().then(() => {
-				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				const inputs = document.querySelectorAll(
+					'input.list-item[type="text"]'
+				) as NodeListOf<HTMLInputElement>;
 				inputs[inputs.length - 1]?.focus();
 			});
 			await updateList(listId, { itemCount: listItems.length });
@@ -241,7 +245,9 @@
 				// Always restore focus to the new item if we're adding one
 				if (isAddingItem) {
 					tick().then(() => {
-						const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+						const inputs = document.querySelectorAll(
+							'input.list-item[type="text"]'
+						) as NodeListOf<HTMLInputElement>;
 						inputs[inputs.length - 1]?.focus();
 					});
 				}
