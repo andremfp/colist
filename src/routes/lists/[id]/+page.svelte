@@ -64,31 +64,38 @@
 				];
 				log('2. Added new item to listItems');
 
-				// Give DOM time to update
+				// Wait for DOM update and a bit more time for mobile browsers
 				await tick();
+				await new Promise((resolve) => setTimeout(resolve, 100));
 
-				// Focus with a touch event simulation for mobile
+				// Try multiple focus strategies
 				const lastInput = document.querySelector(
 					'li:last-child input[type="text"]'
 				) as HTMLInputElement;
 				log(`3. Found input: ${!!lastInput}`);
+
 				if (lastInput) {
-					// Trigger touch events to simulate user interaction
-					lastInput.focus();
-					lastInput.click();
+					// Force scroll to make the element visible first
+					lastInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-					// Force keyboard to show
-					lastInput.setAttribute('readonly', 'false');
-					lastInput.removeAttribute('readonly');
+					// Try multiple focus attempts with delays
+					const focusAttempts = async () => {
+						for (let i = 0; i < 3; i++) {
+							lastInput.focus();
+							// On mobile, this can help trigger the keyboard
+							lastInput.click();
 
-					log(`4. Focus attempted with mobile optimizations`);
+							if (document.activeElement === lastInput) {
+								log('4. Focus successful');
+								break;
+							}
+
+							await new Promise((resolve) => setTimeout(resolve, 50));
+						}
+					};
+
+					focusAttempts();
 				}
-
-				// Scroll to make input visible
-				window.scrollTo({
-					top: document.documentElement.scrollHeight,
-					behavior: 'smooth'
-				});
 			}
 		};
 
@@ -350,7 +357,6 @@
 							{#if isNewItem(index)}
 								<input
 									type="text"
-									inputmode="text"
 									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 									value={newItemName}
 									bind:this={newItemInput}
@@ -359,7 +365,6 @@
 									}}
 									on:focus={() => log('Input received focus event')}
 									on:keydown={handleKeyDown}
-									autocomplete="off"
 								/>
 							{:else}
 								<input
