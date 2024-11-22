@@ -341,31 +341,22 @@
 									handleCheckboxClick(event, item)}
 								aria-label={`Mark ${item.name} as ${item.checked ? 'incomplete' : 'complete'}`}
 							/>
-							{#if isNewItem(index)}
-								<input
-									type="text"
-									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
-									bind:value={newItemName}
-									autocomplete="off"
-									inputmode="text"
-									enterkeyhint="done"
-									use:autoFocus={true}
-									on:keydown={handleKeyDown}
-								/>
-							{:else}
-								<input
-									type="text"
-									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
-									value={item.name}
-									readonly={swipedItemId !== null}
-									on:input={(e) => {
+							<input
+								type="text"
+								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
+								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
+								readonly={swipedItemId !== null &&
+									!(isAddingItem && index === listItems.length - 1)}
+								on:input={(e) => {
+									if (index === listItems.length - 1 && isAddingItem) {
+										newItemName = e.currentTarget.value;
+									} else {
 										item.name = e.currentTarget.value;
 										updateListItem(item.id, { name: item.name });
-										updateListItem(item.id, { name: item.name });
-									}}
-									on:keydown={handleKeyDown}
-								/>
-							{/if}
+									}
+								}}
+								on:keydown={handleKeyDown}
+							/>
 						</div>
 
 						<button
