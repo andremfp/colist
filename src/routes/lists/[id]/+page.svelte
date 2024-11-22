@@ -112,16 +112,13 @@
 		if (shouldFocus) {
 			log('FOCUS-2: attempting to focus');
 			node.focus();
+
+			// Also try after a small delay
+			setTimeout(() => {
+				log('FOCUS-2.1: attempting delayed focus');
+				node.focus();
+			}, 100);
 		}
-		return {
-			update(newShouldFocus: boolean) {
-				log('FOCUS-3: autoFocus update called');
-				if (newShouldFocus) {
-					log('FOCUS-4: attempting to focus on update');
-					node.focus();
-				}
-			}
-		};
 	};
 
 	async function handleAddItem() {
