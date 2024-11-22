@@ -45,10 +45,6 @@
 	}
 
 	onMount(() => {
-		const handleAddNewItem = () => {
-			addNewItemRow(true);
-		};
-
 		// Set up auth state change handler immediately
 		auth.onAuthStateChanged(async (user) => {
 			if (user) {
@@ -77,46 +73,26 @@
 		// Add event listeners
 		window.addEventListener('addNewItemRow', () => {
 			setTimeout(() => {
-				handleAddNewItem();
-			}, 0);
+				addNewItemRow();
+			}, 50);
 		});
 		document.addEventListener('click', handleClickOutside);
 
 		return () => {
-			window.removeEventListener('addNewItemRow', handleAddNewItem);
+			window.removeEventListener('addNewItemRow', addNewItemRow);
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
 
-	function addNewItemRow(isFromEvent = false) {
+	function addNewItemRow() {
 		if (!isAddingItem) {
 			isAddingItem = true;
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
-
-			const focusNewInput = async () => {
-				await tick();
+			tick().then(() => {
 				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-				const lastInput = inputs[inputs.length - 1];
-				if (lastInput) {
-					// For event-triggered adds, we need to be more aggressive
-					if (isFromEvent) {
-						// Create and trigger a fake mouse event
-						const clickEvent = new MouseEvent('mousedown', {
-							bubbles: true,
-							cancelable: true,
-							view: window
-						});
-						lastInput.dispatchEvent(clickEvent);
-					}
-					lastInput.focus();
-				}
-			};
-
-			// Try multiple times with increasing delays
-			focusNewInput();
-			setTimeout(focusNewInput, 100);
-			setTimeout(focusNewInput, 300);
+				inputs[inputs.length - 1]?.focus();
+			});
 		}
 	}
 
@@ -293,14 +269,6 @@
 		newItemName = '';
 		isAddingItem = false;
 	}
-
-	function goBack() {
-		goto('/lists');
-	}
-
-	function isNewItem(index: number): boolean {
-		return index === listItems.length - 1 && isAddingItem;
-	}
 </script>
 
 <div class="p-4 pb-36 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
@@ -375,7 +343,7 @@
 	<div class="mt-4">
 		<button
 			class="add-item text-add-item text-base font-normal flex items-center"
-			on:click={() => addNewItemRow()}
+			on:click={addNewItemRow}
 			aria-label="Add new item"
 		>
 			<span class="ri-add-line text-icon-lg"></span>
