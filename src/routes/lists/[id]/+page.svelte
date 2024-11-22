@@ -66,17 +66,29 @@
 
 				// Give DOM time to update
 				await tick();
-				await new Promise((resolve) => setTimeout(resolve, 50));
 
-				// Focus attempt
+				// Focus with a touch event simulation for mobile
 				const lastInput = document.querySelector(
 					'li:last-child input[type="text"]'
 				) as HTMLInputElement;
 				log(`3. Found input: ${!!lastInput}`);
 				if (lastInput) {
+					// Trigger touch events to simulate user interaction
 					lastInput.focus();
-					log(`4. Is focused: ${document.activeElement === lastInput}`);
+					lastInput.click();
+
+					// Force keyboard to show
+					lastInput.setAttribute('readonly', 'false');
+					lastInput.removeAttribute('readonly');
+
+					log(`4. Focus attempted with mobile optimizations`);
 				}
+
+				// Scroll to make input visible
+				window.scrollTo({
+					top: document.documentElement.scrollHeight,
+					behavior: 'smooth'
+				});
 			}
 		};
 
@@ -338,6 +350,7 @@
 							{#if isNewItem(index)}
 								<input
 									type="text"
+									inputmode="text"
 									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 									value={newItemName}
 									bind:this={newItemInput}
@@ -346,6 +359,7 @@
 									}}
 									on:focus={() => log('Input received focus event')}
 									on:keydown={handleKeyDown}
+									autocomplete="off"
 								/>
 							{:else}
 								<input
