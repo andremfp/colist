@@ -47,7 +47,11 @@
 	}
 
 	onMount(() => {
+		console.log('Setting addNewItemFunction');
 		addNewItemFunction = addNewItemRow;
+
+		// Verify it's set correctly
+		console.log('addNewItemFunction is set:', addNewItemFunction !== null);
 
 		// Set up auth state change handler immediately
 		auth.onAuthStateChanged(async (user) => {

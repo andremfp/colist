@@ -23,6 +23,7 @@
 				})
 			);
 		} else if (showAddButton && addNewItemFunction) {
+			console.log('Calling addNewItemFunction from layout');
 			addNewItemFunction();
 		}
 	}
