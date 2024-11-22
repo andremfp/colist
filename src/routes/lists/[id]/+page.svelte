@@ -31,6 +31,8 @@
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
+	export let addNewItemFunction: (() => void) | null;
+
 	// Add this variable to store the input reference
 	let newItemInput: HTMLInputElement;
 
@@ -45,31 +47,7 @@
 	}
 
 	onMount(() => {
-		const handleAddNewItem = () => {
-			if (!isAddingItem) {
-				log('ADD-1: Starting handleAddNewItem');
-				isAddingItem = true;
-				swipedItemId = null;
-				listItems = [
-					...listItems,
-					{
-						id: '',
-						name: '',
-						listId: '',
-						addedBy: '',
-						checked: false
-					}
-				];
-				log('ADD-2: Added new item to listItems');
-
-				tick().then(() => {
-					log('ADD-3: Tick completed');
-					const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-					inputs[inputs.length - 1]?.focus();
-					log('ADD-4: Focus attempted');
-				});
-			}
-		};
+		addNewItemFunction = addNewItemRow;
 
 		// Set up auth state change handler immediately
 		auth.onAuthStateChanged(async (user) => {
@@ -96,17 +74,9 @@
 			}
 		});
 
-		// Add event listeners
-		window.addEventListener('addNewItemRow', () => {
-			log('Event received: addNewItemRow');
-			setTimeout(() => {
-				handleAddNewItem();
-			}, 0);
-		});
 		document.addEventListener('click', handleClickOutside);
 
 		return () => {
-			window.removeEventListener('addNewItemRow', handleAddNewItem);
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
