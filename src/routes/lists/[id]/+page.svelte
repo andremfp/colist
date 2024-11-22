@@ -368,13 +368,7 @@
 								<input
 									type="text"
 									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
-									value={newItemName}
-									bind:this={newItemInput}
-									inputmode="text"
-									on:input={(e) => {
-										newItemName = e.currentTarget.value;
-									}}
-									on:focus={() => log('Input received focus event')}
+									bind:value={newItemName}
 									on:keydown={handleKeyDown}
 								/>
 							{:else}
