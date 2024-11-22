@@ -46,9 +46,7 @@
 
 	onMount(() => {
 		const handleAddNewItem = () => {
-			if (!isAddingItem) {
-				addNewItemRow();
-			}
+			addNewItemRow(true);
 		};
 
 		// Set up auth state change handler immediately
@@ -90,21 +88,35 @@
 		};
 	});
 
-	function addNewItemRow() {
+	function addNewItemRow(isFromEvent = false) {
 		if (!isAddingItem) {
 			isAddingItem = true;
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
-			// Wait for DOM update and explicitly focus with a longer delay for mobile
-			setTimeout(() => {
+
+			const focusNewInput = async () => {
+				await tick();
 				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
 				const lastInput = inputs[inputs.length - 1];
 				if (lastInput) {
+					// For event-triggered adds, we need to be more aggressive
+					if (isFromEvent) {
+						// Create and trigger a fake mouse event
+						const clickEvent = new MouseEvent('mousedown', {
+							bubbles: true,
+							cancelable: true,
+							view: window
+						});
+						lastInput.dispatchEvent(clickEvent);
+					}
 					lastInput.focus();
-					// Force keyboard to show on mobile
-					(lastInput as HTMLInputElement).click();
 				}
-			}, 100);
+			};
+
+			// Try multiple times with increasing delays
+			focusNewInput();
+			setTimeout(focusNewInput, 100);
+			setTimeout(focusNewInput, 300);
 		}
 	}
 
@@ -363,7 +375,7 @@
 	<div class="mt-4">
 		<button
 			class="add-item text-add-item text-base font-normal flex items-center"
-			on:click={addNewItemRow}
+			on:click={() => addNewItemRow()}
 			aria-label="Add new item"
 		>
 			<span class="ri-add-line text-icon-lg"></span>
