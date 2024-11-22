@@ -77,34 +77,7 @@
 					// Force scroll first
 					lastInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-					// More aggressive focus strategy
-					const focusInput = async () => {
-						// First attempt
-						lastInput.focus();
-						lastInput.click();
-
-						// Second attempt after a delay
-						setTimeout(() => {
-							// Programmatically trigger a touch event
-							const touchEvent = new TouchEvent('touchstart', {
-								bubbles: true,
-								cancelable: true,
-								view: window
-							});
-							lastInput.dispatchEvent(touchEvent);
-
-							lastInput.focus();
-							lastInput.click();
-
-							// Third attempt with direct attribute manipulation
-							lastInput.setAttribute('readonly', 'false');
-							lastInput.removeAttribute('readonly');
-
-							log('4. Focus attempts completed');
-						}, 300);
-					};
-
-					focusInput();
+					lastInput.focus();
 				}
 			}
 		};
@@ -146,6 +119,19 @@
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
+
+	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
+		if (shouldFocus) {
+			node.focus();
+		}
+		return {
+			update(newShouldFocus: boolean) {
+				if (newShouldFocus) {
+					node.focus();
+				}
+			}
+		};
+	};
 
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
@@ -370,6 +356,7 @@
 									class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 									bind:value={newItemName}
 									on:keydown={handleKeyDown}
+									use:autoFocus={isAddingItem && index === listItems.length - 1}
 								/>
 							{:else}
 								<input
