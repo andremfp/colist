@@ -124,6 +124,18 @@
 		}
 	};
 
+	function addNewItemRow() {
+		if (!isAddingItem) {
+			isAddingItem = true;
+			swipedItemId = null;
+			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
+			tick().then(() => {
+				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				inputs[inputs.length - 1]?.focus();
+			});
+		}
+	}
+
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
 
@@ -375,6 +387,17 @@
 			</ul>
 		</div>
 	{/if}
+
+	<div class="mt-4">
+		<button
+			class="add-item text-add-item text-base font-normal flex items-center"
+			on:click={addNewItemRow}
+			aria-label="Add new item"
+		>
+			<span class="ri-add-line text-icon-lg"></span>
+			Add Item
+		</button>
+	</div>
 </div>
 
 <pre class="hidden">
