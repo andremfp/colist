@@ -7,9 +7,7 @@
 	let hasScroll = false;
 	let footer: HTMLElement;
 
-	$: isAddItem = addButtonText === 'Add Item';
-
-	function handleClick() {
+	function handleClick(event: MouseEvent) {
 		if (onAdd) onAdd();
 	}
 
@@ -41,7 +39,7 @@
 	<div class="w-full max-w-4xl mx-auto px-4 flex justify-between items-center">
 		{#if addButtonText}
 			<button
-				class="text-base font-normal flex items-center {addButtonText === 'Add Item'
+				class="footer-add-btn text-base font-normal flex items-center {addButtonText === 'Add Item'
 					? 'text-add-item'
 					: 'text-button-blue'}"
 				on:click={handleClick}
