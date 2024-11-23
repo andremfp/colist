@@ -55,8 +55,7 @@ export default {
 				'column-margin-top': '4rem',
 				divider: '1px',
 				'nav-height': '4rem',
-				'footer-height': '4rem',
-				'footer-padding': 'calc(2.25rem + env(safe-area-inset-bottom))'
+				'footer-height': '4rem'
 			},
 			fontSize: {
 				'icon-xl': '1.5rem',
