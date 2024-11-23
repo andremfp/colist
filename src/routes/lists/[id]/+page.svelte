@@ -215,7 +215,7 @@
 		const clickedElement = event.target as HTMLElement;
 
 		// Don't process if clicking delete button or footer add button
-		if (clickedElement.closest('.delete-btn') || clickedElement.closest('footer')) {
+		if (clickedElement.closest('.delete-btn') || clickedElement.closest('.footer-add-btn')) {
 			return;
 		}
 
@@ -261,7 +261,9 @@
 	}
 </script>
 
-<div class="p-4 pb-36 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
+<div
+	class="p-4 pb-[calc(2.25rem+env(safe-area-inset-bottom))] bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
+>
 	<h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
 	<h3 class="text-sm font-bold mb-6">
 		Shared with: <span class="font-normal"
@@ -344,3 +346,15 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	/* Add this to ensure content scrolls properly when keyboard is visible */
+	:global(body) {
+		min-height: 100vh;
+		min-height: -webkit-fill-available;
+	}
+
+	:global(html) {
+		height: -webkit-fill-available;
+	}
+</style>

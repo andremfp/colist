@@ -35,6 +35,7 @@
 	class="fixed bottom-0 left-0 right-0 h-footer-height transition-colors duration-200 z-10 flex items-center {hasScroll
 		? 'bg-main-bg-light dark:bg-main-bg-dark shadow-lg'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
+	style="padding-bottom: env(safe-area-inset-bottom);"
 >
 	<div class="w-full max-w-4xl mx-auto px-4 flex justify-between items-center">
 		{#if addButtonText}
@@ -61,3 +62,12 @@
 		</a>
 	</div>
 </footer>
+
+<style>
+	@media (max-height: 450px) {
+		/* Hide footer when virtual keyboard is likely visible */
+		footer {
+			display: none;
+		}
+	}
+</style>
