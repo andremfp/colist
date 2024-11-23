@@ -85,7 +85,7 @@
 				</div>
 				<button
 					type="submit"
-					class="w-full py-2 bg-login-btn text-white rounded-md focus:outline-none focus:bg-login-btn-focus"
+					class="w-full py-2 bg-login-btn text-text-light rounded-md focus:outline-none focus:bg-login-btn-focus"
 				>
 					Register
 				</button>

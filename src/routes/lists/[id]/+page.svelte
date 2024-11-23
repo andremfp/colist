@@ -31,56 +31,69 @@
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
 
-	onMount(async () => {
-		try {
-			auth.onAuthStateChanged(async (user) => {
-				if (user) {
-					currentUserId = user.uid;
-					const [fetchedListItems, fetchedListDetail] = await Promise.all([
-						fetchListItems(listId),
-						fetchListById(listId)
-					]);
+	// Add these for debugging
+	let debugLogs: string[] = [];
+	const MAX_LOGS = 10;
 
-					if (fetchedListItems) {
-						listItems = fetchedListItems;
-						listItems = sortItems(listItems);
-					}
+	function log(message: string) {
+		debugLogs = [...debugLogs, `${new Date().toISOString().slice(11, 19)} ${message}`].slice(
+			-MAX_LOGS
+		);
+	}
 
-					if (fetchedListDetail) {
-						listDetail = fetchedListDetail;
-						sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy, currentUserId);
-					}
-					isLoading = false;
-				} else {
-					console.log('User not detected, redirecting to login');
-					goto('/');
+	onMount(() => {
+		// Set up auth state change handler immediately
+		auth.onAuthStateChanged(async (user) => {
+			if (user) {
+				currentUserId = user.uid;
+				const [fetchedListItems, fetchedListDetail] = await Promise.all([
+					fetchListItems(listId),
+					fetchListById(listId)
+				]);
+
+				if (fetchedListItems) {
+					listItems = fetchedListItems;
+					listItems = sortItems(listItems);
 				}
-			});
 
-			document.addEventListener('click', handleClickOutside);
-		} catch (error) {
-			console.error('Failed to fetch list details:', error);
-		}
-	});
-
-	onDestroy(() => {
-		if (typeof document !== 'undefined') {
-			document.removeEventListener('click', handleClickOutside);
-		}
-	});
-
-	const autoFocus = (node: HTMLElement, shouldFocus: boolean) => {
-		if (shouldFocus) {
-			node.focus();
-		}
-		return {
-			update(newShouldFocus: boolean) {
-				if (newShouldFocus) {
-					node.focus();
+				if (fetchedListDetail) {
+					listDetail = fetchedListDetail;
+					sharedWithUsernames = await getSharedWithUsers(listDetail.sharedBy, currentUserId);
 				}
+				isLoading = false;
+			} else {
+				console.log('User not detected, redirecting to login');
+				goto('/');
 			}
+		});
+
+		// Add event listeners
+		window.addEventListener('addNewItemRow', addNewItemRow);
+		document.addEventListener('click', handleClickOutside);
+
+		return () => {
+			window.removeEventListener('addNewItemRow', addNewItemRow);
+			document.removeEventListener('click', handleClickOutside);
 		};
-	};
+	});
+
+	function addNewItemRow() {
+		if (!isAddingItem) {
+			isAddingItem = true;
+			swipedItemId = null;
+			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
+			tick().then(() => {
+				const lastInput = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+				const lastItem = lastInput[lastInput.length - 1];
+
+				// Focus on the last input
+				lastItem?.focus();
+
+				// Scroll to the bottom of the page
+				lastItem?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+			});
+		}
+	}
 
 	async function handleAddItem() {
 		if (!newItemName.trim()) return cancelAddItem();
@@ -97,6 +110,14 @@
 			listItems = [...listItems, newItem];
 			await updateList(listId, { itemCount: listItems.length });
 			listItems = sortItems(listItems);
+
+			// Scroll to bottom after the DOM updates
+			tick().then(() => {
+				window.scrollTo({
+					top: document.documentElement.scrollHeight,
+					behavior: 'smooth'
+				});
+			});
 		} catch (error) {
 			console.error('Error adding item:', error);
 			showToast('Failed to add item.');
@@ -199,53 +220,38 @@
 	function handleClickOutside(event: MouseEvent) {
 		const clickedElement = event.target as HTMLElement;
 
-		// Get the clicked list item's ID and index
-		const clickedListItem = clickedElement.closest('li');
-		// Only select list items that contain list-item-content, excluding dividers
-		const listItems = Array.from(document.querySelectorAll('li:has(.list-item-content)'));
-		const clickedIndex = clickedListItem?.querySelector('.list-item-content')
-			? listItems.indexOf(clickedListItem)
-			: -1;
-		const clickedItemId = clickedListItem?.getAttribute('data-item-id') || null;
-
-		if (!clickedElement.closest('.delete-btn') && !clickedElement.closest('.add-item')) {
-			// If there's any swiped item, prevent default behavior and only handle swipe-related actions
-			if (swipedItemId !== null) {
-				event.preventDefault();
-				// If clicking outside the swiped item, clear the swipe
-				if (swipedItemId !== clickedItemId) {
-					swipedItemId = null;
-				}
-				// Always restore focus to the new item if we're adding one
-				if (isAddingItem) {
-					tick().then(() => {
-						const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-						inputs[inputs.length - 1]?.focus();
-					});
-				}
-				return;
-			}
-
-			// Only handle add/cancel if no item is being swiped and not clicking the last item
-			if (isAddingItem && clickedIndex !== listItems.length - 1) {
-				if (newItemName.trim()) {
-					handleAddItem();
-				} else {
-					cancelAddItem();
-				}
-			}
+		// Don't process if clicking delete button or footer add button
+		if (clickedElement.closest('.delete-btn') || clickedElement.closest('.footer-add-btn')) {
+			return;
 		}
-	}
 
-	function addNewItemRow() {
-		if (!isAddingItem) {
-			isAddingItem = true;
-			swipedItemId = null;
-			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
-			tick().then(() => {
-				const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-				inputs[inputs.length - 1]?.focus();
-			});
+		// If there's any swiped item, prevent default behavior and only handle swipe-related actions
+		if (swipedItemId !== null) {
+			event.preventDefault();
+
+			const clickedListItem = clickedElement.closest('li');
+			// If clicking outside the swiped item, clear the swipe
+			if (clickedListItem?.getAttribute('data-item-id') != swipedItemId) {
+				swipedItemId = null;
+				panDistance = 0;
+			}
+			// Always restore focus to the new item if we're adding one
+			if (isAddingItem) {
+				tick().then(() => {
+					const inputs = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
+					inputs[inputs.length - 1]?.focus();
+				});
+			}
+			return;
+		}
+
+		// Only handle add/cancel if no item is being swiped and we're not clicking the new item input
+		if (isAddingItem && !clickedElement.closest('.list-item-content:last-child')) {
+			if (newItemName.trim()) {
+				handleAddItem();
+			} else {
+				cancelAddItem();
+			}
 		}
 	}
 
@@ -259,19 +265,9 @@
 		newItemName = '';
 		isAddingItem = false;
 	}
-
-	function goBack() {
-		goto('/lists');
-	}
 </script>
 
 <div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
-	<div class="flex items-center mb-6">
-		<button on:click={goBack} class="flex items-center text-lg font-bold">
-			<span class="ri-arrow-left-s-line text-icon-lg mr-2"></span> My Lists
-		</button>
-	</div>
-
 	<h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
 	<h3 class="text-sm font-bold mb-6">
 		Shared with: <span class="font-normal"
@@ -309,8 +305,8 @@
 								type="text"
 								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
-								readonly={swipedItemId !== null &&
-									!(isAddingItem && index === listItems.length - 1)}
+								readonly={swipedItemId !== null || (isAddingItem && index !== listItems.length - 1)}
+								on:mousedown|preventDefault|stopPropagation
 								on:input={(e) => {
 									if (index === listItems.length - 1 && isAddingItem) {
 										newItemName = e.currentTarget.value;
@@ -320,7 +316,6 @@
 									}
 								}}
 								on:keydown={handleKeyDown}
-								use:autoFocus={isAddingItem && index === listItems.length - 1}
 							/>
 						</div>
 
@@ -340,14 +335,18 @@
 			</ul>
 		</div>
 	{/if}
-	<div class="mt-4">
-		<button
-			class="add-item text-add-item text-base font-normal flex items-center"
-			on:click={addNewItemRow}
-			aria-label="Add new item"
-		>
-			<span class="ri-add-line text-icon-lg"></span>
-			Add Item
-		</button>
-	</div>
 </div>
+
+<pre class="hidden">
+	{JSON.stringify({ debugListItems: listItems.length }, null, 2)}
+</pre>
+
+{#if debugLogs.length > 0}
+	<div class="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-4 font-mono text-xs z-50">
+		<div class="max-h-32 overflow-y-auto">
+			{#each debugLogs as log}
+				<div class="whitespace-pre-wrap">{log}</div>
+			{/each}
+		</div>
+	</div>
+{/if}

@@ -29,15 +29,22 @@
 	$: isDoneActive = newListName.trim() !== '';
 
 	onMount(() => {
-		auth.onAuthStateChanged(handleAuthStateChange);
-		document.addEventListener('click', handleClickOutside);
-	});
+		const handleCreateListForm = () => {
+			console.log('Received showCreateListForm event');
+			showCreateForm = true;
+		};
 
-	onDestroy(() => {
-		if (typeof document !== 'undefined') {
+		// Set up auth state change handler immediately
+		auth.onAuthStateChanged(handleAuthStateChange);
+
+		// Add event listeners
+		window.addEventListener('showCreateListForm', handleCreateListForm);
+		document.addEventListener('click', handleClickOutside);
+
+		return () => {
+			window.removeEventListener('showCreateListForm', handleCreateListForm);
 			document.removeEventListener('click', handleClickOutside);
-			document.removeEventListener('click', handleClickOutside);
-		}
+		};
 	});
 
 	async function handleAuthStateChange(user: any) {
@@ -208,16 +215,6 @@
 		{:else}
 			<p class="text-lg">No lists available.</p>
 		{/if}
-
-		<div class="mt-4 flex justify-end">
-			<button
-				class="text-button-blue text-base"
-				on:click={() => (showCreateForm = true)}
-				aria-label="Add new list"
-			>
-				Add List
-			</button>
-		</div>
 	</div>
 
 	{#if showCreateForm}

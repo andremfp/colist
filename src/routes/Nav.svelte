@@ -1,76 +1,84 @@
-<!-- src/Nav.svelte
-
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { getListDetails } from '../lib/api';
-	import { breadcrumbs } from '../store/breadcrumbs';
+	import { goto } from '$app/navigation';
+	import { darkMode } from '$lib/stores/darkModeStore';
+	import { logout } from '$lib/auth';
+	import 'remixicon/fonts/remixicon.css';
 
-	let originalPaths: string[] = [];
-	let translatedPaths: string[] = [];
-	
-	const parts = $page.url.pathname.split('/').filter(Boolean);
+	let hasScroll = false;
+	let nav: HTMLElement;
+	let currentRoute: string;
 
-	// build originalPaths
-	let currentPath = '';
-	//let currentTranslatedPath = '';
-	let previousPart = '';
-	for (let part of parts) {
-		// translate ids to names for breadcrumbs
-		if (previousPart === 'lists') {
-			const listId = parseInt(part);
-			const list = await getListDetails(listId);
-			currentPath += `/${part}`;
-			originalPaths.push(currentPath);
-			translatedPaths.push(`${list.name}`);
-			continue;
-		}
+	$: currentRoute = $page.url.pathname;
+	$: darkModeClass = $darkMode ? 'ri-moon-line' : 'ri-sun-line';
 
-		currentPath += `/${part}`;
-		originalPaths.push(currentPath);
-		translatedPaths.push(part);
-		
-		previousPart = part;
+	onMount(() => {
+		const checkScroll = () => {
+			hasScroll = window.scrollY > 0;
+		};
+
+		window.addEventListener('scroll', checkScroll);
+		checkScroll();
+
+		// Ensure dark mode class is correctly set immediately
+		document.documentElement.classList.toggle('dark', $darkMode);
+
+		return () => window.removeEventListener('scroll', checkScroll);
+	});
+
+	function goBack() {
+		goto('/lists');
 	}
 
-	breadcrumbs.set({ originalPaths, translatedPaths });
-	console.log(originalPaths);
-	console.log(translatedPaths);
+	function toggleDarkMode() {
+		darkMode.update((value) => {
+			const newMode = !value;
+			localStorage.setItem('darkMode', newMode.toString());
+			document.documentElement.classList.toggle('dark', newMode);
+			return newMode;
+		});
+	}
 
-	// onMount(async () => {
-        
-    // });
-
+	async function handleLogout() {
+		try {
+			await logout();
+		} catch (error) {
+			console.error('Error during logout:', error);
+			alert('Logout failed. You have been logged out locally.');
+		} finally {
+			localStorage.removeItem('access_token');
+			localStorage.removeItem('refresh_token');
+			window.location.href = '/';
+		}
+	}
 </script>
 
-<nav>
-	<a href="/" class={$page.url.pathname === '/' ? 'active' : ''}>Home</a>
-	{#each $breadcrumbs.translatedPaths as crumb, i}
-        <a href={$breadcrumbs.originalPaths[i]} class={$page.url.pathname === $breadcrumbs.originalPaths[i] ? 'active' : ''}>{crumb}</a>
-    {/each}
+<nav
+	bind:this={nav}
+	class="fixed top-0 left-0 right-0 h-nav-height transition-colors duration-200 z-10 flex items-center {hasScroll
+		? 'bg-main-bg-light dark:bg-main-bg-dark shadow-lg'
+		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
+>
+	<div class="w-full max-w-4xl mx-auto px-4 flex justify-between items-center">
+		<div>
+			{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
+				<button on:click={goBack} class="flex items-center text-lg font-bold">
+					<span class="ri-arrow-left-s-line text-icon-lg mr-2"></span> My Lists
+				</button>
+			{/if}
+		</div>
+
+		<div class="flex items-center space-x-4">
+			<button on:click={toggleDarkMode} class="text-xl cursor-pointer">
+				<span class={darkModeClass}></span>
+			</button>
+
+			{#if currentRoute !== '/' && currentRoute !== '/register'}
+				<button on:click={handleLogout} class="text-xl cursor-pointer">
+					<span class="ri-logout-box-r-line"></span>
+				</button>
+			{/if}
+		</div>
+	</div>
 </nav>
-
-<style>
-	nav {
-		background-color: #333;
-		color: white;
-		padding: 1rem;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-	}
-
-	a {
-		color: white;
-		text-decoration: none;
-		margin-right: 0.5rem;
-	}
-
-	a.active {
-		text-decoration: underline;
-	}
-
-	a:hover {
-		text-decoration: underline;
-	}
-</style> -->

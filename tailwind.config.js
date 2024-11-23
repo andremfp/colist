@@ -37,7 +37,15 @@ export default {
 				'fail-toast-text': '#FF6B6B',
 				'list-shared-dark': '#9CA3AF',
 				'list-shared-light': '#4B5563',
-				'delete-btn': '#C53030'
+				'delete-btn': '#C53030',
+				'nav-bg-light': '#F0F0F0',
+				'nav-bg-dark': '#1F1F1F',
+				'nav-bg-scroll-light': '#E6E6E6',
+				'nav-bg-scroll-dark': '#262626',
+				'footer-bg-light': '#F0F0F0',
+				'footer-bg-dark': '#1F1F1F',
+				'footer-bg-scroll-light': '#E6E6E6',
+				'footer-bg-scroll-dark': '#262626'
 			},
 			boxShadow: {
 				ios: '0 2px 4px rgba(0, 0, 0, 0.1)'
@@ -45,7 +53,9 @@ export default {
 			spacing: {
 				'column-width': '42rem',
 				'column-margin-top': '4rem',
-				divider: '1px'
+				divider: '1px',
+				'nav-height': '4rem',
+				'footer-height': '4rem'
 			},
 			fontSize: {
 				'icon-xl': '1.5rem',
