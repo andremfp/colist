@@ -261,9 +261,7 @@
 	}
 </script>
 
-<div
-	class="p-4 pb-footer-padding bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
->
+<div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
 	<h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
 	<h3 class="text-sm font-bold mb-6">
 		Shared with: <span class="font-normal"
