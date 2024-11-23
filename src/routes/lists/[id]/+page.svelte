@@ -262,7 +262,7 @@
 </script>
 
 <div
-	class="p-4 pb-[calc(2.25rem+env(safe-area-inset-bottom))] bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
+	class="p-4 pb-footer-padding bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
 	<h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
 	<h3 class="text-sm font-bold mb-6">
@@ -346,15 +346,3 @@
 		</div>
 	</div>
 {/if}
-
-<style>
-	/* Add this to ensure content scrolls properly when keyboard is visible */
-	:global(body) {
-		min-height: 100vh;
-		min-height: -webkit-fill-available;
-	}
-
-	:global(html) {
-		height: -webkit-fill-available;
-	}
-</style>
