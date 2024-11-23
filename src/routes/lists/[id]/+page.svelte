@@ -84,7 +84,13 @@
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
 			tick().then(() => {
 				const lastInput = document.querySelectorAll('.list-item') as NodeListOf<HTMLElement>;
-				lastInput[lastInput.length - 1]?.focus();
+				const lastItem = lastInput[lastInput.length - 1];
+
+				// Focus on the last input
+				lastItem?.focus();
+
+				// Scroll to the bottom of the page
+				lastItem?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 			});
 		}
 	}
@@ -297,7 +303,6 @@
 							/>
 							<input
 								type="text"
-								inputmode="none"
 								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
 								readonly={swipedItemId !== null || (isAddingItem && index !== listItems.length - 1)}
