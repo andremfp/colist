@@ -3,10 +3,12 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { darkMode } from '$lib/stores/darkModeStore';
+	import { currentListStore } from '$lib/stores/listStore';
 	import { logout } from '$lib/auth';
+
 	import 'remixicon/fonts/remixicon.css';
 
-	let hasScroll = false;
+	let scrollPosY = 0;
 	let nav: HTMLElement;
 	let currentRoute: string;
 
@@ -14,17 +16,8 @@
 	$: darkModeClass = $darkMode ? 'ri-moon-line' : 'ri-sun-line';
 
 	onMount(() => {
-		const checkScroll = () => {
-			hasScroll = window.scrollY > 0;
-		};
-
-		window.addEventListener('scroll', checkScroll);
-		checkScroll();
-
 		// Ensure dark mode class is correctly set immediately
 		document.documentElement.classList.toggle('dark', $darkMode);
-
-		return () => window.removeEventListener('scroll', checkScroll);
 	});
 
 	function goBack() {
@@ -54,31 +47,34 @@
 	}
 </script>
 
+<svelte:window bind:scrollY={scrollPosY} />
+
 <nav
 	bind:this={nav}
-	class="fixed top-0 left-0 right-0 h-nav-height transition-colors duration-200 z-10 flex items-center {hasScroll
-		? 'bg-main-bg-light dark:bg-main-bg-dark shadow-lg'
+	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center {scrollPosY >
+	120
+		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
 >
-	<div class="w-full max-w-4xl mx-auto px-4 flex justify-between items-center">
-		<div>
-			{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
-				<button on:click={goBack} class="flex items-center text-lg font-bold">
-					<span class="ri-arrow-left-s-line text-icon-lg mr-2"></span> My Lists
-				</button>
-			{/if}
-		</div>
-
-		<div class="flex items-center space-x-4">
-			<button on:click={toggleDarkMode} class="text-xl cursor-pointer">
-				<span class={darkModeClass}></span>
+	<div class="w-full px-2 flex justify-between items-center">
+		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
+			<button on:click={goBack} class="flex items-center text-medium text-button-blue">
+				<span class="ri-arrow-left-s-line text-icon-xl"></span> My Lists
 			</button>
+		{/if}
 
-			{#if currentRoute !== '/' && currentRoute !== '/register'}
-				<button on:click={handleLogout} class="text-xl cursor-pointer">
-					<span class="ri-logout-box-r-line"></span>
-				</button>
-			{/if}
-		</div>
+		{#if scrollPosY > 50}
+			<p class="ml-auto font-bold text-lg">{$currentListStore.name}</p>
+		{/if}
+
+		<button on:click={toggleDarkMode} class="text-xl cursor-pointer ml-auto">
+			<span class={darkModeClass}></span>
+		</button>
+
+		{#if currentRoute !== '/' && currentRoute !== '/register'}
+			<button on:click={handleLogout} class="text-xl cursor-pointer ml-4">
+				<span class="ri-logout-box-r-line pr-2"></span>
+			</button>
+		{/if}
 	</div>
 </nav>

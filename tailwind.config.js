@@ -38,13 +38,9 @@ export default {
 				'list-shared-dark': '#9CA3AF',
 				'list-shared-light': '#4B5563',
 				'delete-btn': '#C53030',
-				'nav-bg-light': '#F0F0F0',
-				'nav-bg-dark': '#1F1F1F',
 				'nav-bg-scroll-light': '#E6E6E6',
 				'nav-bg-scroll-dark': '#262626',
-				'footer-bg-light': '#F0F0F0',
-				'footer-bg-dark': '#1F1F1F',
-				'footer-bg-scroll-light': '#E6E6E6',
+				'footer-bg-scroll-light': '#E8E8E8',
 				'footer-bg-scroll-dark': '#262626'
 			},
 			boxShadow: {
@@ -54,11 +50,11 @@ export default {
 				'column-width': '42rem',
 				'column-margin-top': '4rem',
 				divider: '1px',
-				'nav-height': '4rem',
-				'footer-height': '4rem'
+				'nav-height': '55px',
+				'footer-height': '55px'
 			},
 			fontSize: {
-				'icon-xl': '1.5rem',
+				'icon-xl': '1.75rem',
 				'icon-lg': '1.25rem'
 			},
 			transitionProperty: {

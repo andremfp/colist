@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import {
 		fetchListItems,
 		addListItem,
@@ -15,6 +15,7 @@
 	import { pan, type GestureCustomEvent } from 'svelte-gestures';
 	import { showToast, sortItems, getSharedWithUsers } from '$lib/utils';
 	import { auth } from '$lib/firebase';
+	import { currentListStore } from '$lib/stores/listStore';
 
 	let listItems: ListItem[] = [];
 	let listDetail: List = { id: '', name: '', ownerId: '', sharedBy: [], itemCount: 0 };
@@ -30,16 +31,6 @@
 
 	const swipeDistance = -100;
 	$: listId = $page.params.id;
-
-	// Add these for debugging
-	let debugLogs: string[] = [];
-	const MAX_LOGS = 10;
-
-	function log(message: string) {
-		debugLogs = [...debugLogs, `${new Date().toISOString().slice(11, 19)} ${message}`].slice(
-			-MAX_LOGS
-		);
-	}
 
 	onMount(() => {
 		// Set up auth state change handler immediately
@@ -76,6 +67,10 @@
 			document.removeEventListener('click', handleClickOutside);
 		};
 	});
+
+	$: if (listDetail) {
+		$currentListStore = listDetail;
+	}
 
 	function addNewItemRow() {
 		if (!isAddingItem) {
@@ -336,17 +331,3 @@
 		</div>
 	{/if}
 </div>
-
-<pre class="hidden">
-	{JSON.stringify({ debugListItems: listItems.length }, null, 2)}
-</pre>
-
-{#if debugLogs.length > 0}
-	<div class="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-4 font-mono text-xs z-50">
-		<div class="max-h-32 overflow-y-auto">
-			{#each debugLogs as log}
-				<div class="whitespace-pre-wrap">{log}</div>
-			{/each}
-		</div>
-	</div>
-{/if}
