@@ -4,36 +4,56 @@
 	export let addButtonText: string = '';
 	export let onAdd: () => void;
 
-	let hasScroll = false;
 	let footer: HTMLElement;
+	let hasContentBehind = false;
+	let mounted = false;
+	let scrollPosY = 0;
 
 	function handleClick(event: MouseEvent) {
 		if (onAdd) onAdd();
 	}
 
-	onMount(() => {
-		const checkScroll = () => {
-			const content = document.documentElement;
-			hasScroll =
-				content.scrollHeight > window.innerHeight &&
-				window.innerHeight + window.scrollY < content.scrollHeight;
-		};
+	function checkContentBehind() {
+		if (!mounted || typeof window === 'undefined') return false;
 
-		window.addEventListener('scroll', checkScroll);
-		window.addEventListener('resize', checkScroll);
-		checkScroll();
+		const bodyHeight = document.body.scrollHeight;
+		const windowHeight = window.innerHeight;
+
+		// Check if content extends beyond viewport or if we've scrolled
+		hasContentBehind = bodyHeight > windowHeight && scrollPosY * 5.9 < bodyHeight - 65;
+	}
+
+	onMount(() => {
+		mounted = true;
+		checkContentBehind();
+
+		// Set up event listeners
+		window.addEventListener('scroll', checkContentBehind);
+		window.addEventListener('resize', checkContentBehind);
+
+		// Check for DOM changes that might affect content height
+		const observer = new MutationObserver(checkContentBehind);
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true,
+			attributes: true
+		});
 
 		return () => {
-			window.removeEventListener('scroll', checkScroll);
-			window.removeEventListener('resize', checkScroll);
+			mounted = false;
+			window.removeEventListener('scroll', checkContentBehind);
+			window.removeEventListener('resize', checkContentBehind);
+			observer.disconnect();
 		};
 	});
 </script>
 
+<svelte:window bind:scrollY={scrollPosY} />
+
 <footer
 	bind:this={footer}
-	class="fixed bottom-0 left-0 right-0 h-footer-height transition-colors duration-200 z-10 flex items-center {hasScroll
-		? 'bg-main-bg-light dark:bg-main-bg-dark shadow-lg'
+	class="fixed bottom-0 left-0 right-0 h-footer-height transition-all duration-200 z-10 flex items-center {hasContentBehind
+		? 'bg-footer-bg-scroll-light/95 dark:bg-footer-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
 	style="padding-bottom: env(safe-area-inset-bottom);"
 >
