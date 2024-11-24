@@ -73,7 +73,7 @@
 		{/if}
 
 		<a
-			href="https://github.com/yourusername/yourrepo"
+			href="https://github.com/andremfp/colist"
 			target="_blank"
 			rel="noopener noreferrer"
 			class="text-text-light dark:text-text-dark hover:opacity-80"
