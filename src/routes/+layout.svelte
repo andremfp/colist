@@ -36,8 +36,9 @@
 			const isDark = e.matches;
 			document.documentElement.classList.toggle('dark', isDark);
 
-			const themeColor = isDark ? '#FE2C31' : '#F0F0F0';
-			document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
+			document
+				.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
+				?.setAttribute('content', 'black');
 		}
 
 		// Initial theme setup
