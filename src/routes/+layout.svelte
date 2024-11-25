@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { darkMode } from '$lib/stores/darkModeStore';
 	import { page } from '$app/stores';
 	import Nav from './Nav.svelte';
 	import Footer from './Footer.svelte';
@@ -31,7 +30,21 @@
 	}
 
 	onMount(() => {
-		document.documentElement.classList.toggle('dark', $darkMode);
+		const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+		function handleThemeChange(e: any) {
+			const isDark = e.matches;
+			document.documentElement.classList.toggle('dark', isDark);
+
+			const themeColor = isDark ? '#1F1F1F' : '#F0F0F0';
+			document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
+		}
+
+		// Initial theme setup
+		handleThemeChange(darkModeMediaQuery);
+
+		// Listen for future changes
+		darkModeMediaQuery.addEventListener('change', handleThemeChange);
 
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
@@ -45,6 +58,10 @@
 					});
 			});
 		}
+
+		return () => {
+			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
+		};
 	});
 </script>
 
