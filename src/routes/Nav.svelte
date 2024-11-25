@@ -27,8 +27,8 @@
 	function toggleDarkMode() {
 		darkMode.update((value) => {
 			const newMode = !value;
+			// Store in localStorage to override system preference
 			localStorage.setItem('darkMode', newMode.toString());
-			document.documentElement.classList.toggle('dark', newMode);
 			return newMode;
 		});
 	}
