@@ -33,15 +33,6 @@
 	onMount(() => {
 		document.documentElement.classList.toggle('dark', $darkMode);
 
-		// Apply the dark mode class immediately to avoid flicker
-		if ($darkMode) {
-			document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#1F1F1F');
-			document.querySelector('meta[name="background"]')?.setAttribute('content', '#1F1F1F');
-		} else {
-			document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#F0F0F0');
-			document.querySelector('meta[name="background"]')?.setAttribute('content', '#F0F0F0');
-		}
-
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
 				navigator.serviceWorker
