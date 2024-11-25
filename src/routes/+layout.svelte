@@ -36,7 +36,7 @@
 			const isDark = e.matches;
 			document.documentElement.classList.toggle('dark', isDark);
 
-			const themeColor = isDark ? '#1F1F1F' : '#F0F0F0';
+			const themeColor = isDark ? '##FE2C31' : '#F0F0F0';
 			document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
 		}
 
