@@ -38,7 +38,7 @@
 
 			document
 				.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
-				?.setAttribute('content', 'black');
+				?.setAttribute('content', 'black-translucent');
 		}
 
 		// Initial theme setup
