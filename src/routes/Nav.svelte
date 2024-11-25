@@ -29,14 +29,6 @@
 			const newMode = !value;
 			localStorage.setItem('darkMode', newMode.toString());
 			document.documentElement.classList.toggle('dark', newMode);
-			// Apply the dark mode class immediately to avoid flicker
-			if (newMode) {
-				document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#1F1F1F');
-				document.querySelector('meta[name="background"]')?.setAttribute('content', '#1F1F1F');
-			} else {
-				document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#F0F0F0');
-				document.querySelector('meta[name="background"]')?.setAttribute('content', '#F0F0F0');
-			}
 			return newMode;
 		});
 	}

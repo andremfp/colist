@@ -9,10 +9,42 @@
 		<meta name="apple-mobile-web-app-title" content="CoList" />
 		<link rel="manifest" href="site.webmanifest" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="theme-color" content="#F0F0F0" />
+		<meta name="background" content="#F0F0F0" />
 		<script>
-			if (localStorage.getItem('darkMode') === 'true') {
-				document.documentElement.classList.add('dark');
+			// Set initial theme based on localStorage or system preference
+			const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+			const storedTheme = localStorage.getItem('darkMode');
+
+			// Function to update theme colors and class
+			function updateTheme(isDark) {
+				const themeColor = isDark ? '#1F1F1F' : '#F0F0F0';
+				document.querySelector('meta[name="theme-color"]').content = themeColor;
+				document.querySelector('meta[name="background"]').content = themeColor;
+
+				if (isDark) {
+					document.documentElement.classList.add('dark');
+				} else {
+					document.documentElement.classList.remove('dark');
+				}
 			}
+
+			// Set initial theme
+			if (storedTheme !== null) {
+				// Use stored preference if it exists
+				updateTheme(storedTheme === 'true');
+			} else {
+				// Otherwise use system preference
+				updateTheme(darkModeMediaQuery.matches);
+			}
+
+			// Listen for system theme changes
+			darkModeMediaQuery.addEventListener('change', (e) => {
+				// Only update based on system preference if there's no stored preference
+				if (localStorage.getItem('darkMode') === null) {
+					updateTheme(e.matches);
+				}
+			});
 		</script>
 		%sveltekit.head%
 	</head>
