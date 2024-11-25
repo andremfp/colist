@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { register } from '../../lib/auth';
 	import { goto } from '$app/navigation';
-	import { darkMode } from '$lib/stores/darkModeStore';
 	import { showToast } from '$lib/utils';
 
 	let email = '';

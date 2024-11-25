@@ -2,7 +2,6 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { pan, type GestureCustomEvent } from 'svelte-gestures';
-	import type { SwipeCustomEvent } from 'svelte-gestures';
 	import { auth } from '../../lib/firebase';
 	import {
 		fetchLists,
