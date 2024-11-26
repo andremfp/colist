@@ -37,9 +37,6 @@
 			document.documentElement.classList.toggle('dark', isDark);
 
 			document
-				.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
-				?.setAttribute('content', 'black-translucent');
-			document
 				.querySelector('meta[name="theme-color"]')
 				?.setAttribute('content', isDark ? '#FF272E' : '#FFFFFF');
 		}
