@@ -66,13 +66,6 @@
 	});
 </script>
 
-<svelte:head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-	<meta name="theme-color" content="#FF272E" />
-</svelte:head>
-
 <div
 	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark pt-[env(safe-area-inset-top)] min-h-screen flex flex-col"
 >
