@@ -51,7 +51,7 @@ export default {
 				'column-margin-top': '4rem',
 				divider: '1px',
 				'nav-height': '56px',
-				'footer-height': '56px'
+				'footer-height': '86px'
 			},
 			fontSize: {
 				'icon-xl': '1.75rem',
