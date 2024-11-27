@@ -10,7 +10,7 @@ export default {
 			},
 			colors: {
 				'main-bg-light': '#FFFFFF',
-				'main-bg-dark': '#FF272E',
+				'main-bg-dark': '#0F0F0F',
 				'text-light': '#1C1C1E',
 				'text-dark': '#E0E0E0',
 				'login-btn': '#FFB653',
