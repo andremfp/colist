@@ -38,7 +38,7 @@
 
 			document
 				.querySelector('meta[name="theme-color"]')
-				?.setAttribute('content', isDark ? '#0F0F0F' : '#FFFFFF');
+				?.setAttribute('content', isDark ? '#FF272E' : '#FFFFFF');
 		}
 
 		// Initial theme setup
@@ -67,7 +67,7 @@
 </script>
 
 <div
-	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark pt-[env(safe-area-inset-top)] min-h-screen flex flex-col"
+	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
 >
 	<Nav />
 
