@@ -68,7 +68,7 @@
 
 <div
 	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col
-	overflow-y-auto overscroll-none height-100vh"
+	overflow-y-hidden overscroll-none height-100% max-height-100% position-fixed"
 >
 	<Nav />
 
