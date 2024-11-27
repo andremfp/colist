@@ -67,12 +67,14 @@
 </script>
 
 <div
-	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
+	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col
+	overflow-hidden overscroll-none"
 >
 	<Nav />
 
 	<main
-		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border"
+		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border
+		overflow-y-auto overscroll-none"
 	>
 		<PageTransition key={data.path} duration={200}>
 			<slot />

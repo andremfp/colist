@@ -43,19 +43,19 @@
 		: 'bg-main-bg-light dark:bg-main-bg-dark'} 
     "
 >
-	<div class="w-full px-2 flex justify-between items-center">
+	<div class="w-full px-2 flex items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
-			<button on:click={goBack} class="flex items-center text-medium text-button-blue">
+			<button on:click={goBack} class="flex-1 flex items-center text-text-m text-button-blue">
 				<span class="ri-arrow-left-s-line text-icon-xl"></span> My Lists
 			</button>
 		{/if}
 
 		{#if scrollPosY > 50}
-			<p class="ml-auto font-bold text-lg">{$currentListStore.name}</p>
+			<p class="mx-auto text-center font-bold text-lg">{$currentListStore.name}</p>
 		{/if}
 
 		{#if currentRoute !== '/' && currentRoute !== '/register'}
-			<button on:click={handleLogout} class="text-xl cursor-pointer ml-auto">
+			<button on:click={handleLogout} class="flex-1 text-xl cursor-pointer text-right">
 				<span class="ri-logout-box-r-line pr-2"></span>
 			</button>
 		{/if}

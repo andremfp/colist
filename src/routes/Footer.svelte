@@ -55,18 +55,16 @@
 	class="fixed bottom-0 left-0 right-0 h-footer-height transition-all duration-200 z-10 flex items-center {hasContentBehind
 		? 'bg-footer-bg-scroll-light/95 dark:bg-footer-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
-	style="padding-bottom: env(safe-area-inset-bottom);"
 >
-	<div class="w-full max-w-4xl mx-auto px-4 flex justify-between items-center">
+	<div class="w-full px-2 flex items-center">
 		{#if addButtonText}
 			<button
-				class="footer-add-btn text-text-m font-normal flex items-center {addButtonText ===
-				'Add Item'
+				class="footer-add-btn flex-1 flex items-center text-text-m {addButtonText === 'Add Item'
 					? 'text-add-item'
 					: 'text-button-blue'}"
 				on:click={handleClick}
 			>
-				<span class="ri-add-line text-icon-lg ml-auto"></span>
+				<span class="ri-add-line text-icon-lg"></span>
 				{addButtonText}
 			</button>
 		{:else}
@@ -77,7 +75,7 @@
 			href="https://github.com/andremfp/colist"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="ml-auto"
+			class="flex-1 text-right"
 		>
 			<span class="ri-github-fill text-icon-lg pr-4"></span>
 		</a>
