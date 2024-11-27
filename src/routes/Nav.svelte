@@ -41,8 +41,7 @@
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'} 
-    h-[calc(env(safe-area-inset-top)+56px)]
-    pt-[env(safe-area-inset-top)]"
+    "
 >
 	<div class="w-full px-2 flex justify-between items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
