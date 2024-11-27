@@ -59,9 +59,6 @@ export default {
 			},
 			transitionProperty: {
 				'transform-opacity': 'transform, opacity'
-			},
-			backgroundColor: {
-				'brand-primary': '#FF272E'
 			}
 		}
 	},
