@@ -66,13 +66,20 @@
 	});
 </script>
 
+<svelte:head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name="theme-color" content="#FF272E" />
+</svelte:head>
+
 <div
-	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
+	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark pt-[env(safe-area-inset-top)] min-h-screen flex flex-col"
 >
 	<Nav />
 
 	<main
-		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border"
+		class="flex-1 flex flex-col pt-[calc(env(safe-area-inset-top)+56px)] pb-footer-height w-full max-w-4xl mx-auto px-4 box-border"
 	>
 		<PageTransition key={data.path} duration={200}>
 			<slot />
