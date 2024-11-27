@@ -271,12 +271,12 @@
 	</h3>
 
 	{#if listItems.length > 0}
-		<div class="rounded-xl shadow-ios pl-4 overflow-hidden bg-lists-bg-light dark:bg-lists-bg-dark">
+		<div class="rounded-xl shadow-ios pl-4 overflow-hidden bg-main-bg-light dark:bg-main-bg-dark">
 			<ul class="space-y-0">
 				{#each listItems as item, index (item.id)}
 					<li
 						data-item-id={item.id}
-						class="relative flex items-center py-2 bg-lists-bg-light dark:bg-lists-bg-dark overflow-hidden"
+						class="relative flex items-center py-2 overflow-hidden"
 						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
 						on:pandown={(event) => handlePanDown(event, item.id)}
 						on:panmove={(event) => handlePanMove(event, item.id)}
@@ -288,7 +288,7 @@
 						>
 							<input
 								type="checkbox"
-								class="w-5 h-5 appearance-none cursor-pointer border-2 border-add-item bg-lists-bg-light dark:bg-lists-bg-dark checked:bg-add-item dark:checked:bg-add-item rounded focus:ring-0"
+								class="w-5 h-5 appearance-none cursor-pointer border-2 border-add-item checked:bg-add-item dark:checked:bg-add-item rounded focus:ring-0"
 								checked={item.checked}
 								disabled={isAddingItem && index === listItems.length - 1}
 								on:mousedown|preventDefault|stopPropagation

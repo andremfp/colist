@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { darkMode } from '$lib/stores/darkModeStore';
 	import { currentListStore } from '$lib/stores/listStore';
 	import { logout } from '$lib/auth';
 
@@ -13,24 +12,11 @@
 	let currentRoute: string;
 
 	$: currentRoute = $page.url.pathname;
-	$: darkModeClass = $darkMode ? 'ri-moon-line' : 'ri-sun-line';
 
-	onMount(() => {
-		// Ensure dark mode class is correctly set immediately
-		document.documentElement.classList.toggle('dark', $darkMode);
-	});
+	onMount(() => {});
 
 	function goBack() {
 		goto('/lists');
-	}
-
-	function toggleDarkMode() {
-		darkMode.update((value) => {
-			const newMode = !value;
-			localStorage.setItem('darkMode', newMode.toString());
-			document.documentElement.classList.toggle('dark', newMode);
-			return newMode;
-		});
 	}
 
 	async function handleLogout() {
@@ -51,10 +37,11 @@
 
 <nav
 	bind:this={nav}
-	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center {scrollPosY >
-	120
+	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
+    {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
-		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
+		: 'bg-main-bg-light dark:bg-main-bg-dark'} 
+    "
 >
 	<div class="w-full px-2 flex justify-between items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
@@ -67,12 +54,8 @@
 			<p class="ml-auto font-bold text-lg">{$currentListStore.name}</p>
 		{/if}
 
-		<button on:click={toggleDarkMode} class="text-xl cursor-pointer ml-auto">
-			<span class={darkModeClass}></span>
-		</button>
-
 		{#if currentRoute !== '/' && currentRoute !== '/register'}
-			<button on:click={handleLogout} class="text-xl cursor-pointer ml-4">
+			<button on:click={handleLogout} class="text-xl cursor-pointer ml-auto">
 				<span class="ri-logout-box-r-line pr-2"></span>
 			</button>
 		{/if}
