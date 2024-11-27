@@ -12,6 +12,14 @@
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="theme-color" content="#FF272E" />
+		<style>
+			@supports (padding-top: env(safe-area-inset-top)) {
+				html,
+				body {
+					background-color: #ff272e;
+				}
+			}
+		</style>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

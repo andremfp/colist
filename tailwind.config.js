@@ -50,8 +50,8 @@ export default {
 				'column-width': '42rem',
 				'column-margin-top': '4rem',
 				divider: '1px',
-				'nav-height': '55px',
-				'footer-height': '55px'
+				'nav-height': '56px',
+				'footer-height': '56px'
 			},
 			fontSize: {
 				'icon-xl': '1.75rem',
@@ -59,6 +59,9 @@ export default {
 			},
 			transitionProperty: {
 				'transform-opacity': 'transform, opacity'
+			},
+			backgroundColor: {
+				'brand-primary': '#FF272E'
 			}
 		}
 	},
