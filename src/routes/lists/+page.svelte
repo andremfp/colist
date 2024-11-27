@@ -223,12 +223,16 @@
 				class="relative z-10 p-6 border rounded-xl max-w-md w-full border-border-light bg-main-bg-light dark:border-border-dark dark:bg-main-bg-dark"
 			>
 				<div class="flex justify-between items-center mb-4">
-					<button class="text-sm text-button-blue" on:click={resetCreateForm} aria-label="Cancel">
+					<button
+						class="text-text-m text-button-blue"
+						on:click={resetCreateForm}
+						aria-label="Cancel"
+					>
 						Cancel
 					</button>
 					<h2 class="text-xl font-semibold">New List</h2>
 					<button
-						class={`text-sm ${isDoneActive ? 'text-button-blue cursor-pointer' : 'text-button-disabled'}`}
+						class={`text-text-m ${isDoneActive ? 'text-button-blue cursor-pointer' : 'text-button-disabled'}`}
 						on:click={handleCreateList}
 						aria-label="Done"
 						disabled={!isDoneActive}
@@ -236,7 +240,7 @@
 						Done
 					</button>
 				</div>
-				<form on:submit|preventDefault={handleCreateList} class="space-y-4">
+				<form on:submit|preventDefault={handleCreateList} class="space-y-4, text-text-m">
 					<label class="block">
 						List Name:
 						<input
@@ -247,7 +251,7 @@
 						/>
 					</label>
 
-					<label class="block">
+					<label class="block mt-2">
 						Share with:
 						<div class="relative">
 							<select

@@ -60,12 +60,13 @@
 	<div class="w-full max-w-4xl mx-auto px-4 flex justify-between items-center">
 		{#if addButtonText}
 			<button
-				class="footer-add-btn text-base font-normal flex items-center {addButtonText === 'Add Item'
+				class="footer-add-btn text-text-m font-normal flex items-center {addButtonText ===
+				'Add Item'
 					? 'text-add-item'
 					: 'text-button-blue'}"
 				on:click={handleClick}
 			>
-				<span class="ri-add-line text-icon-lg mr-2"></span>
+				<span class="ri-add-line text-icon-lg ml-auto"></span>
 				{addButtonText}
 			</button>
 		{:else}
@@ -76,9 +77,9 @@
 			href="https://github.com/andremfp/colist"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="text-text-light dark:text-text-dark hover:opacity-80"
+			class="ml-auto"
 		>
-			<span class="ri-github-fill text-icon-lg"></span>
+			<span class="ri-github-fill text-icon-lg pr-4"></span>
 		</a>
 	</div>
 </footer>

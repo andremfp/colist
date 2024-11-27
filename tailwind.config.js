@@ -30,7 +30,7 @@ export default {
 				'input-border-dark': '#4B5563',
 				'input-bg-dark': '#374151',
 				'input-text-dark': '#D1D5DB',
-				'button-blue': '#3B82F6',
+				'button-blue': '#007AFF',
 				'button-disabled': '#D1D5DB',
 				'fail-toast-bg-light': 'rgba(255, 99, 71, 0.2)',
 				'fail-toast-bg-dark': 'rgba(220, 20, 60, 0.2)',
@@ -54,8 +54,12 @@ export default {
 				'footer-height': '86px'
 			},
 			fontSize: {
+				'text-xl': '1.75rem',
+				'text-lg': '1.5rem',
+				'text-m': '1.2rem',
 				'icon-xl': '1.75rem',
-				'icon-lg': '1.25rem'
+				'icon-lg': '1.5rem',
+				'icon-m': '1.25rem'
 			},
 			transitionProperty: {
 				'transform-opacity': 'transform, opacity'
