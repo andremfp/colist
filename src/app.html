@@ -13,23 +13,9 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="theme-color" content="#0F0F0F" />
 		<meta name="background" content="#0F0F0F" />
-
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<div
-			style="
-				display: contents;
-				overflow: hidden;
-				position: fixed;
-				left: 0;
-				top: 0;
-				right: 0;
-				bottom: 0;
-				touch-action: none;
-			"
-		>
-			%sveltekit.body%
-		</div>
+		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>
