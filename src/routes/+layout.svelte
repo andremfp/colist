@@ -72,8 +72,7 @@
 	<Nav />
 
 	<main
-		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border
-		overscroll-none"
+		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border"
 	>
 		<PageTransition key={data.path} duration={200}>
 			<slot />
