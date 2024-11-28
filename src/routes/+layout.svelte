@@ -39,9 +39,6 @@
 			document
 				.querySelector('meta[name="theme-color"]')
 				?.setAttribute('content', isDark ? '#0F0F0F' : '#FFFFFF');
-			document
-				.querySelector('meta[name="background-color"]')
-				?.setAttribute('content', isDark ? '#0F0F0F' : '#FFFFFF');
 		}
 
 		// Initial theme setup
