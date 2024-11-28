@@ -21,6 +21,7 @@
 <div
 	class="flex flex-col justify-center items-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
+	<input type="text" />
 	<div class="w-full max-w-md flex flex-col">
 		<div class="h-24 w-56 mx-auto my-6">
 			<img src="/images/colist.png" class="object-contain" alt="CoList Logo" />
