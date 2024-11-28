@@ -39,6 +39,9 @@
 			document
 				.querySelector('meta[name="theme-color"]')
 				?.setAttribute('content', isDark ? '#0F0F0F' : '#FFFFFF');
+			document
+				.querySelector('meta[name="background"]')
+				?.setAttribute('content', isDark ? '#0F0F0F' : '#FFFFFF');
 		}
 
 		// Initial theme setup
@@ -71,9 +74,7 @@
 >
 	<Nav />
 
-	<main
-		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border"
-	>
+	<main class="flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto px-4 box-border">
 		<PageTransition key={data.path} duration={200}>
 			<slot />
 		</PageTransition>
