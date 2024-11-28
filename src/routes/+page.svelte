@@ -20,7 +20,7 @@
 
 <div
 	class="flex flex-col justify-center items-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark
-	overflow-hidden"
+	overflow-hidden overscroll-none"
 >
 	<div class="h-28 w-56 mx-auto mt-24">
 		<img src="/images/colist.png" class="object-contain" alt="CoList Logo" />
