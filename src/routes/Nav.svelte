@@ -35,29 +35,31 @@
 
 <svelte:window bind:scrollY={scrollPosY} />
 
-<nav
-	bind:this={nav}
-	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
+{#if currentRoute !== '/' && currentRoute !== '/register'}
+	<nav
+		bind:this={nav}
+		class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
     {scrollPosY > 120
-		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
-		: 'bg-main-bg-light dark:bg-main-bg-dark'} 
-    "
->
-	<div class="w-full px-2 flex items-center">
-		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
-			<button on:click={goBack} class="flex-1 flex items-center text-text-m text-button-blue">
-				<span class="ri-arrow-left-s-line text-icon-xl"></span> My Lists
-			</button>
-		{/if}
+			? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
+			: 'bg-main-bg-light dark:bg-main-bg-dark'}"
+		style="padding-top: env(safe-area-inset-top);"
+	>
+		<div class="w-full px-2 flex items-center">
+			{#if currentRoute !== '/lists'}
+				<button on:click={goBack} class="flex-1 flex items-center text-text-m text-button-blue">
+					<span class="ri-arrow-left-s-line text-icon-xl"></span> My Lists
+				</button>
+			{/if}
 
-		{#if scrollPosY > 50}
-			<p class="mx-auto text-center font-bold text-lg">{$currentListStore.name}</p>
-		{/if}
+			{#if scrollPosY > 50}
+				<p class="mx-auto text-center font-bold text-lg">{$currentListStore.name}</p>
+			{/if}
 
-		{#if currentRoute !== '/' && currentRoute !== '/register'}
-			<button on:click={handleLogout} class="flex-1 text-xl cursor-pointer text-right">
-				<span class="ri-logout-box-r-line pr-2"></span>
-			</button>
-		{/if}
-	</div>
-</nav>
+			{#if currentRoute !== '/' && currentRoute !== '/register'}
+				<button on:click={handleLogout} class="flex-1 text-xl cursor-pointer text-right">
+					<span class="ri-logout-box-r-line pr-2"></span>
+				</button>
+			{/if}
+		</div>
+	</nav>
+{/if}
