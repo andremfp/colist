@@ -74,6 +74,7 @@
 	}
 
 	function toggleFooter(show: boolean) {
+		console.log('toggleFooter', show);
 		footerStore.set(show);
 	}
 

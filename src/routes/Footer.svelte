@@ -12,6 +12,7 @@
 	let showFooter = true;
 
 	footerStore.subscribe((value) => {
+		console.log('footerStore changed:', value);
 		showFooter = value;
 	});
 
@@ -58,11 +59,10 @@
 
 <footer
 	bind:this={footer}
-	class="${showFooter
-		? ''
-		: 'display-none'} fixed bottom-0 left-0 right-0 h-footer-height transition-all duration-200 z-10 flex items-center {hasContentBehind
+	class="fixed bottom-0 left-0 right-0 h-footer-height transition-all duration-200 z-10 flex items-center {hasContentBehind
 		? 'bg-footer-bg-scroll-light/95 dark:bg-footer-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
-		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
+		: 'bg-main-bg-light dark:bg-main-bg-dark'}
+		{showFooter ? '' : 'display-none'}"
 	style="padding-bottom: env(safe-area-inset-bottom);"
 >
 	<div class="w-full px-2 flex items-center">
