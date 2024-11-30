@@ -11,9 +11,6 @@
 	onMount(() => {
 		if (browser) {
 			document.documentElement.style.overscrollBehavior = 'none';
-			document.body.style.position = 'fixed';
-			document.body.style.width = '100%';
-			document.body.style.height = '100%';
 			document.body.style.overflow = 'hidden';
 		}
 	});
@@ -21,10 +18,7 @@
 	onDestroy(() => {
 		if (browser) {
 			document.documentElement.style.overscrollBehavior = 'auto';
-			document.body.style.position = 'static';
-			document.body.style.width = 'auto';
-			document.body.style.height = 'auto';
-			document.body.style.overflow = 'visible';
+			document.body.style.overflow = 'auto';
 		}
 	});
 
