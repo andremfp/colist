@@ -63,40 +63,18 @@
 			});
 		}
 
-		// Prevent body scrolling when an input is focused
-		const handleFocus = () => {
-			document.body.classList.add('fixed', 'inset-0', 'overflow-hidden');
-		};
-
-		const handleBlur = () => {
-			document.body.classList.remove('fixed', 'inset-0', 'overflow-hidden');
-		};
-
-		// Add event listeners to all inputs
-		const inputs = document.querySelectorAll('input, textarea, select');
-		inputs.forEach((input) => {
-			input.addEventListener('focus', handleFocus);
-			input.addEventListener('blur', handleBlur);
-		});
-
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-			inputs.forEach((input) => {
-				input.removeEventListener('focus', handleFocus);
-				input.removeEventListener('blur', handleBlur);
-			});
 		};
 	});
 </script>
 
 <div
-	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col overflow-hidden"
+	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
 >
 	<Nav />
 
-	<main
-		class="flex-1 flex-col overflow-y-auto pt-nav-height pb-footer-height w-full mx-auto px-4 box-border relative"
-	>
+	<main class="flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto px-4 box-border">
 		<PageTransition key={data.path} duration={200}>
 			<slot />
 		</PageTransition>
