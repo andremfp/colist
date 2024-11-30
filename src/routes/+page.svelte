@@ -35,7 +35,7 @@
 </script>
 
 <div
-	class="flex flex-col justify-center items-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark overflow-hidden"
+	class="flex flex-col justify-center items-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
 	<div class="h-28 w-56 mx-auto mt-24">
 		<img src="/images/colist.png" class="object-contain" alt="CoList Logo" />
@@ -51,7 +51,7 @@
 					id="email"
 					type="email"
 					bind:value={email}
-					class="w-full p-2 border border-border-light dark:border-border-dark rounded-md text-text-light dark:text-input-text-dark bg-white dark:bg-input-bg-dark focus:outline-none focus:ring-1"
+					class="w-full p-2 border border-border-light dark:border-border-dark rounded-md text-text-light dark:text-input-text-dark bg-white dark:bg-input-bg-dark focus:outline-none focus:ring-1 focus:overflow-y-hidden"
 					required
 				/>
 			</div>
