@@ -16,6 +16,7 @@
 	import { showToast, sortItems, getSharedWithUsers } from '$lib/utils';
 	import { auth } from '$lib/firebase';
 	import { currentListStore } from '$lib/stores/listStore';
+	import { footerStore } from '$lib/stores/footerStore';
 
 	let listItems: ListItem[] = [];
 	let listDetail: List = { id: '', name: '', ownerId: '', sharedBy: [], itemCount: 0 };
@@ -72,8 +73,14 @@
 		$currentListStore = listDetail;
 	}
 
+	function toggleFooter(show: boolean) {
+		footerStore.set(show);
+	}
+
 	function addNewItemRow() {
 		if (!isAddingItem) {
+			toggleFooter(false);
+			document.querySelector('footer')?.classList.add('display-none');
 			isAddingItem = true;
 			swipedItemId = null;
 			listItems = [...listItems, { id: '', name: '', listId: '', addedBy: '', checked: false }];
@@ -119,6 +126,7 @@
 		} finally {
 			newItemName = '';
 			isAddingItem = false;
+			toggleFooter(true);
 		}
 	}
 
@@ -259,6 +267,7 @@
 		listItems.pop();
 		newItemName = '';
 		isAddingItem = false;
+		toggleFooter(true);
 	}
 </script>
 
