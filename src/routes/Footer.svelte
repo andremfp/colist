@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { footerStore } from '$lib/stores/footerStore';
 
 	export let addButtonText: string = '';
 	export let onAdd: () => void;
@@ -9,12 +8,6 @@
 	let hasContentBehind = false;
 	let mounted = false;
 	let scrollPosY = 0;
-	let showFooter = true;
-
-	footerStore.subscribe((value) => {
-		console.log('footerStore changed:', value);
-		showFooter = value;
-	});
 
 	function handleClick(event: MouseEvent) {
 		if (onAdd) onAdd();
@@ -61,8 +54,7 @@
 	bind:this={footer}
 	class="fixed bottom-0 left-0 right-0 h-footer-height transition-all duration-200 z-10 flex items-center {hasContentBehind
 		? 'bg-footer-bg-scroll-light/95 dark:bg-footer-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
-		: 'bg-main-bg-light dark:bg-main-bg-dark'}
-		{showFooter ? '' : 'display-none'}"
+		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
 	style="padding-bottom: env(safe-area-inset-bottom);"
 >
 	<div class="w-full px-2 flex items-center">

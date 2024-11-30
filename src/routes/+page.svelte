@@ -11,14 +11,12 @@
 	onMount(() => {
 		if (browser) {
 			document.documentElement.style.overscrollBehavior = 'none';
-			document.body.style.overflow = 'hidden';
 		}
 	});
 
 	onDestroy(() => {
 		if (browser) {
 			document.documentElement.style.overscrollBehavior = 'auto';
-			document.body.style.overflow = 'auto';
 		}
 	});
 
