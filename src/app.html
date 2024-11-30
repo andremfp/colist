@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="bg-main-bg-light dark:bg-main-bg-dark">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="favicon-48x48.png" sizes="48x48" />
@@ -13,15 +13,9 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="theme-color" content="#0F0F0F" />
 		<meta name="background" content="#0F0F0F" />
-		<style>
-			html,
-			body {
-				background-color: #0f0f0f;
-			}
-		</style>
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover">
+	<body data-sveltekit-preload-data="hover" class="bg-main-bg-light dark:bg-main-bg-dark">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>
