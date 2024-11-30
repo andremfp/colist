@@ -63,26 +63,9 @@ export default {
 			},
 			transitionProperty: {
 				'transform-opacity': 'transform, opacity'
-			},
-			overscroll: {
-				'none-x': 'none',
-				'none-y': 'none',
-				'none-all': 'none'
 			}
 		}
 	},
-	plugins: [
-		function ({ addUtilities }) {
-			const newUtilities = {
-				'.overscroll-none-x': { 'overscroll-behavior-x': 'none' },
-				'.overscroll-none-y': { 'overscroll-behavior-y': 'none' },
-				'.overscroll-none-all': {
-					'overscroll-behavior-x': 'none',
-					'overscroll-behavior-y': 'none'
-				}
-			};
-			addUtilities(newUtilities);
-		}
-	],
+	plugins: [],
 	darkMode: 'class'
 };
