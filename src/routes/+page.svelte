@@ -2,9 +2,18 @@
 	import { login } from '../lib/auth';
 	import { goto } from '$app/navigation';
 	import { showToast } from '$lib/utils';
+	import { onMount, onDestroy } from 'svelte';
 
 	let email = '';
 	let password = '';
+
+	onMount(() => {
+		document.documentElement.style.overscrollBehavior = 'none';
+	});
+
+	onDestroy(() => {
+		document.documentElement.style.overscrollBehavior = 'auto';
+	});
 
 	async function handleLogin() {
 		try {
@@ -64,9 +73,3 @@
 		</p>
 	</div>
 </div>
-
-<style>
-	.html {
-		overscroll-behavior: none;
-	}
-</style>
