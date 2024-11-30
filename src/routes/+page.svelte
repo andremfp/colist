@@ -3,17 +3,30 @@
 	import { goto } from '$app/navigation';
 	import { showToast } from '$lib/utils';
 	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 
 	let email = '';
 	let password = '';
 
 	onMount(() => {
-		document.documentElement.style.overscrollBehavior = 'none';
+		if (browser) {
+			document.documentElement.style.overscrollBehavior = 'none';
+			document.body.style.position = 'fixed';
+			document.body.style.width = '100%';
+			document.body.style.height = '100%';
+			document.body.style.overflow = 'hidden';
+		}
 	});
 
-	// onDestroy(() => {
-	// 	document.documentElement.style.overscrollBehavior = 'auto';
-	// });
+	onDestroy(() => {
+		if (browser) {
+			document.documentElement.style.overscrollBehavior = 'auto';
+			document.body.style.position = 'static';
+			document.body.style.width = 'auto';
+			document.body.style.height = 'auto';
+			document.body.style.overflow = 'visible';
+		}
+	});
 
 	async function handleLogin() {
 		try {
