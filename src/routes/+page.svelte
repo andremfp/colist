@@ -11,9 +11,9 @@
 		document.documentElement.style.overscrollBehavior = 'none';
 	});
 
-	onDestroy(() => {
-		document.documentElement.style.overscrollBehavior = 'auto';
-	});
+	// onDestroy(() => {
+	// 	document.documentElement.style.overscrollBehavior = 'auto';
+	// });
 
 	async function handleLogin() {
 		try {
