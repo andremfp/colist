@@ -19,7 +19,7 @@
 </script>
 
 <div
-	class="flex flex-col justify-center items-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
+	class="page-container flex flex-col justify-center items-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
 	<div class="h-28 w-56 mx-auto mt-24">
 		<img src="/images/colist.png" class="object-contain" alt="CoList Logo" />
@@ -66,7 +66,7 @@
 </div>
 
 <style>
-	:global(html) {
+	.page-container {
 		overscroll-behavior: none;
 	}
 </style>
