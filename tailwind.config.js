@@ -63,12 +63,19 @@ export default {
 			},
 			transitionProperty: {
 				'transform-opacity': 'transform, opacity'
-			},
-			overscroll: {
-				none: 'none'
 			}
 		}
 	},
-	plugins: [],
+	plugins: [
+		function ({ addUtilities }) {
+			const newUtilities = {
+				'.overscroll-none': {
+					'overscroll-behavior-y': 'none',
+					'overscroll-behavior-x': 'none'
+				}
+			};
+			addUtilities(newUtilities);
+		}
+	],
 	darkMode: 'class'
 };
