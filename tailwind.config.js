@@ -63,6 +63,9 @@ export default {
 			},
 			transitionProperty: {
 				'transform-opacity': 'transform, opacity'
+			},
+			overscroll: {
+				none: 'none'
 			}
 		}
 	},
