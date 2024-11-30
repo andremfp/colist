@@ -64,3 +64,9 @@
 		</p>
 	</div>
 </div>
+
+<style>
+	:global(html, body) {
+		overscroll-behavior: none;
+	}
+</style>
