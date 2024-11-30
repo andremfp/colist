@@ -70,7 +70,7 @@
 </script>
 
 <div
-	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col overscroll-none"
+	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col overscroll-none-all"
 >
 	<Nav />
 
