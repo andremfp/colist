@@ -66,7 +66,7 @@
 </div>
 
 <style>
-	.body {
+	:global(body) {
 		overscroll-behavior: none;
 	}
 </style>
