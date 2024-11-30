@@ -82,12 +82,3 @@
 		</a>
 	</div>
 </footer>
-
-<style>
-	@media (max-height: 450px) {
-		/* Hide footer when virtual keyboard is likely visible */
-		footer {
-			display: none;
-		}
-	}
-</style>

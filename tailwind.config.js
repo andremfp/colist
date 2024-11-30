@@ -63,9 +63,6 @@ export default {
 			},
 			transitionProperty: {
 				'transform-opacity': 'transform, opacity'
-			},
-			focusWithin: {
-				overflowYHidden: 'overflow-y-hidden'
 			}
 		}
 	},
