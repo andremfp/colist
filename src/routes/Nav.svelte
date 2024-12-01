@@ -132,3 +132,11 @@
 		{/if}
 	</div>
 </nav>
+
+<!-- Debug Logs -->
+<div class="fixed bottom-0 left-0 right-0 bg-red-100 z-50 p-2">
+	<h3 class="font-bold">Debug Logs:</h3>
+	{#each debugLogs as log}
+		<p class="text-xs">{log}</p>
+	{/each}
+</div>
