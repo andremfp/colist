@@ -74,7 +74,9 @@
 >
 	<Nav />
 
-	<main class="flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto px-4 box-border">
+	<main
+		class="position-absolute top-[calc(env(safe-area-inset-top) + var(--nav-height))] left-0 right-0 bottom-0 overflow-y-auto flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto px-4 box-border"
+	>
 		<PageTransition key={data.path} duration={200}>
 			<slot />
 		</PageTransition>

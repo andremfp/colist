@@ -103,3 +103,12 @@
 		<p class="text-xs">{log}</p>
 	{/each}
 </div>
+
+<style>
+	:global(html, body) {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		overscroll-behavior-y: contain;
+	}
+</style>
