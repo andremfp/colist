@@ -11,8 +11,6 @@
 	let nav: HTMLElement;
 	let currentRoute: string;
 	let navTranslateY = 0;
-	let debugLogs: string[] = [];
-	let keyboardHeight = 0;
 
 	$: currentRoute = $page.url.pathname;
 
@@ -20,20 +18,21 @@
 		goto('/lists');
 	}
 
-	function log(message: string) {
-		console.log(message);
-		debugLogs = [...debugLogs, message].slice(-10); // Keep last 5 logs
-	}
-
 	function handleVisualViewportResize() {
 		if (!window.visualViewport) return;
 
-		// Calculate keyboard height
-		const keyboardHeight = window.outerHeight - window.visualViewport.height;
+		// Check if a keyboard is likely open
+		const isKeyboardVisible = window.innerHeight > window.visualViewport.height;
 
-		if (keyboardHeight > 0) {
-			// Adjust the viewport to prevent pushing content up
-			window.scrollTo(0, 0);
+		if (isKeyboardVisible) {
+			// Calculate the difference between window height and visual viewport height
+			const keyboardHeight = window.innerHeight - window.visualViewport.height;
+
+			// Translate the navbar up by the keyboard height
+			navTranslateY = -keyboardHeight;
+		} else {
+			// Reset translation when keyboard is not visible
+			navTranslateY = 0;
 		}
 	}
 
@@ -51,6 +50,7 @@
 	}
 
 	onMount(() => {
+		// Add event listener for visual viewport
 		if (window.visualViewport) {
 			window.visualViewport.addEventListener('resize', handleVisualViewportResize);
 		}
@@ -68,11 +68,12 @@
 
 <nav
 	bind:this={nav}
-	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-60 flex items-center
+	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
-	style="padding-top: env(safe-area-inset-top);"
+	style="padding-top: env(safe-area-inset-top);
+		   transform: translateY({navTranslateY}px);"
 >
 	<div class="w-full px-2 flex items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
@@ -92,23 +93,3 @@
 		{/if}
 	</div>
 </nav>
-
-<!-- Debug Logs -->
-<div
-	class="fixed top-1/3 left-0 right-0 bg-main-bg-light dark:bg-main-bg-dark z-50 p-2"
-	style="margin-top: env(safe-area-inset-top)"
->
-	<h3 class="font-bold">Debug Logs:</h3>
-	{#each debugLogs as log}
-		<p class="text-xs">{log}</p>
-	{/each}
-</div>
-
-<style>
-	:global(html, body) {
-		height: 100%;
-		margin: 0;
-		padding: 0;
-		overscroll-behavior-y: contain;
-	}
-</style>
