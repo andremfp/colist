@@ -38,7 +38,7 @@
 		log(`Screen Height: ${screen.height}`);
 
 		// More precise keyboard height calculation
-		keyboardHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
+		keyboardHeight = window.outerHeight - window.visualViewport.height;
 
 		// Check if a keyboard is likely open
 		const isKeyboardVisible = keyboardHeight > 0;
@@ -47,8 +47,8 @@
 		log(`Keyboard Height: ${keyboardHeight}`);
 
 		if (isKeyboardVisible) {
-			// Translate the navbar up by the keyboard height
-			navTranslateY = -keyboardHeight;
+			// Translate the navbar down by the keyboard height
+			navTranslateY = keyboardHeight;
 			log(`Navbar Translate Y: ${navTranslateY}`);
 		} else {
 			// Reset translation when keyboard is not visible
