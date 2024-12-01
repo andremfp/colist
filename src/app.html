@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-100vh">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/png" href="favicon-48x48.png" sizes="48x48" />
@@ -21,4 +21,12 @@
 	<body data-sveltekit-preload-data="hover" class="bg-main-bg-light dark:bg-main-bg-dark">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
+	<style>
+		html,
+		body {
+			overflow-y: auto;
+			overflow-x: hidden;
+			position: fixed;
+		}
+	</style>
 </html>
