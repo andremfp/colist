@@ -11,7 +11,7 @@
 	let nav: HTMLElement;
 	let currentRoute: string;
 	let debugLogs: string[] = [];
-	let keyboardHeight = 0;
+	let keyboardShowing = false;
 
 	$: currentRoute = $page.url.pathname;
 
@@ -29,8 +29,8 @@
 			log('Visual Viewport API not supported');
 			return;
 		} else {
-			keyboardHeight = window.scrollY;
-			log(`offset: ${keyboardHeight}`);
+			keyboardShowing = window.visualViewport.height < window.outerHeight;
+			log(`keyboard showing? ${keyboardShowing}`);
 		}
 	}
 
@@ -71,11 +71,11 @@
 
 <nav
 	bind:this={nav}
-	class="fixed top-[${keyboardHeight}px] bottom-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
+	class="fixed bottom-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
-	style="padding-top: env(safe-area-inset-top);"
+	style="top: {keyboardShowing ? scrollPosY : 0}px; padding-top: env(safe-area-inset-top);"
 >
 	<div class="w-full px-2 flex items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
