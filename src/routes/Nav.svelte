@@ -71,7 +71,7 @@
 
 <nav
 	bind:this={nav}
-	class="fixed bottom-0 left-0 right-0 h-nav-height transition-all duration-0 z-10 flex items-center
+	class="fixed left-0 right-0 h-nav-height transition-all duration-0 z-10 flex items-center
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
