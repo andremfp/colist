@@ -26,28 +26,14 @@
 	}
 
 	function handleVisualViewportResize() {
-		if (!window.visualViewport) {
-			console.log('Visual Viewport API not supported');
-			return;
-		}
+		if (!window.visualViewport) return;
 
 		// Calculate keyboard height
-		keyboardHeight = window.outerHeight - window.visualViewport.height;
-		log(`Outer Height: ${window.outerHeight}`);
-		log(`Visual Viewport Height: ${window.visualViewport.height}`);
-		log(`Keyboard Height: ${keyboardHeight}`);
+		const keyboardHeight = window.outerHeight - window.visualViewport.height;
 
-		// Prevent the page from being resized
 		if (keyboardHeight > 0) {
-			log(`body height before: ${document.body.style.height}`);
-			log(`body overflow before: ${document.body.style.overflow}`);
-			document.body.style.height = `${window.visualViewport.height}px`;
-			document.body.style.overflow = 'hidden';
-			log(`body height after: ${document.body.style.height}`);
-			log(`body overflow after: ${document.body.style.overflow}`);
-		} else {
-			document.body.style.height = '';
-			document.body.style.overflow = '';
+			// Adjust the viewport to prevent pushing content up
+			window.scrollTo(0, 0);
 		}
 	}
 
@@ -74,8 +60,6 @@
 			if (window.visualViewport) {
 				window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
 			}
-			document.body.style.height = '';
-			document.body.style.overflow = '';
 		};
 	});
 </script>
@@ -84,7 +68,7 @@
 
 <nav
 	bind:this={nav}
-	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
+	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-60 flex items-center
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
