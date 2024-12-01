@@ -12,6 +12,7 @@
 	let currentRoute: string;
 	let navTranslateY = 0;
 	let debugLogs: string[] = [];
+	let keyboardHeight = 0;
 
 	$: currentRoute = $page.url.pathname;
 
@@ -30,22 +31,22 @@
 			return;
 		}
 
+		// Detailed logging
 		log(`Window Inner Height: ${window.innerHeight}`);
 		log(`Visual Viewport Height: ${window.visualViewport.height}`);
 		log(`Window Outer Height: ${window.outerHeight}`);
 		log(`Screen Height: ${screen.height}`);
 
+		// More precise keyboard height calculation
+		keyboardHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
+
 		// Check if a keyboard is likely open
-		const isKeyboardVisible = window.innerHeight > window.visualViewport.height;
+		const isKeyboardVisible = keyboardHeight > 0;
 
 		log(`Is Keyboard Visible: ${isKeyboardVisible}`);
+		log(`Keyboard Height: ${keyboardHeight}`);
 
 		if (isKeyboardVisible) {
-			// Calculate the difference between window height and visual viewport height
-			const keyboardHeight = window.innerHeight - window.visualViewport.height;
-
-			log(`Keyboard Height: ${keyboardHeight}`);
-
 			// Translate the navbar up by the keyboard height
 			navTranslateY = -keyboardHeight;
 			log(`Navbar Translate Y: ${navTranslateY}`);
@@ -88,6 +89,8 @@
 			(e) => {
 				if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
 					log(`Focus on input: ${e.target.tagName}`);
+					// Force viewport resize check
+					setTimeout(handleVisualViewportResize, 100);
 				}
 			},
 			true
@@ -134,7 +137,10 @@
 </nav>
 
 <!-- Debug Logs -->
-<div class="fixed bottom-0 left-0 right-0 bg-red-100 z-50 p-2">
+<div
+	class="fixed top-50 bottom-0 left-0 right-0 bg-main-bg-light dark:bg-main-bg-dark z-50 p-2"
+	style="margin-top: env(safe-area-inset-top)"
+>
 	<h3 class="font-bold">Debug Logs:</h3>
 	{#each debugLogs as log}
 		<p class="text-xs">{log}</p>
