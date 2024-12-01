@@ -114,7 +114,7 @@
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}
-	{navTranslateY !== 0 ? 'translate-y-' + navTranslateY : ''}"
+	{navTranslateY > 0 ? `translate-y-[${navTranslateY}px]` : ''}"
 	style="padding-top: env(safe-area-inset-top);"
 >
 	<div class="w-full px-2 flex items-center">
