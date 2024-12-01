@@ -27,33 +27,27 @@
 
 	function handleVisualViewportResize() {
 		if (!window.visualViewport) {
-			log('Visual Viewport API not supported');
+			console.log('Visual Viewport API not supported');
 			return;
 		}
 
-		// Detailed logging
-		log(`Window Inner Height: ${window.innerHeight}`);
-		log(`Visual Viewport Height: ${window.visualViewport.height}`);
-		log(`Window Outer Height: ${window.outerHeight}`);
-		log(`Screen Height: ${screen.height}`);
-
-		// More precise keyboard height calculation
+		// Calculate keyboard height
 		keyboardHeight = window.outerHeight - window.visualViewport.height;
+		console.log('Outer Height:', window.outerHeight);
+		console.log('Visual Viewport Height:', window.visualViewport.height);
+		console.log('Keyboard Height:', keyboardHeight);
 
-		// Check if a keyboard is likely open
-		const isKeyboardVisible = keyboardHeight > 0;
-
-		log(`Is Keyboard Visible: ${isKeyboardVisible}`);
-		log(`Keyboard Height: ${keyboardHeight}`);
-
-		if (isKeyboardVisible) {
-			// Translate the navbar down by the keyboard height
-			navTranslateY = keyboardHeight;
-			log(`Navbar Translate Y: ${navTranslateY}`);
+		// Prevent the page from being resized
+		if (keyboardHeight > 0) {
+			console.log('body height before:', document.body.style.height);
+			console.log('body overflow before:', document.body.style.overflow);
+			document.body.style.height = `${window.visualViewport.height}px`;
+			document.body.style.overflow = 'hidden';
+			console.log('body height after:', document.body.style.height);
+			console.log('body overflow after:', document.body.style.overflow);
 		} else {
-			// Reset translation when keyboard is not visible
-			navTranslateY = 0;
-			log('Keyboard not visible, resetting navbar position');
+			document.body.style.height = '';
+			document.body.style.overflow = '';
 		}
 	}
 
@@ -71,37 +65,17 @@
 	}
 
 	onMount(() => {
-		log('Nav Component Mounted');
-
-		// Add event listener for visual viewport
 		if (window.visualViewport) {
-			log('Adding Visual Viewport Resize Listener');
 			window.visualViewport.addEventListener('resize', handleVisualViewportResize);
-			window.visualViewport.addEventListener('scroll', handleVisualViewportResize);
-		} else {
-			log('Visual Viewport API Not Available');
 		}
-
-		// Additional event listeners for debugging
-		window.addEventListener('resize', () => log('Window Resize Event'));
-		document.addEventListener(
-			'focus',
-			(e) => {
-				if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-					log(`Focus on input: ${e.target.tagName}`);
-					// Force viewport resize check
-					setTimeout(handleVisualViewportResize, 100);
-				}
-			},
-			true
-		);
 
 		return () => {
 			// Cleanup
 			if (window.visualViewport) {
 				window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
-				window.visualViewport.removeEventListener('scroll', handleVisualViewportResize);
 			}
+			document.body.style.height = '';
+			document.body.style.overflow = '';
 		};
 	});
 </script>
@@ -110,7 +84,7 @@
 
 <nav
 	bind:this={nav}
-	class="fixed top-[{navTranslateY}px] left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
+	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
