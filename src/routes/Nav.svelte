@@ -11,6 +11,7 @@
 	let nav: HTMLElement;
 	let currentRoute: string;
 	let navTranslateY = 0;
+	let debugLogs: string[] = [];
 
 	$: currentRoute = $page.url.pathname;
 
@@ -18,21 +19,40 @@
 		goto('/lists');
 	}
 
+	function log(message: string) {
+		console.log(message);
+		debugLogs = [...debugLogs, message].slice(-10); // Keep last 5 logs
+	}
+
 	function handleVisualViewportResize() {
-		if (!window.visualViewport) return;
+		if (!window.visualViewport) {
+			log('Visual Viewport API not supported');
+			return;
+		}
+
+		log(`Window Inner Height: ${window.innerHeight}`);
+		log(`Visual Viewport Height: ${window.visualViewport.height}`);
+		log(`Window Outer Height: ${window.outerHeight}`);
+		log(`Screen Height: ${screen.height}`);
 
 		// Check if a keyboard is likely open
 		const isKeyboardVisible = window.innerHeight > window.visualViewport.height;
+
+		log(`Is Keyboard Visible: ${isKeyboardVisible}`);
 
 		if (isKeyboardVisible) {
 			// Calculate the difference between window height and visual viewport height
 			const keyboardHeight = window.innerHeight - window.visualViewport.height;
 
+			log(`Keyboard Height: ${keyboardHeight}`);
+
 			// Translate the navbar up by the keyboard height
 			navTranslateY = -keyboardHeight;
+			log(`Navbar Translate Y: ${navTranslateY}`);
 		} else {
 			// Reset translation when keyboard is not visible
 			navTranslateY = 0;
+			log('Keyboard not visible, resetting navbar position');
 		}
 	}
 
@@ -50,15 +70,34 @@
 	}
 
 	onMount(() => {
+		log('Nav Component Mounted');
+
 		// Add event listener for visual viewport
 		if (window.visualViewport) {
+			log('Adding Visual Viewport Resize Listener');
 			window.visualViewport.addEventListener('resize', handleVisualViewportResize);
+			window.visualViewport.addEventListener('scroll', handleVisualViewportResize);
+		} else {
+			log('Visual Viewport API Not Available');
 		}
+
+		// Additional event listeners for debugging
+		window.addEventListener('resize', () => log('Window Resize Event'));
+		document.addEventListener(
+			'focus',
+			(e) => {
+				if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+					log(`Focus on input: ${e.target.tagName}`);
+				}
+			},
+			true
+		);
 
 		return () => {
 			// Cleanup
 			if (window.visualViewport) {
 				window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
+				window.visualViewport.removeEventListener('scroll', handleVisualViewportResize);
 			}
 		};
 	});
