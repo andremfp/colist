@@ -105,7 +105,7 @@
 
 <!-- Debug Logs -->
 <div
-	class="fixed top-50 bottom-0 left-0 right-0 bg-main-bg-light dark:bg-main-bg-dark z-50 p-2"
+	class="fixed top-1/3 bottom-0 left-0 right-0 bg-main-bg-light dark:bg-main-bg-dark z-50 p-2"
 	style="margin-top: env(safe-area-inset-top)"
 >
 	<h3 class="font-bold">Debug Logs:</h3>
