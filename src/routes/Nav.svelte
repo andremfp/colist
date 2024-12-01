@@ -10,29 +10,34 @@
 	let scrollPosY = 0;
 	let nav: HTMLElement;
 	let currentRoute: string;
-	let navTranslateY = 0;
+	let debugLogs: string[] = [];
+	let newViewportHeight = 0;
+	let keyboardHeight = 0;
 
 	$: currentRoute = $page.url.pathname;
+
+	function log(message: string) {
+		console.log(message);
+		debugLogs = [...debugLogs, message].slice(-10); // Keep last 5 logs
+	}
 
 	function goBack() {
 		goto('/lists');
 	}
 
 	function handleVisualViewportResize() {
-		if (!window.visualViewport) return;
-
-		// Check if a keyboard is likely open
-		const isKeyboardVisible = window.innerHeight > window.visualViewport.height;
-
-		if (isKeyboardVisible) {
-			// Calculate the difference between window height and visual viewport height
-			const keyboardHeight = window.innerHeight - window.visualViewport.height;
-
-			// Translate the navbar up by the keyboard height
-			navTranslateY = -keyboardHeight;
+		if (!window.visualViewport) {
+			log('Visual Viewport API not supported');
+			return;
 		} else {
-			// Reset translation when keyboard is not visible
-			navTranslateY = 0;
+			newViewportHeight = window.visualViewport.height;
+			log(`New Visual Viewport Height: ${newViewportHeight}`);
+			keyboardHeight = window.outerHeight - newViewportHeight;
+			log(`New Keyboard Height: ${keyboardHeight}`);
+		}
+
+		if (keyboardHeight > 0) {
+			nav.style.bottom = `${keyboardHeight}px`;
 		}
 	}
 
@@ -52,13 +57,18 @@
 	onMount(() => {
 		// Add event listener for visual viewport
 		if (window.visualViewport) {
+			log('Adding Visual Viewport Resize Listener');
 			window.visualViewport.addEventListener('resize', handleVisualViewportResize);
+			window.visualViewport.addEventListener('scroll', handleVisualViewportResize);
+		} else {
+			log('Visual Viewport API Not Available');
 		}
 
 		return () => {
 			// Cleanup
 			if (window.visualViewport) {
 				window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
+				window.visualViewport.removeEventListener('scroll', handleVisualViewportResize);
 			}
 		};
 	});
@@ -72,8 +82,7 @@
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
-	style="padding-top: env(safe-area-inset-top);
-		   transform: translateY({navTranslateY}px);"
+	style="padding-top: env(safe-area-inset-top);"
 >
 	<div class="w-full px-2 flex items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
@@ -93,3 +102,14 @@
 		{/if}
 	</div>
 </nav>
+
+<!-- Debug Logs -->
+<div
+	class="fixed top-50 bottom-0 left-0 right-0 bg-main-bg-light dark:bg-main-bg-dark z-50 p-2"
+	style="margin-top: env(safe-area-inset-top)"
+>
+	<h3 class="font-bold">Debug Logs:</h3>
+	{#each debugLogs as log}
+		<p class="text-xs">{log}</p>
+	{/each}
+</div>
