@@ -33,18 +33,18 @@
 
 		// Calculate keyboard height
 		keyboardHeight = window.outerHeight - window.visualViewport.height;
-		console.log('Outer Height:', window.outerHeight);
-		console.log('Visual Viewport Height:', window.visualViewport.height);
-		console.log('Keyboard Height:', keyboardHeight);
+		log(`Outer Height: ${window.outerHeight}`);
+		log(`Visual Viewport Height: ${window.visualViewport.height}`);
+		log(`Keyboard Height: ${keyboardHeight}`);
 
 		// Prevent the page from being resized
 		if (keyboardHeight > 0) {
-			console.log('body height before:', document.body.style.height);
-			console.log('body overflow before:', document.body.style.overflow);
+			log(`body height before: ${document.body.style.height}`);
+			log(`body overflow before: ${document.body.style.overflow}`);
 			document.body.style.height = `${window.visualViewport.height}px`;
 			document.body.style.overflow = 'hidden';
-			console.log('body height after:', document.body.style.height);
-			console.log('body overflow after:', document.body.style.overflow);
+			log(`body height after: ${document.body.style.height}`);
+			log(`body overflow after: ${document.body.style.overflow}`);
 		} else {
 			document.body.style.height = '';
 			document.body.style.overflow = '';
