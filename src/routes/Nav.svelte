@@ -11,7 +11,6 @@
 	let nav: HTMLElement;
 	let currentRoute: string;
 	let debugLogs: string[] = [];
-	let newViewportHeight = 0;
 	let keyboardHeight = 0;
 
 	$: currentRoute = $page.url.pathname;
@@ -30,14 +29,8 @@
 			log('Visual Viewport API not supported');
 			return;
 		} else {
-			newViewportHeight = window.visualViewport.height;
-			log(`New Visual Viewport Height: ${newViewportHeight}`);
-			keyboardHeight = window.outerHeight - newViewportHeight;
-			log(`New Keyboard Height: ${keyboardHeight}`);
-		}
-
-		if (keyboardHeight > 0) {
-			nav.style.bottom = `${keyboardHeight}px`;
+			keyboardHeight = window.scrollY;
+			log(`offset: ${keyboardHeight}`);
 		}
 	}
 
@@ -78,7 +71,7 @@
 
 <nav
 	bind:this={nav}
-	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
+	class="fixed top-[${keyboardHeight}px] bottom-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
@@ -105,7 +98,7 @@
 
 <!-- Debug Logs -->
 <div
-	class="fixed top-1/3 bottom-0 left-0 right-0 bg-main-bg-light dark:bg-main-bg-dark z-50 p-2"
+	class="fixed top-1/3 left-0 right-0 bg-main-bg-light dark:bg-main-bg-dark z-50 p-2"
 	style="margin-top: env(safe-area-inset-top)"
 >
 	<h3 class="font-bold">Debug Logs:</h3>
