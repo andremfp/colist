@@ -59,7 +59,9 @@
 		darkModeMediaQuery.addEventListener('change', handleThemeChange);
 
 		// Add viewport resize listener
-		window.addEventListener('resize', checkKeyboard);
+		if (window.visualViewport) {
+			window.visualViewport.addEventListener('resize', checkKeyboard);
+		}
 
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
@@ -76,7 +78,9 @@
 
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-			window.removeEventListener('resize', checkKeyboard);
+			if (window.visualViewport) {
+				window.visualViewport.removeEventListener('resize', checkKeyboard);
+			}
 		};
 	});
 </script>
