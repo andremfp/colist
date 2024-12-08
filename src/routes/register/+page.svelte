@@ -2,6 +2,8 @@
 	import { register } from '../../lib/auth';
 	import { goto } from '$app/navigation';
 	import { showToast } from '$lib/utils';
+	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 
 	let email = '';
 	let username = '';
@@ -23,6 +25,18 @@
 			showToast(errorMessage);
 		}
 	}
+
+	onMount(() => {
+		if (browser) {
+			document.documentElement.style.overscrollBehavior = 'none';
+		}
+	});
+
+	onDestroy(() => {
+		if (browser) {
+			document.documentElement.style.overscrollBehavior = 'auto';
+		}
+	});
 
 	function goBack() {
 		goto('/');
