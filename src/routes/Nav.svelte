@@ -55,7 +55,7 @@
 		{/if}
 
 		{#if scrollPosY > 50}
-			<p class="mx-auto text-center text-m">{$currentListStore.name}</p>
+			<p class="mx-auto text-center font-bold text-m">{$currentListStore.name}</p>
 		{/if}
 
 		{#if currentRoute !== '/' && currentRoute !== '/register'}

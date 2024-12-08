@@ -50,7 +50,7 @@ export default {
 				'column-width': '42rem',
 				'column-margin-top': '4rem',
 				divider: '1px',
-				'nav-height': '96px',
+				'nav-height': '100px',
 				'footer-height': '82px'
 			},
 			fontSize: {
