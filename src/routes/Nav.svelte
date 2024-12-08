@@ -11,9 +11,6 @@
 	let nav: HTMLElement;
 	let currentRoute: string;
 	let debugLogs: string[] = [];
-	let keyboardShowing = false;
-	let viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
-	let originalBodyHeight = '100%';
 
 	$: currentRoute = $page.url.pathname;
 
@@ -24,53 +21,6 @@
 
 	function goBack() {
 		goto('/lists');
-	}
-
-	function handleViewportResize() {
-		if (typeof window === 'undefined') return;
-
-		const currentViewportHeight = window.innerHeight;
-
-		// Detect potential keyboard appearance
-		const isKeyboardLikely = currentViewportHeight < viewportHeight;
-
-		if (isKeyboardLikely) {
-			// Adjust body height to prevent scroll
-			document.body.style.height = `${currentViewportHeight}px`;
-			document.documentElement.style.height = `${currentViewportHeight}px`;
-			keyboardShowing = true;
-		} else {
-			// Restore original body height
-			document.body.style.height = originalBodyHeight;
-			document.documentElement.style.height = originalBodyHeight;
-			keyboardShowing = false;
-		}
-
-		// Update viewport height
-		viewportHeight = currentViewportHeight;
-
-		log(`Viewport resize detected. Keyboard showing: ${keyboardShowing}`);
-	}
-
-	function handleInputFocus(event: FocusEvent) {
-		if (typeof window === 'undefined') return;
-
-		// Store original body height first time
-		if (originalBodyHeight === '100%') {
-			originalBodyHeight = document.body.style.height || '100%';
-		}
-
-		// Wait a bit to ensure viewport has adjusted
-		setTimeout(handleViewportResize, 100);
-	}
-
-	function handleInputBlur() {
-		if (typeof window === 'undefined') return;
-
-		// Restore original body height
-		document.body.style.height = originalBodyHeight;
-		document.documentElement.style.height = originalBodyHeight;
-		keyboardShowing = false;
 	}
 
 	async function handleLogout() {
@@ -85,27 +35,6 @@
 			window.location.href = '/';
 		}
 	}
-
-	onMount(() => {
-		// Add resize listener
-		window.addEventListener('resize', handleViewportResize);
-
-		// Add focus and blur listeners to all inputs
-		const inputs = document.querySelectorAll('input, textarea');
-		inputs.forEach((input) => {
-			input.addEventListener('focus', handleInputFocus as EventListener);
-			input.addEventListener('blur', handleInputBlur as EventListener);
-		});
-
-		return () => {
-			// Cleanup listeners
-			window.removeEventListener('resize', handleViewportResize);
-			inputs.forEach((input) => {
-				input.removeEventListener('focus', handleInputFocus as EventListener);
-				input.removeEventListener('blur', handleInputBlur as EventListener);
-			});
-		};
-	});
 </script>
 
 <svelte:window bind:scrollY={scrollPosY} />
@@ -126,7 +55,7 @@
 		{/if}
 
 		{#if scrollPosY > 50}
-			<p class="mx-auto text-center font-bold text-lg">{$currentListStore.name}</p>
+			<p class="mx-auto text-center text-m">{$currentListStore.name}</p>
 		{/if}
 
 		{#if currentRoute !== '/' && currentRoute !== '/register'}
