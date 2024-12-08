@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 
 	export let addButtonText: string = '';
 	export let onAdd: () => void;
@@ -8,6 +9,7 @@
 	let hasContentBehind = false;
 	let mounted = false;
 	let scrollPosY = 0;
+	$: currentRoute = $page.url.pathname;
 
 	function handleClick(event: MouseEvent) {
 		if (onAdd) onAdd();
@@ -18,10 +20,9 @@
 
 		const bodyHeight = document.body.scrollHeight;
 		const windowHeight = window.innerHeight;
-		console.log(bodyHeight, windowHeight, scrollPosY);
 
 		// Check if content extends beyond viewport or if we've scrolled
-		hasContentBehind = bodyHeight > windowHeight && scrollPosY * 4.57 < bodyHeight - 82;
+		hasContentBehind = bodyHeight > windowHeight && scrollPosY * 4.3 < bodyHeight - 82;
 	}
 
 	onMount(() => {
@@ -53,7 +54,9 @@
 
 <footer
 	bind:this={footer}
-	class="fixed bottom-0 left-0 right-0 h-footer-height transition-all duration-200 z-10 flex items-center {hasContentBehind
+	class="fixed bottom-0 left-0 right-0 h-footer-height transition-all duration-200 z-10 flex items-center {hasContentBehind &&
+	currentRoute !== '/' &&
+	currentRoute !== '/register'
 		? 'bg-footer-bg-scroll-light/95 dark:bg-footer-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
 	style="padding-bottom: env(safe-area-inset-bottom);"
