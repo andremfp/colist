@@ -57,6 +57,7 @@ export default {
 				'text-xl': '1.75rem',
 				'text-lg': '1.5rem',
 				'text-m': '1.1rem',
+				'icon-2xl': '2rem',
 				'icon-xl': '1.75rem',
 				'icon-lg': '1.5rem',
 				'icon-m': '1.25rem'

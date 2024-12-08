@@ -50,7 +50,7 @@
 	<div class="w-full px-2 flex items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
 			<button on:click={goBack} class="flex-1 flex items-center text-text-m text-button-blue">
-				<span class="ri-arrow-left-s-line text-icon-xl"></span> My Lists
+				<span class="ri-arrow-left-s-line text-icon-2xl"></span> My Lists
 			</button>
 		{/if}
 
