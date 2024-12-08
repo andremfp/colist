@@ -12,26 +12,65 @@
 	let currentRoute: string;
 	let debugLogs: string[] = [];
 	let keyboardShowing = false;
+	let viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
+	let originalBodyHeight = '100%';
 
 	$: currentRoute = $page.url.pathname;
 
 	function log(message: string) {
 		console.log(message);
-		debugLogs = [...debugLogs, message].slice(-10); // Keep last 5 logs
+		debugLogs = [...debugLogs, message].slice(-10);
 	}
 
 	function goBack() {
 		goto('/lists');
 	}
 
-	function handleVisualViewportResize() {
-		if (!window.visualViewport) {
-			log('Visual Viewport API not supported');
-			return;
+	function handleViewportResize() {
+		if (typeof window === 'undefined') return;
+
+		const currentViewportHeight = window.innerHeight;
+
+		// Detect potential keyboard appearance
+		const isKeyboardLikely = currentViewportHeight < viewportHeight;
+
+		if (isKeyboardLikely) {
+			// Adjust body height to prevent scroll
+			document.body.style.height = `${currentViewportHeight}px`;
+			document.documentElement.style.height = `${currentViewportHeight}px`;
+			keyboardShowing = true;
 		} else {
-			keyboardShowing = window.visualViewport.height < window.outerHeight;
-			log(`keyboard showing? ${keyboardShowing}`);
+			// Restore original body height
+			document.body.style.height = originalBodyHeight;
+			document.documentElement.style.height = originalBodyHeight;
+			keyboardShowing = false;
 		}
+
+		// Update viewport height
+		viewportHeight = currentViewportHeight;
+
+		log(`Viewport resize detected. Keyboard showing: ${keyboardShowing}`);
+	}
+
+	function handleInputFocus(event: FocusEvent) {
+		if (typeof window === 'undefined') return;
+
+		// Store original body height first time
+		if (originalBodyHeight === '100%') {
+			originalBodyHeight = document.body.style.height || '100%';
+		}
+
+		// Wait a bit to ensure viewport has adjusted
+		setTimeout(handleViewportResize, 100);
+	}
+
+	function handleInputBlur() {
+		if (typeof window === 'undefined') return;
+
+		// Restore original body height
+		document.body.style.height = originalBodyHeight;
+		document.documentElement.style.height = originalBodyHeight;
+		keyboardShowing = false;
 	}
 
 	async function handleLogout() {
@@ -48,21 +87,23 @@
 	}
 
 	onMount(() => {
-		// Add event listener for visual viewport
-		if (window.visualViewport) {
-			log('Adding Visual Viewport Resize Listener');
-			window.visualViewport.addEventListener('resize', handleVisualViewportResize);
-			window.visualViewport.addEventListener('scroll', handleVisualViewportResize);
-		} else {
-			log('Visual Viewport API Not Available');
-		}
+		// Add resize listener
+		window.addEventListener('resize', handleViewportResize);
+
+		// Add focus and blur listeners to all inputs
+		const inputs = document.querySelectorAll('input, textarea');
+		inputs.forEach((input) => {
+			input.addEventListener('focus', handleInputFocus as EventListener);
+			input.addEventListener('blur', handleInputBlur as EventListener);
+		});
 
 		return () => {
-			// Cleanup
-			if (window.visualViewport) {
-				window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
-				window.visualViewport.removeEventListener('scroll', handleVisualViewportResize);
-			}
+			// Cleanup listeners
+			window.removeEventListener('resize', handleViewportResize);
+			inputs.forEach((input) => {
+				input.removeEventListener('focus', handleInputFocus as EventListener);
+				input.removeEventListener('blur', handleInputBlur as EventListener);
+			});
 		};
 	});
 </script>
@@ -75,7 +116,7 @@
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
-	style="top: {keyboardShowing ? scrollPosY : 0}px; padding-top: env(safe-area-inset-top);"
+	style="top: 0; height: env(safe-area-inset-top) + var(--nav-height); position: fixed;"
 >
 	<div class="w-full px-2 flex items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
@@ -95,14 +136,3 @@
 		{/if}
 	</div>
 </nav>
-
-<!-- Debug Logs -->
-<!-- <div
-	class="fixed top-1/3 left-0 right-0 bg-main-bg-light dark:bg-main-bg-dark z-50 p-2"
-	style="margin-top: env(safe-area-inset-top)"
->
-	<h3 class="font-bold">Debug Logs:</h3>
-	{#each debugLogs as log}
-		<p class="text-xs">{log}</p>
-	{/each}
-</div> -->

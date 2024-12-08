@@ -8,6 +8,9 @@
 
 	export let data;
 
+	let viewportHeight: number;
+	let originalBodyHeight = '100%';
+
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
 
@@ -26,6 +29,30 @@
 					composed: true
 				})
 			);
+		}
+	}
+
+	function handleViewportResize() {
+		if (typeof window === 'undefined') return;
+
+		viewportHeight = window.innerHeight;
+
+		// Adjust body height if keyboard is likely showing
+		const isKeyboardLikely = viewportHeight < window.outerHeight;
+
+		if (isKeyboardLikely) {
+			// Store original height if not already stored
+			if (originalBodyHeight === '100%') {
+				originalBodyHeight = document.body.style.height || '100%';
+			}
+
+			// Adjust body height to prevent scroll
+			document.body.style.height = `${viewportHeight}px`;
+			document.documentElement.style.height = `${viewportHeight}px`;
+		} else {
+			// Restore original body height
+			document.body.style.height = originalBodyHeight;
+			document.documentElement.style.height = originalBodyHeight;
 		}
 	}
 
@@ -50,6 +77,9 @@
 		// Listen for future changes
 		darkModeMediaQuery.addEventListener('change', handleThemeChange);
 
+		// Add viewport resize listener
+		window.addEventListener('resize', handleViewportResize);
+
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
 				navigator.serviceWorker
@@ -63,8 +93,12 @@
 			});
 		}
 
+		// Initial viewport setup
+		handleViewportResize();
+
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
+			window.removeEventListener('resize', handleViewportResize);
 		};
 	});
 </script>
@@ -75,7 +109,17 @@
 	<Nav />
 
 	<main
-		class="position-absolute top-[calc(env(safe-area-inset-top) + var(--nav-height))] left-0 right-0 bottom-0 overflow-y-auto flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto px-4 box-border"
+		class="pt-[calc(env(safe-area-inset-top)+var(--nav-height))]
+               left-0 right-0
+               bottom-0
+               overflow-y-auto
+               flex-1
+               flex-col
+               pb-footer-height
+               w-full
+               mx-auto
+               px-4
+               box-border"
 	>
 		<PageTransition key={data.path} duration={200}>
 			<slot />
