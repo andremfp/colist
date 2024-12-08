@@ -57,7 +57,7 @@
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
 	style="padding-bottom: env(safe-area-inset-bottom);"
 >
-	<div class="w-full px-2 flex items-center">
+	<div class="w-full px-2 flex items-center justify-between">
 		{#if addButtonText}
 			<button
 				class="footer-add-btn flex-1 flex items-center text-text-m {addButtonText === 'Add Item'
@@ -69,16 +69,16 @@
 				{addButtonText}
 			</button>
 		{:else}
-			<div></div>
+			<div class="flex-1"></div>
 		{/if}
 
 		<a
 			href="https://github.com/andremfp/colist"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="flex-1 text-right"
+			class="absolute right-4"
 		>
-			<span class="ri-github-fill text-icon-lg pr-4"></span>
+			<span class="ri-github-fill text-icon-lg"></span>
 		</a>
 	</div>
 </footer>
