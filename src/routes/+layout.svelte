@@ -61,20 +61,6 @@
 		// Add viewport resize listener
 		window.addEventListener('resize', checkKeyboard);
 
-		// Add input focus/blur listeners
-		// const inputs = document.querySelectorAll('input, textarea');
-		// const handleFocus = () => {
-		// 	isKeyboardVisible = true;
-		// };
-		// const handleBlur = () => {
-		// 	isKeyboardVisible = false;
-		// };
-
-		// inputs.forEach((input) => {
-		// 	input.addEventListener('focus', handleFocus);
-		// 	input.addEventListener('blur', handleBlur);
-		// });
-
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
 				navigator.serviceWorker
@@ -91,10 +77,6 @@
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
 			window.removeEventListener('resize', checkKeyboard);
-			// inputs.forEach((input) => {
-			// 	input.removeEventListener('focus', handleFocus);
-			// 	input.removeEventListener('blur', handleBlur);
-			// });
 		};
 	});
 </script>

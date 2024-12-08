@@ -116,7 +116,7 @@
     {scrollPosY > 120
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
-	style="top: 0; height: env(safe-area-inset-top) + var(--nav-height); position: fixed;"
+	style="padding-top: env(safe-area-inset-top);"
 >
 	<div class="w-full px-2 flex items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
