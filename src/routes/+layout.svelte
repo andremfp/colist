@@ -8,11 +8,16 @@
 
 	export let data;
 
-	let viewportHeight: number;
-	let originalBodyHeight = '100%';
+	let isKeyboardVisible = false;
 
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
+
+	function checkKeyboard() {
+		if (typeof window !== 'undefined' && window.visualViewport) {
+			isKeyboardVisible = window.visualViewport.height < window.outerHeight;
+		}
+	}
 
 	function handleAdd() {
 		if (isListsPage) {
@@ -29,30 +34,6 @@
 					composed: true
 				})
 			);
-		}
-	}
-
-	function handleViewportResize() {
-		if (typeof window === 'undefined') return;
-
-		viewportHeight = window.innerHeight;
-
-		// Adjust body height if keyboard is likely showing
-		const isKeyboardLikely = viewportHeight < window.outerHeight;
-
-		if (isKeyboardLikely) {
-			// Store original height if not already stored
-			if (originalBodyHeight === '100%') {
-				originalBodyHeight = document.body.style.height || '100%';
-			}
-
-			// Adjust body height to prevent scroll
-			document.body.style.height = `${viewportHeight}px`;
-			document.documentElement.style.height = `${viewportHeight}px`;
-		} else {
-			// Restore original body height
-			document.body.style.height = originalBodyHeight;
-			document.documentElement.style.height = originalBodyHeight;
 		}
 	}
 
@@ -78,7 +59,21 @@
 		darkModeMediaQuery.addEventListener('change', handleThemeChange);
 
 		// Add viewport resize listener
-		window.addEventListener('resize', handleViewportResize);
+		window.addEventListener('resize', checkKeyboard);
+
+		// Add input focus/blur listeners
+		// const inputs = document.querySelectorAll('input, textarea');
+		// const handleFocus = () => {
+		// 	isKeyboardVisible = true;
+		// };
+		// const handleBlur = () => {
+		// 	isKeyboardVisible = false;
+		// };
+
+		// inputs.forEach((input) => {
+		// 	input.addEventListener('focus', handleFocus);
+		// 	input.addEventListener('blur', handleBlur);
+		// });
 
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
@@ -93,12 +88,13 @@
 			});
 		}
 
-		// Initial viewport setup
-		handleViewportResize();
-
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-			window.removeEventListener('resize', handleViewportResize);
+			window.removeEventListener('resize', checkKeyboard);
+			// inputs.forEach((input) => {
+			// 	input.removeEventListener('focus', handleFocus);
+			// 	input.removeEventListener('blur', handleBlur);
+			// });
 		};
 	});
 </script>
@@ -106,7 +102,9 @@
 <div
 	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
 >
-	<Nav />
+	{#if !isKeyboardVisible}
+		<Nav />
+	{/if}
 
 	<main
 		class="pt-[calc(env(safe-area-inset-top)+var(--nav-height))]
@@ -126,8 +124,10 @@
 		</PageTransition>
 	</main>
 
-	<Footer
-		addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
-		onAdd={handleAdd}
-	/>
+	{#if !isKeyboardVisible}
+		<Footer
+			addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
+			onAdd={handleAdd}
+		/>
+	{/if}
 </div>
