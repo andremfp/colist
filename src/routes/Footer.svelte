@@ -18,9 +18,10 @@
 
 		const bodyHeight = document.body.scrollHeight;
 		const windowHeight = window.innerHeight;
+		console.log(bodyHeight, windowHeight, scrollPosY);
 
 		// Check if content extends beyond viewport or if we've scrolled
-		hasContentBehind = bodyHeight > windowHeight && scrollPosY * 5.9 < bodyHeight - 65;
+		hasContentBehind = bodyHeight > windowHeight && scrollPosY * 4.57 < bodyHeight - 82;
 	}
 
 	onMount(() => {
