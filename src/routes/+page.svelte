@@ -2,9 +2,23 @@
 	import { login } from '../lib/auth';
 	import { goto } from '$app/navigation';
 	import { showToast } from '$lib/utils';
+	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 
 	let email = '';
 	let password = '';
+
+	onMount(() => {
+		if (browser) {
+			document.documentElement.style.overscrollBehavior = 'none';
+		}
+	});
+
+	onDestroy(() => {
+		if (browser) {
+			document.documentElement.style.overscrollBehavior = 'auto';
+		}
+	});
 
 	async function handleLogin() {
 		try {
@@ -19,10 +33,10 @@
 </script>
 
 <div
-	class="flex flex-col items-center justify-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
+	class="flex flex-col justify-center items-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
-	<div class="h-40 w-64 overflow-hidden mb-6">
-		<img src="/images/colist.png" class="h-auto w-full object-cover" alt="CoList Logo" />
+	<div class="h-28 w-56 mx-auto mt-24">
+		<img src="/images/colist.png" class="object-contain" alt="CoList Logo" />
 	</div>
 
 	<div class="w-full max-w-md bg-login-bg-light dark:bg-login-bg-dark shadow-ios rounded-lg p-6">
@@ -35,7 +49,7 @@
 					id="email"
 					type="email"
 					bind:value={email}
-					class="w-full p-2 border border-border-light dark:border-border-dark rounded-md text-text-light dark:text-input-text-dark bg-white dark:bg-input-bg-dark focus:outline-none focus:ring-1"
+					class="w-full p-2 border border-border-light dark:border-border-dark rounded-md text-text-light dark:text-input-text-dark bg-white dark:bg-input-bg-dark focus:outline-none focus:ring-1 focus:overflow-y-hidden"
 					required
 				/>
 			</div>

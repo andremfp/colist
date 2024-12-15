@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { currentListStore } from '$lib/stores/listStore';
 	import { logout } from '$lib/auth';
@@ -12,8 +11,6 @@
 	let currentRoute: string;
 
 	$: currentRoute = $page.url.pathname;
-
-	onMount(() => {});
 
 	function goBack() {
 		goto('/lists');
@@ -37,25 +34,26 @@
 
 <nav
 	bind:this={nav}
-	class="fixed top-0 left-0 right-0 h-nav-height transition-all duration-500 z-10 flex items-center
-    {scrollPosY > 120
+	id="nav"
+	class="fixed left-0 right-0 h-nav-height transition-all duration-200 z-10 flex items-center
+    {scrollPosY > 145 && currentRoute !== '/lists'
 		? 'bg-nav-bg-scroll-light/95 dark:bg-nav-bg-scroll-dark/95 shadow-lg backdrop-blur-md'
-		: 'bg-main-bg-light dark:bg-main-bg-dark'} 
-    "
+		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
+	style="padding-top: env(safe-area-inset-top);"
 >
-	<div class="w-full px-2 flex justify-between items-center">
+	<div class="w-full px-2 flex items-center">
 		{#if currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
-			<button on:click={goBack} class="flex items-center text-medium text-button-blue">
-				<span class="ri-arrow-left-s-line text-icon-xl"></span> My Lists
+			<button on:click={goBack} class="flex-1 flex items-center text-text-m text-button-blue">
+				<span class="ri-arrow-left-s-line text-icon-2xl"></span> My Lists
 			</button>
 		{/if}
 
 		{#if scrollPosY > 50}
-			<p class="ml-auto font-bold text-lg">{$currentListStore.name}</p>
+			<p class="mx-auto text-center font-bold text-m">{$currentListStore.name}</p>
 		{/if}
 
 		{#if currentRoute !== '/' && currentRoute !== '/register'}
-			<button on:click={handleLogout} class="text-xl cursor-pointer ml-auto">
+			<button on:click={handleLogout} class="flex-1 text-xl cursor-pointer text-right">
 				<span class="ri-logout-box-r-line pr-2"></span>
 			</button>
 		{/if}
