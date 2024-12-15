@@ -121,5 +121,5 @@
 
 <div
 	id="debug-log"
-	style="position: fixed; top: 2/3; left: 0; width: 100%; background-color: #fff; padding: 10px; font-size: 12px; overflow-y: auto; max-height: 200px;"
+	style="position: fixed; top: 50% ; left: 0; width: 100%; background-color: #fff; padding: 10px; font-size: 12px; overflow-y: auto; max-height: 200px;"
 ></div>
