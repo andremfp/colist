@@ -5,10 +5,18 @@
 	import Footer from './Footer.svelte';
 	import '../app.css';
 	import PageTransition from '$lib/transition.svelte';
+	import { protectRoute, initAuthListener, isAuthenticated } from '$lib/auth';
 
 	export let data;
+	let isAuth = false;
 
 	let isKeyboardVisible = false;
+
+	// Reactive subscription to the authentication status
+	$: isAuth = $isAuthenticated;
+
+	// List of public routes that don't require authentication
+	const publicRoutes = ['/', '/register'];
 
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
@@ -38,6 +46,17 @@
 	}
 
 	onMount(() => {
+		// Initialize the auth listener for real-time state changes
+		initAuthListener();
+
+		// Protect route if not public
+		const protect = async () => {
+			if (!publicRoutes.includes($page.url.pathname)) {
+				await protectRoute();
+			}
+		};
+		protect().catch(console.error);
+
 		const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 		function handleThemeChange(e: any) {
