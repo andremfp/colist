@@ -301,7 +301,6 @@
 								class="list-item flex-grow pl-4 p-2 focus:outline-none bg-transparent"
 								value={index === listItems.length - 1 && isAddingItem ? newItemName : item.name}
 								readonly={swipedItemId !== null || (isAddingItem && index !== listItems.length - 1)}
-								on:mousedown|preventDefault|stopPropagation
 								on:input={(e) => {
 									if (index === listItems.length - 1 && isAddingItem) {
 										newItemName = e.currentTarget.value;
