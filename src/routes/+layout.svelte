@@ -13,13 +13,14 @@
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
 
-	function checkKeyboard() {
-		logDebug('checking keyboard');
-		if (typeof window !== 'undefined' && window.visualViewport) {
-			logDebug(`viewport height: ${window.visualViewport.height}`);
-			logDebug(`outer height: ${window.outerHeight}`);
+	let navHeight = 0;
 
-			isKeyboardVisible = window.visualViewport.height < window.outerHeight;
+	function updateNavHeight() {
+		const navElement = document.querySelector('nav');
+		if (navElement) {
+			logDebug('Updating nav height', navHeight);
+			navHeight = navElement.offsetHeight;
+			document.documentElement.style.setProperty('--nav-height', `${navHeight}px`);
 		}
 	}
 
@@ -73,7 +74,11 @@
 
 		// Add viewport resize listener
 
-		window.addEventListener('resize', checkKeyboard);
+		updateNavHeight();
+
+		window.visualViewport?.addEventListener('resize', () => {
+			updateNavHeight();
+		});
 
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
@@ -90,7 +95,7 @@
 
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-			window.removeEventListener('resize', checkKeyboard);
+			window.visualViewport?.removeEventListener('resize', updateNavHeight);
 		};
 	});
 </script>
@@ -98,9 +103,7 @@
 <div
 	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
 >
-	{#if !isKeyboardVisible}
-		<Nav />
-	{/if}
+	<Nav />
 
 	<main
 		class="position-absolute top-[calc(env(safe-area-inset-top) + var(--nav-height))] left-0 right-0 bottom-0 overflow-y-auto flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto px-4 box-border"
@@ -110,12 +113,10 @@
 		</PageTransition>
 	</main>
 
-	{#if !isKeyboardVisible}
-		<Footer
-			addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
-			onAdd={handleAdd}
-		/>
-	{/if}
+	<Footer
+		addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
+		onAdd={handleAdd}
+	/>
 </div>
 
 <div
