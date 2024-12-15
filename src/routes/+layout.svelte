@@ -9,8 +9,16 @@
 
 	export let data;
 
+	let isKeyboardVisible = false;
+
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
+
+	function checkKeyboard() {
+		if (typeof window !== 'undefined' && window.visualViewport) {
+			isKeyboardVisible = window.visualViewport.height < window.outerHeight - 1;
+		}
+	}
 
 	function handleAdd() {
 		if (isListsPage) {
@@ -42,6 +50,9 @@
 			document
 				.querySelector('meta[name="theme-color"]')
 				?.setAttribute('content', isDark ? '#0F0F0F' : '#FFFFFF');
+			document
+				.querySelector('meta[name="background"]')
+				?.setAttribute('content', isDark ? '#0F0F0F' : '#FFFFFF');
 		}
 
 		// Initial theme setup
@@ -49,6 +60,11 @@
 
 		// Listen for future changes
 		darkModeMediaQuery.addEventListener('change', handleThemeChange);
+
+		// Add viewport resize listener
+		if (window.visualViewport) {
+			window.visualViewport.addEventListener('resize', checkKeyboard);
+		}
 
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
@@ -65,6 +81,9 @@
 
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
+			if (window.visualViewport) {
+				window.visualViewport.removeEventListener('resize', checkKeyboard);
+			}
 		};
 	});
 </script>
@@ -72,18 +91,22 @@
 <div
 	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
 >
-	<Nav />
+	{#if !isKeyboardVisible}
+		<Nav />
+	{/if}
 
 	<main
-		class="flex-1 flex flex-col pt-nav-height pb-footer-height w-full max-w-4xl mx-auto px-4 box-border"
+		class="position-absolute top-[calc(env(safe-area-inset-top) + var(--nav-height))] left-0 right-0 bottom-0 overflow-y-auto flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto px-4 box-border"
 	>
 		<PageTransition key={data.path} duration={200}>
 			<slot />
 		</PageTransition>
 	</main>
 
-	<Footer
-		addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
-		onAdd={handleAdd}
-	/>
+	{#if !isKeyboardVisible}
+		<Footer
+			addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
+			onAdd={handleAdd}
+		/>
+	{/if}
 </div>
