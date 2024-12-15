@@ -13,14 +13,31 @@
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
 
-	let navHeight = 0;
+	const bottomBar = document.getElementById('nav');
+	const viewport = window.visualViewport;
+	function viewportHandler() {
+		const layoutViewport = document.getElementById('layoutViewport');
 
-	function updateNavHeight() {
-		const navElement = document.querySelector('nav');
-		if (navElement) {
-			logDebug('Updating nav height', navHeight);
-			navHeight = navElement.offsetHeight;
-			document.documentElement.style.setProperty('--nav-height', `${navHeight}px`);
+		if (viewport && layoutViewport) {
+			logDebug(`got viewport: ${JSON.stringify(viewport)}`);
+			logDebug(`got layoutViewport: ${JSON.stringify(layoutViewport)}`);
+
+			// Since the bar is position: fixed we need to offset it by the visual
+			// viewport's offset from the layout viewport origin.
+			const offsetLeft = viewport?.offsetLeft;
+			logDebug(`offsetLeft: ${offsetLeft}`);
+			const offsetTop =
+				viewport.height - layoutViewport.getBoundingClientRect().height + viewport.offsetTop;
+			logDebug(`offsetTop: ${offsetTop}`);
+
+			// You could also do this by setting style.left and style.top if you
+			// use width: 100% instead.
+			if (bottomBar) {
+				bottomBar.style.transform = `translate(${offsetLeft}px, ${offsetTop}px) scale(${
+					1 / viewport.scale
+				})`;
+				logDebug(`transform: ${bottomBar.style.transform}`);
+			}
 		}
 	}
 
@@ -73,12 +90,8 @@
 		darkModeMediaQuery.addEventListener('change', handleThemeChange);
 
 		// Add viewport resize listener
-
-		updateNavHeight();
-
-		window.visualViewport?.addEventListener('resize', () => {
-			updateNavHeight();
-		});
+		window.visualViewport?.addEventListener('scroll', viewportHandler);
+		window.visualViewport?.addEventListener('resize', viewportHandler);
 
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
@@ -95,7 +108,8 @@
 
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-			window.visualViewport?.removeEventListener('resize', updateNavHeight);
+			window.visualViewport?.removeEventListener('scroll', viewportHandler);
+			window.visualViewport?.removeEventListener('resize', viewportHandler);
 		};
 	});
 </script>
