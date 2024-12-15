@@ -14,6 +14,7 @@
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
 
 	function checkKeyboard() {
+		logDebug('checking keyboard');
 		if (typeof window !== 'undefined' && window.visualViewport) {
 			logDebug(`viewport height: ${window.visualViewport.height}`);
 			logDebug(`outer height: ${window.outerHeight}`);
