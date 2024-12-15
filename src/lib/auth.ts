@@ -8,9 +8,6 @@ import type { UserData } from './types';
 import { goto } from '$app/navigation';
 import { onAuthStateChanged } from 'firebase/auth';
 
-// Create a store to hold the authentication state
-export const isAuthenticated = writable(false);
-
 // Array of protected routes
 const protectedRoutes = ['/lists', '/profile'];
 
@@ -106,10 +103,11 @@ export async function register(email: string, username: string, password: string
 export function listenForAuthChanges() {
 	onAuthStateChanged(auth, (user) => {
 		if (user) {
-			isAuthenticated.set(true);
+			// Redirect to /lists if the user is authenticated
+			if (window.location.pathname === '/') {
+				goto('/lists'); // Redirect to /lists if user is authenticated
+			}
 		} else {
-			isAuthenticated.set(false);
-
 			// Get the current page route (adjust based on your setup)
 			const currentPath = window.location.pathname;
 
