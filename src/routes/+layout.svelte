@@ -5,6 +5,7 @@
 	import Footer from './Footer.svelte';
 	import '../app.css';
 	import PageTransition from '$lib/transition.svelte';
+	import { listenForAuthChanges } from '$lib/auth';
 
 	export let data;
 
@@ -38,6 +39,8 @@
 	}
 
 	onMount(() => {
+		listenForAuthChanges();
+
 		const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 		function handleThemeChange(e: any) {

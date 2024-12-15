@@ -1,9 +1,15 @@
 import { auth, db } from './firebase';
+import { writable } from 'svelte/store';
 import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 import type { AuthError } from 'firebase/auth';
 import type { UserCredential } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import type { UserData } from './types';
+import { goto } from '$app/navigation';
+import { onAuthStateChanged } from 'firebase/auth';
+
+// Array of protected routes
+const protectedRoutes = ['/lists', '/profile'];
 
 export async function login(email: string, password: string) {
 	try {
@@ -91,4 +97,24 @@ export async function register(email: string, username: string, password: string
 			throw new Error('An unknown error occurred during registration.');
 		}
 	}
+}
+
+// Listen for authentication state changes
+export function listenForAuthChanges() {
+	onAuthStateChanged(auth, (user) => {
+		if (user) {
+			// Redirect to /lists if the user is authenticated
+			if (window.location.pathname === '/') {
+				goto('/lists'); // Redirect to /lists if user is authenticated
+			}
+		} else {
+			// Get the current page route (adjust based on your setup)
+			const currentPath = window.location.pathname;
+
+			// Check if the current route is protected
+			if (protectedRoutes.includes(currentPath)) {
+				goto('/'); // Redirect to login page if not authenticated
+			}
+		}
+	});
 }
