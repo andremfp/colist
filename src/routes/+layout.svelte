@@ -8,11 +8,18 @@
 
 	export let data;
 
-	let bottomBar: HTMLElement | null;
-	let viewport: VisualViewport | null;
+	let isKeyboardVisible = false;
 
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
+
+	function checkKeyboard() {
+		if (typeof window !== 'undefined' && window.visualViewport) {
+			logDebug(`viewport height: ${window.visualViewport.height}`);
+			logDebug(`outer height: ${window.outerHeight}`);
+			isKeyboardVisible = window.visualViewport.height < window.outerHeight;
+		}
+	}
 
 	function handleAdd() {
 		if (isListsPage) {
@@ -42,8 +49,6 @@
 	}
 
 	onMount(() => {
-		bottomBar = document.getElementById('nav');
-		viewport = window.visualViewport;
 		const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 		function handleThemeChange(e: any) {
@@ -65,8 +70,9 @@
 		darkModeMediaQuery.addEventListener('change', handleThemeChange);
 
 		// Add viewport resize listener
-		window.visualViewport?.addEventListener('scroll', viewportHandler);
-		window.visualViewport?.addEventListener('resize', viewportHandler);
+		if (window.visualViewport) {
+			window.visualViewport.addEventListener('resize', checkKeyboard);
+		}
 
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
@@ -83,42 +89,19 @@
 
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-			window.visualViewport?.removeEventListener('scroll', viewportHandler);
-			window.visualViewport?.removeEventListener('resize', viewportHandler);
+			if (window.visualViewport) {
+				window.visualViewport.removeEventListener('resize', checkKeyboard);
+			}
 		};
 	});
-
-	function viewportHandler() {
-		const layoutViewport = document.getElementById('layoutViewport');
-
-		if (viewport && layoutViewport) {
-			logDebug(`got viewport: ${JSON.stringify(viewport)}`);
-			logDebug(`got layoutViewport: ${JSON.stringify(layoutViewport)}`);
-
-			// Since the bar is position: fixed we need to offset it by the visual
-			// viewport's offset from the layout viewport origin.
-			const offsetLeft = viewport?.offsetLeft;
-			logDebug(`offsetLeft: ${offsetLeft}`);
-			const offsetTop =
-				viewport.height - layoutViewport.getBoundingClientRect().height + viewport.offsetTop;
-			logDebug(`offsetTop: ${offsetTop}`);
-
-			// You could also do this by setting style.left and style.top if you
-			// use width: 100% instead.
-			if (bottomBar) {
-				bottomBar.style.transform = `translate(${offsetLeft}px, ${offsetTop}px) scale(${
-					1 / viewport.scale
-				})`;
-				logDebug(`transform: ${bottomBar.style.transform}`);
-			}
-		}
-	}
 </script>
 
 <div
 	class="bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark min-h-screen flex flex-col"
 >
-	<Nav />
+	{#if !isKeyboardVisible}
+		<Nav />
+	{/if}
 
 	<main
 		class="position-absolute top-[calc(env(safe-area-inset-top) + var(--nav-height))] left-0 right-0 bottom-0 overflow-y-auto flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto px-4 box-border"
@@ -128,10 +111,12 @@
 		</PageTransition>
 	</main>
 
-	<Footer
-		addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
-		onAdd={handleAdd}
-	/>
+	{#if !isKeyboardVisible}
+		<Footer
+			addButtonText={isListsPage ? 'Add List' : showAddButton ? 'Add Item' : ''}
+			onAdd={handleAdd}
+		/>
+	{/if}
 </div>
 
 <div
