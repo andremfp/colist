@@ -15,6 +15,8 @@
 
 	function checkKeyboard() {
 		if (typeof window !== 'undefined' && window.visualViewport) {
+			logDebug(`viewport height: ${window.visualViewport.height}`);
+			logDebug(`outer height: ${window.outerHeight}`);
 			isKeyboardVisible = window.visualViewport.height < window.outerHeight;
 		}
 	}
@@ -34,6 +36,15 @@
 					composed: true
 				})
 			);
+		}
+	}
+
+	function logDebug(message: string) {
+		const debugLogElement = document.getElementById('debug-log');
+		if (debugLogElement) {
+			const logMessage = document.createElement('div');
+			logMessage.textContent = message;
+			debugLogElement.appendChild(logMessage);
 		}
 	}
 
@@ -107,3 +118,8 @@
 		/>
 	{/if}
 </div>
+
+<div
+	id="debug-log"
+	style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: #fff; padding: 10px; font-size: 12px; overflow-y: auto; max-height: 200px;"
+></div>
