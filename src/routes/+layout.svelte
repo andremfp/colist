@@ -16,7 +16,6 @@
 	function checkKeyboard() {
 		if (typeof window !== 'undefined' && window.visualViewport) {
 			isKeyboardVisible = window.visualViewport.height < window.outerHeight - 1;
-			logDebug(`isKeyboardVisible: ${isKeyboardVisible}`);
 		}
 	}
 
@@ -35,15 +34,6 @@
 					composed: true
 				})
 			);
-		}
-	}
-
-	function logDebug(message: string) {
-		const debugLogElement = document.getElementById('debug-log');
-		if (debugLogElement) {
-			const logMessage = document.createElement('div');
-			logMessage.textContent = message;
-			debugLogElement.appendChild(logMessage);
 		}
 	}
 
@@ -117,8 +107,3 @@
 		/>
 	{/if}
 </div>
-
-<div
-	id="debug-log"
-	style="position: fixed; top: 50% ; left: 0; width: 100%; background-color: #fff; padding: 10px; font-size: 12px; overflow-y: auto; max-height: 200px;"
-></div>
