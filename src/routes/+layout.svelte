@@ -8,38 +8,11 @@
 
 	export let data;
 
-	let isKeyboardVisible = false;
+	let bottomBar: HTMLElement | null;
+	let viewport: VisualViewport | null;
 
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
-
-	const bottomBar = document.getElementById('nav');
-	const viewport = window.visualViewport;
-	function viewportHandler() {
-		const layoutViewport = document.getElementById('layoutViewport');
-
-		if (viewport && layoutViewport) {
-			logDebug(`got viewport: ${JSON.stringify(viewport)}`);
-			logDebug(`got layoutViewport: ${JSON.stringify(layoutViewport)}`);
-
-			// Since the bar is position: fixed we need to offset it by the visual
-			// viewport's offset from the layout viewport origin.
-			const offsetLeft = viewport?.offsetLeft;
-			logDebug(`offsetLeft: ${offsetLeft}`);
-			const offsetTop =
-				viewport.height - layoutViewport.getBoundingClientRect().height + viewport.offsetTop;
-			logDebug(`offsetTop: ${offsetTop}`);
-
-			// You could also do this by setting style.left and style.top if you
-			// use width: 100% instead.
-			if (bottomBar) {
-				bottomBar.style.transform = `translate(${offsetLeft}px, ${offsetTop}px) scale(${
-					1 / viewport.scale
-				})`;
-				logDebug(`transform: ${bottomBar.style.transform}`);
-			}
-		}
-	}
 
 	function handleAdd() {
 		if (isListsPage) {
@@ -69,6 +42,8 @@
 	}
 
 	onMount(() => {
+		bottomBar = document.getElementById('nav');
+		viewport = window.visualViewport;
 		const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 		function handleThemeChange(e: any) {
@@ -112,6 +87,32 @@
 			window.visualViewport?.removeEventListener('resize', viewportHandler);
 		};
 	});
+
+	function viewportHandler() {
+		const layoutViewport = document.getElementById('layoutViewport');
+
+		if (viewport && layoutViewport) {
+			logDebug(`got viewport: ${JSON.stringify(viewport)}`);
+			logDebug(`got layoutViewport: ${JSON.stringify(layoutViewport)}`);
+
+			// Since the bar is position: fixed we need to offset it by the visual
+			// viewport's offset from the layout viewport origin.
+			const offsetLeft = viewport?.offsetLeft;
+			logDebug(`offsetLeft: ${offsetLeft}`);
+			const offsetTop =
+				viewport.height - layoutViewport.getBoundingClientRect().height + viewport.offsetTop;
+			logDebug(`offsetTop: ${offsetTop}`);
+
+			// You could also do this by setting style.left and style.top if you
+			// use width: 100% instead.
+			if (bottomBar) {
+				bottomBar.style.transform = `translate(${offsetLeft}px, ${offsetTop}px) scale(${
+					1 / viewport.scale
+				})`;
+				logDebug(`transform: ${bottomBar.style.transform}`);
+			}
+		}
+	}
 </script>
 
 <div
