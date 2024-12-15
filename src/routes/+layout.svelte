@@ -15,8 +15,8 @@
 
 	function checkKeyboard() {
 		if (typeof window !== 'undefined' && window.visualViewport) {
-			isKeyboardVisible = window.visualViewport.height < window.outerHeight + 1;
-			console.log(isKeyboardVisible);
+			isKeyboardVisible = window.visualViewport.height < window.outerHeight - 1;
+			logDebug(`isKeyboardVisible: ${isKeyboardVisible}`);
 		}
 	}
 
