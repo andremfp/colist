@@ -17,6 +17,7 @@
 		if (typeof window !== 'undefined' && window.visualViewport) {
 			logDebug(`viewport height: ${window.visualViewport.height}`);
 			logDebug(`outer height: ${window.outerHeight}`);
+
 			isKeyboardVisible = window.visualViewport.height < window.outerHeight;
 		}
 	}
@@ -70,9 +71,8 @@
 		darkModeMediaQuery.addEventListener('change', handleThemeChange);
 
 		// Add viewport resize listener
-		if (window) {
-			window.addEventListener('resize', checkKeyboard);
-		}
+
+		window.addEventListener('resize', checkKeyboard);
 
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
@@ -89,9 +89,7 @@
 
 		return () => {
 			darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-			if (window.visualViewport) {
-				window.visualViewport.removeEventListener('resize', checkKeyboard);
-			}
+			window.removeEventListener('resize', checkKeyboard);
 		};
 	});
 </script>
