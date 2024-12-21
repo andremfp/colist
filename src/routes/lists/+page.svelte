@@ -188,7 +188,7 @@
 										<strong class="text-lg font-semibold"
 											>{#if list.name.length > 20}{list.name.slice(
 													0,
-													20
+													15
 												)}...{:else}{list.name}{/if}</strong
 										>
 									</div>
@@ -197,9 +197,7 @@
 									{#if list.sharedBy.length > 0}
 										<small class="text-list-shared-light dark:text-list-shared-dark">Shared</small>
 									{/if}
-									<span class="text-list-item-count-light dark:text-list-item-count-dark">
-										{list.itemCount}
-									</span>
+
 									<span class="ri-arrow-right-s-line text-xl"></span>
 								</div>
 							</button>
