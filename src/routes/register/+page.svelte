@@ -43,7 +43,25 @@
 	}
 </script>
 
+<!-- Disable Register to prevent abuse -->
+
 <div
+	class="flex items-center justify-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
+>
+	<div class="w-full max-w-md flex flex-col items-center">
+		<div class="w-full flex justify-start mb-6">
+			<button on:click={goBack} class="text-lg font-bold">
+				<span class="ri-arrow-left-line text-icon-large"></span>
+			</button>
+		</div>
+
+		<h3 class="text-2xl font-bold mb-4 text-center">
+			Register disabled to prevent abuse. Deploy your own version of the app.
+		</h3>
+	</div>
+</div>
+
+<!-- <div
 	class="flex items-center justify-center bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark"
 >
 	<div class="w-full max-w-md flex flex-col items-center">
@@ -105,4 +123,4 @@
 			</form>
 		</div>
 	</div>
-</div>
+</div> -->
