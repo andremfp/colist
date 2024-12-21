@@ -260,16 +260,28 @@
 		newItemName = '';
 		isAddingItem = false;
 	}
+
+	function clearAll() {
+		for (const item of listItems) {
+			if (item.checked) {
+				toggleItemCompletion(item);
+			}
+		}
+	}
 </script>
 
 <div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
 	<h1 class="text-3xl font-bold mb-6">
 		{#if listDetail.name.length > 18}{listDetail.name.slice(0, 18)}...{:else}{listDetail.name}{/if}
 	</h1>
-	<h3 class="text-sm font-bold mb-6">
-		Shared with: <span class="font-normal"
+	<h3 class="text-m font-bold mb-6 flex items-center">
+		Shared with: <span class="font-normal p-2"
 			>{sharedWithUsernames.length > 0 ? sharedWithUsernames.join(', ') : 'No one'}</span
 		>
+		<i class="ri-checkbox-blank-circle-fill text-icon-xs"></i>
+		<button on:click={clearAll} class="flex-1 flex items-center font-normal p-2 text-button-blue">
+			<span></span> Clear
+		</button>
 	</h3>
 
 	{#if listItems.length > 0}

@@ -60,7 +60,8 @@ export default {
 				'icon-2xl': '2rem',
 				'icon-xl': '1.75rem',
 				'icon-lg': '1.5rem',
-				'icon-m': '1.25rem'
+				'icon-m': '1.25rem',
+				'icon-xs': '0.25rem'
 			},
 			transitionProperty: {
 				'transform-opacity': 'transform, opacity'
