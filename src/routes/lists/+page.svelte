@@ -185,12 +185,17 @@
 								<div class="flex items-center space-x-4">
 									<span class="ri-list-check text-xl"></span>
 									<div>
-										<strong class="text-lg font-semibold"
-											>{#if list.name.length > 15}{list.name.slice(
+										<strong class="text-lg font-semibold">
+											{#if list.sharedBy.length > 0}
+												{#if list.name.length > 15}{list.name.slice(
+														0,
+														15
+													)}...{:else}{list.name}{/if}
+											{:else if list.name.length > 20}{list.name.slice(
 													0,
-													15
-												)}...{:else}{list.name}{/if}</strong
-										>
+													20
+												)}...{:else}{list.name}{/if}
+										</strong>
 									</div>
 								</div>
 								<div class="flex items-center space-x-4">
