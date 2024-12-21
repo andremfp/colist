@@ -270,11 +270,11 @@
 	}
 </script>
 
-<div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
-	<h1 class="text-3xl font-bold mb-6">
+<div class="pt-4 pl-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
+	<h1 class="text-3xl font-bold mb-2">
 		{#if listDetail.name.length > 18}{listDetail.name.slice(0, 18)}...{:else}{listDetail.name}{/if}
 	</h1>
-	<h3 class="text-m font-bold mb-6 flex items-center">
+	<h3 class="text-m font-bold mb-1 flex items-center">
 		Shared with: <span class="font-normal p-2"
 			>{sharedWithUsernames.length > 0 ? sharedWithUsernames.join(', ') : 'No one'}</span
 		>
@@ -284,13 +284,15 @@
 		</button>
 	</h3>
 
+	<hr class="border-t border-border-light dark:border-border-dark" />
+
 	{#if listItems.length > 0}
-		<div class="rounded-xl shadow-ios pl-4 overflow-hidden bg-main-bg-light dark:bg-main-bg-dark">
-			<ul class="space-y-0">
+		<div class="rounded-xl shadow-ios overflow-hidden bg-main-bg-light dark:bg-main-bg-dark">
+			<ul>
 				{#each listItems as item, index (item.id)}
 					<li
 						data-item-id={item.id}
-						class="relative flex items-center py-2 overflow-hidden"
+						class="relative flex items-center overflow-hidden"
 						use:pan={{ delay: 0, touchAction: 'pan-y', direction: 'horizontal', threshold: 0 }}
 						on:pandown={(event) => handlePanDown(event, item.id)}
 						on:panmove={(event) => handlePanMove(event, item.id)}
@@ -336,9 +338,8 @@
 							Delete
 						</button>
 					</li>
-					{#if listItems.length - 1 !== index}
-						<li class="border-t border-border-light dark:border-border-dark mt-2"></li>
-					{/if}
+
+					<hr class="border-t ml-8 border-border-light dark:border-border-dark" />
 				{/each}
 			</ul>
 		</div>
