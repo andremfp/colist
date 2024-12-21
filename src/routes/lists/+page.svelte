@@ -185,7 +185,12 @@
 								<div class="flex items-center space-x-4">
 									<span class="ri-list-check text-xl"></span>
 									<div>
-										<strong class="text-lg font-semibold">{list.name}</strong>
+										<strong class="text-lg font-semibold"
+											>{#if list.name.length > 20}{list.name.slice(
+													0,
+													20
+												)}...{:else}{list.name}{/if}</strong
+										>
 									</div>
 								</div>
 								<div class="flex items-center space-x-4">
