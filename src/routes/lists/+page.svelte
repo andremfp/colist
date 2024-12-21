@@ -185,21 +185,24 @@
 								<div class="flex items-center space-x-4">
 									<span class="ri-list-check text-xl"></span>
 									<div>
-										<strong class="text-lg font-semibold"
-											>{#if list.name.length > 20}{list.name.slice(
+										<strong class="text-lg font-semibold">
+											{#if list.sharedBy.length > 0}
+												{#if list.name.length > 15}{list.name.slice(
+														0,
+														15
+													)}...{:else}{list.name}{/if}
+											{:else if list.name.length > 20}{list.name.slice(
 													0,
 													20
-												)}...{:else}{list.name}{/if}</strong
-										>
+												)}...{:else}{list.name}{/if}
+										</strong>
 									</div>
 								</div>
 								<div class="flex items-center space-x-4">
 									{#if list.sharedBy.length > 0}
 										<small class="text-list-shared-light dark:text-list-shared-dark">Shared</small>
 									{/if}
-									<span class="text-list-item-count-light dark:text-list-item-count-dark">
-										{list.itemCount}
-									</span>
+
 									<span class="ri-arrow-right-s-line text-xl"></span>
 								</div>
 							</button>

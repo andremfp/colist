@@ -48,11 +48,11 @@
 			</button>
 		{/if}
 
-		{#if scrollPosY > 50}
+		{#if scrollPosY > 50 && currentRoute !== '/lists' && currentRoute !== '/' && currentRoute !== '/register'}
 			<p class="mx-auto text-center font-bold text-m">
-				{#if $currentListStore.name.length > 20}{$currentListStore.name.slice(
+				{#if $currentListStore.name.length > 16}{$currentListStore.name.slice(
 						0,
-						20
+						16
 					)}...{:else}{$currentListStore.name}{/if}
 			</p>
 		{/if}
