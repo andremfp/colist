@@ -186,7 +186,7 @@
 									<span class="ri-list-check text-xl"></span>
 									<div>
 										<strong class="text-lg font-semibold"
-											>{#if list.name.length > 20}{list.name.slice(
+											>{#if list.name.length > 15}{list.name.slice(
 													0,
 													15
 												)}...{:else}{list.name}{/if}</strong
