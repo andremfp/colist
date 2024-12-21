@@ -49,7 +49,12 @@
 		{/if}
 
 		{#if scrollPosY > 50}
-			<p class="mx-auto text-center font-bold text-m">{$currentListStore.name}</p>
+			<p class="mx-auto text-center font-bold text-m">
+				{#if $currentListStore.name.length > 20}{$currentListStore.name.slice(
+						0,
+						20
+					)}...{:else}{$currentListStore.name}{/if}
+			</p>
 		{/if}
 
 		{#if currentRoute !== '/' && currentRoute !== '/register'}

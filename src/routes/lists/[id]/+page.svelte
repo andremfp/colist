@@ -263,7 +263,9 @@
 </script>
 
 <div class="p-4 bg-main-bg-light dark:bg-main-bg-dark text-text-light dark:text-text-dark">
-	<h1 class="text-3xl font-bold mb-6">{listDetail.name}</h1>
+	<h1 class="text-3xl font-bold mb-6">
+		{#if listDetail.name.length > 20}{listDetail.name.slice(0, 20)}...{:else}{listDetail.name}{/if}
+	</h1>
 	<h3 class="text-sm font-bold mb-6">
 		Shared with: <span class="font-normal"
 			>{sharedWithUsernames.length > 0 ? sharedWithUsernames.join(', ') : 'No one'}</span
