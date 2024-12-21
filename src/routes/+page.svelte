@@ -73,8 +73,9 @@
 			</button>
 		</form>
 
-		<p class="mt-4 text-center">
+		<!-- Disable register to prevent abuse -->
+		<!-- <p class="mt-4 text-center">
 			<a href="/register" class="text-text-light dark:text-text-dark underline">Register</a>
-		</p>
+		</p> -->
 	</div>
 </div>
