@@ -10,7 +10,9 @@
 	export let data;
 
 	let isKeyboardVisible = false;
+	let currentRoute: string;
 
+	$: currentRoute = $page.url.pathname;
 	$: isListsPage = $page.url.pathname === '/lists';
 	$: showAddButton = $page.url.pathname.startsWith('/lists');
 
@@ -96,7 +98,8 @@
 	{/if}
 
 	<main
-		class="position-absolute top-[calc(env(safe-area-inset-top) + var(--nav-height))] left-0 right-0 bottom-0 overflow-y-auto flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto pl-4 box-border"
+		class={`position-absolute top-[calc(env(safe-area-inset-top) + var(--nav-height))] left-0 right-0 bottom-0 overflow-y-auto flex-1 flex-col pt-nav-height pb-footer-height w-full mx-auto box-border
+		${currentRoute.includes('/lists/') ? 'pl-4' : 'px-4'}`}
 	>
 		<PageTransition key={data.path} duration={200}>
 			<slot />
