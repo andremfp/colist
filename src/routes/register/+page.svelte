@@ -55,9 +55,9 @@
 			</button>
 		</div>
 
-		<h3 class="text-2xl font-bold mb-4 text-center">
+		<h4 class="text-2xl mb-4 text-center">
 			Register disabled to prevent abuse. Deploy your own version of the app.
-		</h3>
+		</h4>
 	</div>
 </div>
 
