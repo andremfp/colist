@@ -61,10 +61,10 @@
 		: 'bg-main-bg-light dark:bg-main-bg-dark'}"
 	style="padding-bottom: env(safe-area-inset-bottom);"
 >
-	<div class="w-full px-2 flex items-center justify-between">
+	<div class="w-full px-4 flex items-center justify-between">
 		{#if addButtonText}
 			<button
-				class="footer-add-btn flex-1 flex items-center text-text-m {addButtonText === 'Add Item'
+				class="footer-add-btn flex items-center text-text-m {addButtonText === 'Add Item'
 					? 'text-add-item'
 					: 'text-button-blue'}"
 				on:click={handleClick}
@@ -76,11 +76,14 @@
 			<div class="flex-1"></div>
 		{/if}
 
+		<!-- Empty element to create space -->
+		<div class="flex-1"></div>
+
 		<a
 			href="https://github.com/andremfp/colist"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="absolute right-4"
+			class="ml-4"
 		>
 			<span class="ri-github-fill text-icon-lg"></span>
 		</a>
