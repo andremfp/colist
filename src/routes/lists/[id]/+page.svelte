@@ -141,7 +141,7 @@
 		try {
 			const updatedId = await updateListItem(item.id, { checked: !item.checked });
 			listItems = listItems.map((i) => (i.id === updatedId ? { ...i, checked: !i.checked } : i));
-			listItems = [...sortItems(listItems.slice(0, -1)), listItems[listItems.length - 1]];
+			listItems = sortItems(listItems);
 		} catch (error) {
 			console.error('Error updating item:', error);
 			showToast('Failed to update item.');
